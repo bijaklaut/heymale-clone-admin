@@ -129,8 +129,12 @@ export const deleteProduct = async (id: string) => {
 // End of Product Dashboard
 
 // User Dashboard
-export const getUsers = async (token: string) => {
-  const url = `${ROOT_API}/${API_VER}/user`;
+export const getUser = async (token: string, id?: string) => {
+  let url = `${ROOT_API}/${API_VER}/user`;
+
+  if (id) {
+    url = `${ROOT_API}/${API_VER}/user/${id}`;
+  }
 
   return callApi({
     url,
