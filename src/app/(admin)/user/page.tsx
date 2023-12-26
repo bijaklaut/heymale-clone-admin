@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getUsers } from "../../../../services/admin";
+import { getUser } from "../../../../services/admin";
 import UserTable from "../../../../components/Tables/UserTable";
 import CreateUserModal from "../../../../components/Modals/User/CreateUser";
 import { cookies } from "next/headers";
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const UserDashboard = async () => {
   const token = cookies().get("token")?.value;
-  const { payload: users } = await getUsers(token!);
+  const { payload: users } = await getUser(token!);
 
   return (
     <>
