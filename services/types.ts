@@ -79,11 +79,5 @@ export interface SignInTypes {
 }
 
 export interface UserToken {
-  data: {
-    id: string;
-    email: string;
-    name: string;
-    phoneNumber: string;
-    avatar: string;
-  };
+  id: string;
 }
