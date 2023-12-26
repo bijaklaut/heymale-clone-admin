@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import { UserToken } from "../../services/types";
 import { jwtDecode } from "jwt-decode";
 import { authLogout } from "../../services/actions";
+import { getUser } from "../../services/admin";
 
 const UserAction = () => {
   const IMG = `${process.env.NEXT_PUBLIC_IMG}/user`;
@@ -17,14 +18,19 @@ const UserAction = () => {
 
   useLayoutEffect(() => {
     const token = Cookies.get("token");
+    const getUserAPI = async (id: string) => {
+      const { payload } = await getUser(token!, id);
+
+      setUser({
+        avatar: payload.avatar,
+        name: payload.name,
+      });
+    };
 
     if (token) {
       const reverse = atob(token);
-      const { data } = jwtDecode<UserToken>(reverse);
-      setUser({
-        avatar: data.avatar,
-        name: data.name,
-      });
+      const { id } = jwtDecode<UserToken>(reverse);
+      getUserAPI(id);
     }
   }, []);
 
