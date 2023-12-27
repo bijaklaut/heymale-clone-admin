@@ -4,7 +4,6 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Sidebar } from "../../../components/Sidebar/Sidebar";
 import { Suspense } from "react";
-import SidebarLoading from "../../../components/Loading/SidebarLoading";
 import Loading from "./loading";
 
 export const metadata: Metadata = {

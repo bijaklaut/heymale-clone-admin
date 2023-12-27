@@ -9,30 +9,16 @@ import { jwtDecode } from "jwt-decode";
 import { authLogout } from "../../services/actions";
 import { getUser } from "../../services/admin";
 
-const UserAction = () => {
+interface ThisProps {
+  user: {
+    name: string;
+    avatar: string;
+  };
+}
+
+const UserAction = (props: ThisProps) => {
+  const { user } = props;
   const IMG = `${process.env.NEXT_PUBLIC_IMG}/user`;
-  const [user, setUser] = useState({
-    name: "",
-    avatar: "",
-  });
-
-  useLayoutEffect(() => {
-    const token = Cookies.get("token");
-    const getUserAPI = async (id: string) => {
-      const { payload } = await getUser(token!, id);
-
-      setUser({
-        avatar: payload.avatar,
-        name: payload.name,
-      });
-    };
-
-    if (token) {
-      const reverse = atob(token);
-      const { id } = jwtDecode<UserToken>(reverse);
-      getUserAPI(id);
-    }
-  }, []);
 
   return (
     <div className="dropdown dropdown-top absolute bottom-0 left-0 flex w-full items-center justify-between py-5 ps-3">
