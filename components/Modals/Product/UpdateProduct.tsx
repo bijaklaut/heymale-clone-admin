@@ -13,6 +13,7 @@ import Image from "next/image";
 import SelectCategory from "./SelectCategory";
 import VariantInput from "./VariantInput";
 import { NumericFormat } from "react-number-format";
+import { EditSvg } from "../../Misc/SvgGroup";
 
 interface thisProps {
   product: ProductTypes;
@@ -203,10 +204,10 @@ const UpdateProductModal = (props: thisProps) => {
   return (
     <>
       <button
-        className="btn btn-primary btn-xs min-w-[75px] rounded-md text-white"
+        className="text-gray-600 transition-all hover:text-blue-500"
         onClick={() => modalHandler(`updateProd${index}`, true)}
       >
-        Update
+        <EditSvg className="w-5 stroke-current" />
       </button>
       <dialog
         data-theme={"dracula"}

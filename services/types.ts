@@ -33,6 +33,7 @@ export interface ProductTypes
   _id: string;
   category: CategoryTypes;
   thumbnail: string;
+  status: string;
 }
 
 export interface PostAddressTypes {

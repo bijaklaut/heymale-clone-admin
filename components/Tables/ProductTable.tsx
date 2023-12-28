@@ -7,7 +7,10 @@ import DeleteProductModal from "../Modals/Product/DeleteProduct";
 import UpdateProductModal from "../Modals/Product/UpdateProduct";
 
 interface ProductTableProps {
-  products: ProductTypes[];
+  products: {
+    activeProducts: ProductTypes[];
+    inactiveProducts: ProductTypes[];
+  };
   categories: CategoryTypes[];
 }
 
@@ -32,7 +35,7 @@ const ProductTable = (props: ProductTableProps) => {
           </tr>
         </thead>
         <tbody>
-          {products.map((product: ProductTypes, i: any) => {
+          {products.activeProducts.map((product: ProductTypes, i: any) => {
             return (
               <tr key={i} className="">
                 <th className="text-center">{i + 1}</th>
@@ -76,7 +79,7 @@ const ProductTable = (props: ProductTableProps) => {
                 </td>
 
                 <td>
-                  <div className="flex min-h-full flex-col items-center justify-center gap-y-2">
+                  <div className="flex min-h-full items-center justify-center gap-x-2">
                     <UpdateProductModal
                       product={product}
                       categories={categories}
