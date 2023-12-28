@@ -2,7 +2,7 @@ import { ChangeEvent } from "react";
 import { PostAddressTypes } from "../../services/types";
 
 interface TextInputProps {
-  data: PostAddressTypes;
+  data: any;
   label: string[];
   onChange(event: ChangeEvent, label: string): void;
   validation: { field: string; message: string }[];

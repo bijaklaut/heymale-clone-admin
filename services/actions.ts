@@ -17,9 +17,9 @@ export async function authLogout() {
 export async function getUserToken() {
   const token = cookies().get("token")?.value;
   const jwt = Buffer.from(token!, "base64").toString("ascii");
-  const { data } = jwtDecode<UserToken>(jwt);
+  const { id } = jwtDecode<UserToken>(jwt);
 
-  return data;
+  return id;
 }
 
 export const getProvince = async () => {
