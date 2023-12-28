@@ -9,6 +9,17 @@ import { getUser } from "../../services/admin";
 import { jwtDecode } from "jwt-decode";
 import { UserToken } from "../../services/types";
 import SidebarLoading from "../Loading/SidebarLoading";
+import Link from "next/link";
+import heymaleLogo from "../../public/images/logo/heymale-logo.png";
+import {
+  CategorySvg,
+  HistorySvg,
+  PaymentSvg,
+  ProductSvg,
+  TransactionSvg,
+  UserSvg,
+  VoucherSvg,
+} from "../Misc/SvgGroup";
 
 export const Sidebar = () => {
   const [user, setUser] = useState({
@@ -39,47 +50,58 @@ export const Sidebar = () => {
   return !isLoading ? (
     <aside
       data-theme={"nord"}
-      className="fixed left-0 top-0 z-10 h-screen w-[17rem] px-2 py-7"
+      className="fixed left-0 top-0 z-10 h-screen w-[17rem] px-3 py-7"
     >
       <div className="title mx-auto flex h-[50px] w-full items-center justify-center">
-        <Image
-          src={"/images/logo/heymale-logo.png"}
-          width={180}
-          height={180}
-          alt="heymale-logo"
-          className="h-auto w-[180px]"
-          priority
-        />
+        <Link href={"/"}>
+          <Image
+            src={heymaleLogo}
+            width={180}
+            height={180}
+            alt="heymale-logo"
+            className="h-auto w-[180px]"
+            priority
+          />
+        </Link>
       </div>
       <div className="divider mt-10"></div>
-      <ul className="menu w-full">
-        <span className="mb-3 ms-4 font-bold text-gray-600">COMMERCIAL</span>
-        <MenuItem item="transaction" href="/transaction">
-          Transactions
+      <div className="w-full">
+        <div className="menu mx-auto text-sm font-bold text-gray-400">
+          <p>COMMERCIAL</p>
+        </div>
+        <MenuItem href="/transaction">
+          <TransactionSvg className="stroke-current" />
+          <p className="ms-1">Transactions</p>
         </MenuItem>
-        <MenuItem item="history" href="/history">
-          History Transactions
+        <MenuItem href="/history">
+          <HistorySvg className="fill-current stroke-current" />
+          <p className="ms-1">History Transactions</p>
         </MenuItem>
-        <MenuItem item="voucher" href="/voucher">
-          Vouchers
+        <MenuItem href="/voucher">
+          <VoucherSvg className="stroke-current" />
+          <p className="ms-1">Vouchers</p>
         </MenuItem>
 
-        <span className="mb-3 ms-4 mt-5 font-bold text-gray-600">
-          ADMINISTRATION
-        </span>
-        <MenuItem item="category" href="/category">
-          Categories
+        <div className="menu mx-auto mt-5 text-sm font-bold text-gray-400">
+          <p>ADMINISTRATION</p>
+        </div>
+        <MenuItem href="/category">
+          <CategorySvg className="stroke-current" />
+          <p className="ms-1">Categories</p>
         </MenuItem>
-        <MenuItem item="product" href="/product">
-          Products
+        <MenuItem href="/product">
+          <ProductSvg className="stroke-current" />
+          <p className="ms-1">Products</p>
         </MenuItem>
-        <MenuItem item="payment" href="/payment">
-          Payments
+        <MenuItem href="/payment">
+          <PaymentSvg className="stroke-current" />
+          <p className="ms-1">Payments</p>
         </MenuItem>
-        <MenuItem item="usermgm" href="/user">
-          User Management
+        <MenuItem href="/user">
+          <UserSvg className="stroke-current" />
+          <p className="ms-1">User Management</p>
         </MenuItem>
-      </ul>
+      </div>
       <UserAction user={user} />
     </aside>
   ) : (

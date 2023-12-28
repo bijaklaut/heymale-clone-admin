@@ -5,31 +5,25 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 interface MenuItemProps {
-  item: string;
   href: string;
   children: ReactNode;
 }
 
 export const MenuItem = (props: MenuItemProps) => {
-  const { item, href, children } = props;
+  const { href, children } = props;
   const pathname = usePathname();
   const classItem = cx({
-    "font-semibold": true,
-    "bg-secondary bg-opacity-70 hover:bg-secondary hover:cursor-default pointer-events-none":
+    "font-semibold text-sm flex items-center gap-x-2 p-2 rounded-md transition-all hover:bg-gray-300":
+      true,
+    "bg-primary hover:bg-secondary text-white hover:cursor-default pointer-events-none shadow-md":
       pathname.includes(href),
   });
 
   return (
-    <li>
+    <div>
       <Link href={href} className={classItem}>
-        <Image
-          src={`/icon/${item}.svg`}
-          width={25}
-          height={25}
-          alt={`icon-${item}`}
-        />
-        <p className="ms-1">{children}</p>
+        {children}
       </Link>
-    </li>
+    </div>
   );
 };
