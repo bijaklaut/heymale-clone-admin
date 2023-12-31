@@ -79,7 +79,7 @@ const ProductTable = (props: ProductTableProps) => {
                 </td>
 
                 <td>
-                  <div className="flex min-h-full items-center justify-center gap-x-2">
+                  <div className="flex min-h-full items-center justify-center gap-x-2 px-5">
                     <UpdateProductModal
                       product={product}
                       categories={categories}

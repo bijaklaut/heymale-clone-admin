@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 const AddCategoryModal = () => {
   const router = useRouter();
   const [disable, setDisable] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     name: "",
   });
@@ -20,21 +21,22 @@ const AddCategoryModal = () => {
 
   const modalHandler = (id: string, show: boolean) => {
     const modal = document.getElementById(id) as HTMLDialogElement;
-    setValidation([
-      {
-        field: "",
-        message: "",
-      },
-    ]);
-    setData({
-      name: "",
-    });
 
     if (modal && show) {
-      modal.showModal();
-    } else if (modal && show == false) {
-      modal.close();
+      setValidation([
+        {
+          field: "",
+          message: "",
+        },
+      ]);
+      setData({
+        name: "",
+      });
+
+      return modal.showModal();
     }
+
+    return modal.close();
   };
 
   const changeHandler = (event: ChangeEvent<HTMLInputElement>) => {
@@ -44,13 +46,14 @@ const AddCategoryModal = () => {
     });
 
     if (!event.target.value) {
-      setDisable(true);
-    } else {
-      setDisable(false);
+      return setDisable(true);
     }
+
+    return setDisable(false);
   };
 
   const submitHandler = async () => {
+    setLoading(true);
     setValidation([
       {
         field: "",
@@ -67,9 +70,12 @@ const AddCategoryModal = () => {
         });
 
         modalHandler("addCat", false);
-        router.refresh();
+        setTimeout(() => setLoading(false), 600);
+        return router.refresh();
       }
     } catch (error: any) {
+      setTimeout(() => setLoading(false), 600);
+
       if (error.message == "Validation Error" || error.code == 11000) {
         for (const [key] of Object.entries(error.errorDetail)) {
           setValidation((prev) => [
@@ -80,10 +86,11 @@ const AddCategoryModal = () => {
             },
           ]);
         }
+
         return toast.error(error.message, { containerId: "CreateCategory" });
       }
 
-      toast.error(error.message, { containerId: "CreateCategory" });
+      return toast.error(error.message, { containerId: "CreateCategory" });
     }
   };
 
@@ -96,22 +103,24 @@ const AddCategoryModal = () => {
       >
         Add Category
       </button>
-      <dialog data-theme={"nord"} id="addCat" className="modal">
+      <dialog data-theme={"nord"} id="addCat" className="modal text-neutral">
         <ToastContainer
           enableMultiContainer
           containerId={"CreateCategory"}
           theme="dark"
         />
-        <div className="modal-box">
+        <div className="modal-box absolute">
           <h3 className=" mb-5 text-lg font-bold text-primary">Add Category</h3>
           <label className="w-full max-w-xs">
             <div className="label">
-              <span className="label-text -ms-1">Category Name</span>
+              <span className="label-text -ms-1 font-semibold">
+                Category Name
+              </span>
             </div>
             <input
               type="text"
               placeholder="Enter category name"
-              className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 text-primary-content focus:outline-0 focus:ring-0"
+              className="input h-10 w-full rounded-md border border-neutral p-2 focus:outline-0 focus:ring-0"
               onChange={(e) => {
                 changeHandler(e);
               }}
@@ -130,13 +139,21 @@ const AddCategoryModal = () => {
             </div>
           </label>
           <div className="modal-action flex">
-            <button
-              className="btn btn-primary btn-sm"
-              disabled={disable}
-              onClick={submitHandler}
-            >
-              Confirm
-            </button>
+            {!loading ? (
+              <button
+                className="btn btn-primary btn-sm text-white"
+                disabled={disable}
+                onClick={submitHandler}
+              >
+                Create
+              </button>
+            ) : (
+              <button className="btn btn-disabled btn-sm">
+                <span className="loading loading-spinner loading-sm"></span>
+                Creating..
+              </button>
+            )}
+
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
               <button className="btn btn-outline btn-sm">Close</button>

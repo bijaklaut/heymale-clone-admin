@@ -21,11 +21,8 @@ const CategoryTable = async () => {
               <tr key={i} className="hover">
                 <th className="">{i + 1}</th>
                 <td>{category.name}</td>
-                <td className="flex gap-1">
+                <td className="flex gap-x-2">
                   <UpdateCategoryModal category={category} index={i} />
-                  {/* <button className="btn btn-primary btn-xs text-white">
-                    Update
-                  </button> */}
                   <DeleteCategoryModal category={category} index={i} />
                 </td>
               </tr>

@@ -4,6 +4,8 @@ import { deleteCategory } from "../../../services/admin";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { CategoryTypes } from "../../../services/types";
+import { TrashSvg } from "../../Misc/SvgGroup";
+import { useState } from "react";
 
 interface thisProps {
   category: CategoryTypes;
@@ -13,6 +15,7 @@ interface thisProps {
 const DeleteCategoryModal = (props: thisProps) => {
   const { category, index } = props;
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const modalHandler = (id: string, show: boolean) => {
     const modal = document.getElementById(id) as HTMLDialogElement;
@@ -39,9 +42,11 @@ const DeleteCategoryModal = (props: thisProps) => {
         });
 
         modalHandler(`delCat${index}`, false);
+        setLoading(false);
         router.refresh();
       }
     } catch (error: any) {
+      setLoading(false);
       toast.update(loading, {
         render: error.message,
         type: "error",
@@ -56,22 +61,23 @@ const DeleteCategoryModal = (props: thisProps) => {
   return (
     <>
       <button
-        className="btn btn-error btn-xs text-white "
+        className="text-gray-600 transition-all hover:text-error"
         onClick={() => modalHandler(`delCat${index}`, true)}
       >
-        Delete
+        <TrashSvg className="w-5 stroke-current" />
       </button>
-      <dialog data-theme={"dracula"} id={`delCat${index}`} className="modal">
+      <dialog data-theme={"nord"} id={`delCat${index}`} className="modal">
         <div className="modal-box">
-          <h3 className=" mb-5 font-semibold text-primary">
+          <h3 className="mb-5 font-semibold">
             Are you sure to delete {`"${category.name}"`}?
           </h3>
           <div className="modal-action flex">
+            {!loading ? "" : ""}
             <button
-              className="btn btn-primary btn-xs"
+              className="btn btn-error btn-xs text-white"
               onClick={() => submitHandler(category._id, index)}
             >
-              Confirm
+              Delete
             </button>
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
