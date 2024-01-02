@@ -10,7 +10,7 @@ import { useRef, useState } from "react";
 import { deleteAddress } from "../../../services/admin";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import PostAddressCollapse from "../Address/CreateAddress";
+import PostAddressCollapse from "../../Collapse/Address/CreateAddress";
 
 interface thisProps {
   user: UserTypes;

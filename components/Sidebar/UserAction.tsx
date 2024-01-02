@@ -21,7 +21,7 @@ const UserAction = (props: ThisProps) => {
   const IMG = `${process.env.NEXT_PUBLIC_IMG}/user`;
 
   return (
-    <div className="dropdown dropdown-top absolute bottom-0 left-0 flex w-full items-center justify-between py-5 ps-3">
+    <div className="dropdown dropdown-right absolute bottom-0 left-0 flex w-full items-center justify-between py-5 ps-3">
       {user.avatar ? (
         <div className="avatar">
           <div className="w-[50px] rounded-full">
@@ -42,9 +42,9 @@ const UserAction = (props: ThisProps) => {
       )}
 
       <p className="text-sm font-semibold">{user.name}</p>
-      <div
+      <button
         tabIndex={0}
-        className="rounded-l-md p-3 shadow-none transition-all hover:bg-primary hover:bg-opacity-80"
+        className="rounded-l-md p-3 shadow-none transition-all active:bg-primary active:bg-opacity-80"
       >
         <svg
           height={12}
@@ -60,7 +60,7 @@ const UserAction = (props: ThisProps) => {
         </svg>
         <ul
           tabIndex={0}
-          className="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow"
+          className="menu dropdown-content z-[1] w-52 -translate-y-10 rounded-box bg-base-100 p-2 shadow"
         >
           <li>
             <Link href={"/profile"}>Profile</Link>
@@ -71,7 +71,7 @@ const UserAction = (props: ThisProps) => {
             </button>
           </li>
         </ul>
-      </div>
+      </button>
     </div>
   );
 };

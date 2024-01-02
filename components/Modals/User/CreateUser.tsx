@@ -163,17 +163,15 @@ const CreateUserModal = () => {
               value={data.name}
             />
             <div className="label">
-              {validation.map((val, key) => {
-                if (val.field == "name") {
-                  return (
-                    <span key={key} className="label-text-alt text-error">
-                      {val.message}
-                    </span>
-                  );
-                } else {
-                  return "";
-                }
-              })}
+              {validation.map((val, key) =>
+                val.field == "name" ? (
+                  <span key={key} className="label-text-alt text-error">
+                    {val.message}
+                  </span>
+                ) : (
+                  ""
+                ),
+              )}
             </div>
           </label>
           <label className="w-full max-w-xs">
@@ -194,17 +192,15 @@ const CreateUserModal = () => {
               value={data.email}
             />
             <div className="label">
-              {validation.map((val, key) => {
-                if (val.field == "email") {
-                  return (
-                    <span key={key} className="label-text-alt text-error">
-                      {val.message}
-                    </span>
-                  );
-                } else {
-                  return "";
-                }
-              })}
+              {validation.map((val, key) =>
+                val.field == "email" ? (
+                  <span key={key} className="label-text-alt text-error">
+                    {val.message}
+                  </span>
+                ) : (
+                  ""
+                ),
+              )}
             </div>
           </label>
           <label className="w-full max-w-xs">
@@ -225,17 +221,15 @@ const CreateUserModal = () => {
               value={data.phoneNumber}
             />
             <div className="label">
-              {validation.map((val, key) => {
-                if (val.field == "phoneNumber") {
-                  return (
-                    <span key={key} className="label-text-alt text-error">
-                      {val.message}
-                    </span>
-                  );
-                } else {
-                  return "";
-                }
-              })}
+              {validation.map((val, key) =>
+                val.field == "phoneNumber" ? (
+                  <span key={key} className="label-text-alt text-error">
+                    {val.message}
+                  </span>
+                ) : (
+                  ""
+                ),
+              )}
             </div>
           </label>
           <label className="w-full max-w-xs">
@@ -256,17 +250,15 @@ const CreateUserModal = () => {
               value={data.password}
             />
             <div className="label">
-              {validation.map((val, key) => {
-                if (val.field == "password") {
-                  return (
-                    <span key={key} className="label-text-alt text-error">
-                      {val.message}
-                    </span>
-                  );
-                } else {
-                  return "";
-                }
-              })}
+              {validation.map((val, key) =>
+                val.field == "password" ? (
+                  <span key={key} className="label-text-alt text-error">
+                    {val.message}
+                  </span>
+                ) : (
+                  ""
+                ),
+              )}
             </div>
           </label>
           <label className="w-full max-w-xs">
@@ -284,17 +276,15 @@ const CreateUserModal = () => {
               value={confirm}
             />
             <div className="label">
-              {validation.map((val, key) => {
-                if (val.field == "confirm") {
-                  return (
-                    <span key={key} className="label-text-alt text-error">
-                      {val.message}
-                    </span>
-                  );
-                } else {
-                  return "";
-                }
-              })}
+              {validation.map((val, key) =>
+                val.field == "confirm" ? (
+                  <span key={key} className="label-text-alt text-error">
+                    {val.message}
+                  </span>
+                ) : (
+                  ""
+                ),
+              )}
             </div>
           </label>
 

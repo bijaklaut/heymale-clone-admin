@@ -1,5 +1,4 @@
 import { ChangeEvent } from "react";
-import { PostAddressTypes } from "../../services/types";
 
 interface TextInputProps {
   data: any;
@@ -11,9 +10,8 @@ interface TextInputProps {
 const TextInput = (props: TextInputProps) => {
   const { label, onChange, validation, data } = props;
   const [textLabel, fieldLabel, placeholder] = label;
-
   return (
-    <label className="w-full max-w-xs">
+    <label className="w-full">
       <div className="label">
         <span className="label-text -ms-1 text-white">{textLabel}</span>
       </div>

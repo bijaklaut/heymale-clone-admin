@@ -9,47 +9,14 @@ import VariantInput from "./VariantInput";
 import SelectCategory from "./SelectCategory";
 import Image from "next/image";
 import { NumericFormat } from "react-number-format";
+import TextInput from "../../Form/TextInput";
 
 interface CreateProductProps {
   categories: CategoryTypes[];
 }
 
-const CreateProductModal = (props: CreateProductProps) => {
-  const router = useRouter();
-  const { categories } = props;
-  const fileInput = useRef<HTMLInputElement>(null);
-  const [disable, setDisable] = useState(true);
-  const [preview, setPreview] = useState("");
-  const [validation, setValidation] = useState({
-    name: {
-      message: "",
-    },
-    category: {
-      message: "",
-    },
-    "variant.s": {
-      message: "",
-    },
-    "variant.m": {
-      message: "",
-    },
-    "variant.l": {
-      message: "",
-    },
-    "variant.xl": {
-      message: "",
-    },
-    price: {
-      message: "",
-    },
-    description: {
-      message: "",
-    },
-    thumbnail: {
-      message: "",
-    },
-  });
-  const [data, setData] = useState<PostProductTypes>({
+const initialState = () => {
+  return {
     name: "",
     category: "",
     variant: {
@@ -61,16 +28,32 @@ const CreateProductModal = (props: CreateProductProps) => {
     price: 0,
     description: "",
     thumbnail: "",
-  });
+  };
+};
 
-  const buttonCheck = () => {
-    const { name, category, price, description } = data;
+const CreateProductModal = (props: CreateProductProps) => {
+  const { categories } = props;
+  const router = useRouter();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [disable, setDisable] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [preview, setPreview] = useState("");
+  const [validation, setValidation] = useState([
+    {
+      field: "",
+      message: "",
+    },
+  ]);
+  const [data, setData] = useState<PostProductTypes>(initialState());
 
-    if (!name || !category || !price || !description) {
-      setDisable(true);
-    } else {
-      setDisable(false);
+  const buttonCheck = (
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    if (!event.target.value) {
+      return setDisable(true);
     }
+
+    return setDisable(false);
   };
 
   const variantHandler = (
@@ -86,73 +69,57 @@ const CreateProductModal = (props: CreateProductProps) => {
     });
   };
 
+  const changeHandler = (
+    event: ChangeEvent<HTMLInputElement>,
+    label: string,
+  ) => {
+    setData({
+      ...data,
+      [label]: event.target.value,
+    });
+
+    buttonCheck(event);
+  };
+
   const categoryHandler = (event: ChangeEvent<HTMLSelectElement>) => {
     setData({
       ...data,
       category: event.target.value,
     });
-    buttonCheck();
+    buttonCheck(event);
   };
 
   const modalHandler = (id: string, show: boolean) => {
     const modal = document.getElementById(id) as HTMLDialogElement;
-    setDisable(true);
-    setPreview("");
-    setData({
-      name: "",
-      category: "",
-      variant: {
-        s: 0,
-        m: 0,
-        l: 0,
-        xl: 0,
-      },
-      price: 0,
-      description: "",
-      thumbnail: "",
-    });
-    setValidation({
-      name: {
-        message: "",
-      },
-      category: {
-        message: "",
-      },
-      "variant.s": {
-        message: "",
-      },
-      "variant.m": {
-        message: "",
-      },
-      "variant.l": {
-        message: "",
-      },
-      "variant.xl": {
-        message: "",
-      },
-      price: {
-        message: "",
-      },
-      description: {
-        message: "",
-      },
-      thumbnail: {
-        message: "",
-      },
-    });
 
     if (fileInput.current != null) {
       fileInput.current.value = "";
     }
 
     if (modal && show) {
-      modal.showModal();
-    } else if (modal && show == false) {
-      modal.close();
+      setDisable(true);
+      setPreview("");
+      setData(initialState());
+      setValidation([
+        {
+          field: "",
+          message: "",
+        },
+      ]);
+
+      return modal.showModal();
     }
+
+    return modal.close();
   };
 
   const submitHandler = async () => {
+    setValidation([
+      {
+        field: "",
+        message: "",
+      },
+    ]);
     const form = new FormData();
 
     for (const [key, value] of Object.entries(data)) {
@@ -190,7 +157,15 @@ const CreateProductModal = (props: CreateProductProps) => {
           autoClose: 3000,
           containerId: "CreateProduct",
         });
-        setValidation(error.errorDetail);
+        for (const [key] of Object.entries(error.errorDetail)) {
+          setValidation((prev) => [
+            ...prev,
+            {
+              field: key,
+              message: error.errorDetail[key].message,
+            },
+          ]);
+        }
       } else if (error.code == 11000) {
         toast.update(loading, {
           render: error.message,
@@ -219,123 +194,71 @@ const CreateProductModal = (props: CreateProductProps) => {
       >
         Add Product
       </button>
-      <dialog data-theme={"dracula"} id="addProd" className="modal">
+      <dialog id="addProd" data-theme={"nord"} className="modal text-neutral">
         <ToastContainer
           enableMultiContainer
           containerId={"CreateProduct"}
           theme="dark"
         />
-        <div className="modal-box max-w-4xl">
-          <h3 className=" mb-5 text-lg font-bold text-primary">
+        <div className="no-scrollbar modal-box absolute max-w-3xl bg-gray-700">
+          <h3 className=" mb-5 text-lg font-bold text-white">
             Add New Product
           </h3>
-          {/* Product Name */}
-          <label className="w-full max-w-xs">
-            <div className="label">
-              <span className="label-text -ms-1">Product Name</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Type here"
-              className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 focus:outline-0 focus:ring-0"
-              onChange={(e) => {
-                setData({
-                  ...data,
-                  name: e.target.value,
-                });
-              }}
-              onKeyUp={buttonCheck}
-              value={data.name}
+          {/* Product Name & Category */}
+          <div className="flex w-full gap-x-3">
+            <TextInput
+              data={data}
+              label={["Product Name", "name", "Enter product name"]}
+              onChange={changeHandler}
+              validation={validation}
             />
-            <div className="label">
-              {validation.name?.message ? (
-                <span className="label-text-alt text-error">
-                  {validation.name?.message}
-                </span>
-              ) : (
-                ""
-              )}
-            </div>
-          </label>
-          {/* Category */}
-          <SelectCategory
-            data={data}
-            handler={categoryHandler}
-            validation={validation}
-            categories={categories}
-          />
+            <SelectCategory
+              data={data}
+              handler={categoryHandler}
+              validation={validation}
+              categories={categories}
+            />
+          </div>
           {/* Variant */}
           <div>
             <label className="label">
-              <span className="label-text -ms-1 block">Variant</span>
+              <span className="label-text -ms-1 block text-white">Variant</span>
             </label>
-            <div className="flex flex-wrap gap-x-8">
+            <div className="mb-3 flex flex-wrap justify-between">
               <VariantInput
-                label="s"
-                handler={variantHandler}
                 data={data}
+                label="s"
                 validation={validation}
+                handler={variantHandler}
               />
               <VariantInput
                 label="m"
                 handler={variantHandler}
-                data={data}
                 validation={validation}
+                data={data}
               />
               <VariantInput
+                data={data}
                 label="l"
-                handler={variantHandler}
-                data={data}
                 validation={validation}
+                handler={variantHandler}
               />
               <VariantInput
-                label="xl"
-                handler={variantHandler}
                 data={data}
+                label="xl"
                 validation={validation}
+                handler={variantHandler}
               />
             </div>
           </div>
-          {/* Price */}
-          <label className="w-full max-w-xs">
-            <div className="label">
-              <span className="label-text -ms-1">Price</span>
-            </div>
-            <NumericFormat
-              allowNegative={false}
-              valueIsNumericString
-              thousandSeparator="."
-              decimalSeparator=","
-              prefix="Rp. "
-              value={data.price}
-              onValueChange={(e) => {
-                setData({
-                  ...data,
-                  price: Number(e.value),
-                });
-              }}
-              className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 focus:outline-0 focus:ring-0"
-              placeholder="Input product price"
-              onKeyUp={buttonCheck}
-            />
 
-            <div className="label">
-              {validation.price?.message ? (
-                <span className="label-text-alt text-error">
-                  {validation.price?.message}
-                </span>
-              ) : (
-                ""
-              )}
-            </div>
-          </label>
           {/* Description */}
           <label className="form-control w-full">
             <div className="label">
-              <span className="label-text">Description</span>
+              <span className="label-text text-white">Description</span>
             </div>
             <textarea
-              className="textarea textarea-bordered h-24"
+              className="textarea textarea-bordered h-24 p-2"
               placeholder="Type product decription"
               onChange={(e) => {
                 setData({
@@ -343,21 +266,91 @@ const CreateProductModal = (props: CreateProductProps) => {
                   description: e.target.value,
                 });
               }}
-              onKeyUp={buttonCheck}
               value={data.description}
             ></textarea>
             <div className="label">
-              {validation.description?.message ? (
-                <span className="label-text-alt text-error">
-                  {validation.description?.message}
-                </span>
-              ) : (
-                ""
-              )}
+              {validation.map((val) => {
+                return val.field == "description" ? (
+                  <span className="label-text-alt text-error">
+                    {val.message}
+                  </span>
+                ) : (
+                  ""
+                );
+              })}
             </div>
           </label>
-          {/* Thumbnail */}
-          <div className="flex gap-x-3">
+          {/* Thumbnail & Price */}
+          <div className="flex justify-between">
+            <div className="flex w-1/2 flex-col">
+              <label className="w-full">
+                <div className="label">
+                  <span className="label-text -ms-1 text-white">Price</span>
+                </div>
+                <NumericFormat
+                  allowNegative={false}
+                  valueIsNumericString
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="Rp. "
+                  value={data.price}
+                  onValueChange={(e) => {
+                    setData({
+                      ...data,
+                      price: Number(e.value),
+                    });
+
+                    if (!e.value) return setDisable(true);
+                    return setDisable(false);
+                  }}
+                  className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 text-neutral focus:outline-0 focus:ring-0"
+                  placeholder="Input product price"
+                />
+
+                <div className="label">
+                  {validation.map((val, i) =>
+                    val.field == "price" ? (
+                      <span key={i} className="label-text-alt text-error">
+                        {val.message}
+                      </span>
+                    ) : (
+                      ""
+                    ),
+                  )}
+                </div>
+              </label>
+              <label className="form-control w-full">
+                <div className="label">
+                  <span className="label-text text-white">Thumbnail</span>
+                </div>
+                <input
+                  type="file"
+                  ref={fileInput}
+                  className="file-input file-input-sm w-full border-0"
+                  accept="image/jpg, image/jpeg, image/png"
+                  onChange={(e) => {
+                    if (e.target.files instanceof FileList) {
+                      setPreview(URL.createObjectURL(e.target.files[0]));
+                      setData({
+                        ...data,
+                        thumbnail: e.target.files[0],
+                      });
+                    }
+                  }}
+                />
+                <div className="label">
+                  {validation.map((val) => {
+                    return val.field == "thumbnail" ? (
+                      <span className="label-text-alt text-error">
+                        {val.message}
+                      </span>
+                    ) : (
+                      ""
+                    );
+                  })}
+                </div>
+              </label>
+            </div>
             <div className="flex h-[250px] w-[250px] items-center justify-center rounded-md bg-neutral">
               <Image
                 src={preview == "" ? "icon/image.svg" : preview}
@@ -371,48 +364,21 @@ const CreateProductModal = (props: CreateProductProps) => {
                 }
               />
             </div>
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">Thumbnail</span>
-              </div>
-              <input
-                type="file"
-                ref={fileInput}
-                className="file-input file-input-bordered w-full max-w-xs"
-                accept="image/jpg, image/jpeg, image/png"
-                onChange={(e) => {
-                  if (e.target.files instanceof FileList) {
-                    setPreview(URL.createObjectURL(e.target.files[0]));
-                    setData({
-                      ...data,
-                      thumbnail: e.target.files[0],
-                    });
-                  }
-                }}
-              />
-              <div className="label">
-                {validation.thumbnail?.message ? (
-                  <span className="label-text-alt text-error">
-                    {validation.thumbnail?.message}
-                  </span>
-                ) : (
-                  ""
-                )}
-              </div>
-            </label>
           </div>
           {/* Submit */}
-          <div className="modal-action flex">
+          <div className="modal-action mt-16 flex">
             <button
-              className="btn btn-primary btn-sm"
-              disabled={disable}
+              className="btn btn-primary btn-sm text-white"
+              // disabled={disable}
               onClick={submitHandler}
             >
-              Confirm
+              Create
             </button>
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-outline btn-sm">Close</button>
+              <button className="btn btn-sm border-transparent bg-transparent text-white hover:border-white hover:bg-transparent">
+                Close
+              </button>
             </form>
           </div>
         </div>

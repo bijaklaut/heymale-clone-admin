@@ -1,39 +1,10 @@
 import { ChangeEvent } from "react";
-import { PostProductTypes } from "../../../services/types";
 
 interface VariantInputProps {
+  data: any;
   handler(event: ChangeEvent, label: string): void;
   label: string;
-  validation: {
-    name: {
-      message: string;
-    };
-    category: {
-      message: string;
-    };
-    "variant.s": {
-      message: string;
-    };
-    "variant.m": {
-      message: string;
-    };
-    "variant.l": {
-      message: string;
-    };
-    "variant.xl": {
-      message: string;
-    };
-    price: {
-      message: string;
-    };
-    description: {
-      message: string;
-    };
-    thumbnail: {
-      message: string;
-    };
-  };
-  data: PostProductTypes;
+  validation: { field: string; message: string }[];
 }
 
 const VariantInput = (props: VariantInputProps) => {
@@ -41,8 +12,8 @@ const VariantInput = (props: VariantInputProps) => {
   const joinLabel = `variant.${label}`;
 
   return (
-    <div className="join relative mb-10 w-36">
-      <div className="label join-item bg-neutral ">
+    <div className="join relative w-36 md:w-1/5">
+      <div className="label join-item bg-gray-800">
         <span className="label-text w-7 text-center font-bold text-white">
           {label.toUpperCase()}
         </span>
@@ -50,20 +21,21 @@ const VariantInput = (props: VariantInputProps) => {
       <input
         type="number"
         min={0}
-        placeholder="Stock"
-        className="input join-horizontal h-10 w-full rounded-l-none border-2 border-gray-700 p-2 text-white focus:outline-0 focus:ring-0"
+        className="input join-horizontal h-10 w-full rounded-l-none border-2 border-white p-2 text-neutral focus:outline-0 focus:ring-0"
         onChange={(e) => {
           handler(e, label);
         }}
         value={(data.variant as any)[label]}
       />
       <div className="label absolute -bottom-10 left-0">
-        {(validation as any)[joinLabel]?.message ? (
-          <span className="label-text-alt text-error">
-            {(validation as any)[joinLabel]?.message}
-          </span>
-        ) : (
-          ""
+        {validation.map((val, i) =>
+          val.field == joinLabel ? (
+            <span key={i} className="label-text-alt text-error">
+              {val.message}
+            </span>
+          ) : (
+            ""
+          ),
         )}
       </div>
     </div>

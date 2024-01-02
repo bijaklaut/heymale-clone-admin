@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 };
 
 const ProductDashboard = async () => {
-  const { payload: products } = await getProducts();
   const { payload: categories } = await getCategories();
 
   return (
@@ -17,7 +16,7 @@ const ProductDashboard = async () => {
       <h2 className="text-2xl font-semibold">Product Dashboard</h2>
 
       <CreateProductModal categories={categories} />
-      <ProductTable products={products} categories={categories} />
+      <ProductTable categories={categories} />
     </>
   );
 };

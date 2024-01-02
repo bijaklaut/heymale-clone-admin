@@ -82,3 +82,12 @@ export interface SignInTypes {
 export interface UserToken {
   id: string;
 }
+
+export interface CategoryFilterTypes {
+  name: string;
+  include: boolean;
+}
+
+// export interface FilterCriteriaTypes {
+//   name: string;
+// }

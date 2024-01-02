@@ -23,7 +23,7 @@ export default function AdminLayout({
       <Suspense fallback={<Loading />}>
         <main
           data-theme={"dracula"}
-          className="ms-[17rem] min-h-screen w-full p-10"
+          className="ms-[17rem] min-h-screen w-full px-16 py-10"
         >
           {children}
         </main>

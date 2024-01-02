@@ -1,55 +1,27 @@
-import React, { ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 import { CategoryTypes, PostProductTypes } from "../../../services/types";
-import { getCategories } from "../../../services/admin";
 
 interface SelectCategoryProps {
   handler(event: ChangeEvent<HTMLSelectElement>): void;
-  validation: {
-    name: {
-      message: string;
-    };
-    category: {
-      message: string;
-    };
-    "variant.s": {
-      message: string;
-    };
-    "variant.m": {
-      message: string;
-    };
-    "variant.l": {
-      message: string;
-    };
-    "variant.xl": {
-      message: string;
-    };
-    price: {
-      message: string;
-    };
-    description: {
-      message: string;
-    };
-    thumbnail: {
-      message: string;
-    };
-  };
-  data: PostProductTypes;
+  data: any;
   categories: CategoryTypes[];
+  validation: { field: string; message: string }[];
 }
 
 const SelectCategory = (props: SelectCategoryProps) => {
   const { handler, validation, data, categories } = props;
+
   return (
-    <label className="form-control w-full max-w-xs">
+    <label className="form-control w-full">
       <div className="label">
-        <span className="label-text">Product Category</span>
+        <span className="label-text text-white">Product Category</span>
       </div>
       <select
-        className="select select-bordered text-white"
+        className="h-10 rounded-md p-2 text-sm text-neutral"
         onChange={(e) => {
           handler(e);
         }}
-        defaultValue={data.category ? data.category : ""}
+        value={data.category ? data.category : ""}
       >
         <option disabled value={""}>
           Select Product Category
@@ -63,13 +35,17 @@ const SelectCategory = (props: SelectCategoryProps) => {
         })}
       </select>
       <div className="label">
-        {validation.category?.message ? (
-          <span className="label-text-alt text-error">
-            {validation.category?.message}
-          </span>
-        ) : (
-          ""
-        )}
+        {validation.length > 0
+          ? validation.map((val, i) =>
+              val.field == "category" ? (
+                <span key={i} className="label-text-alt text-error">
+                  {val.message}
+                </span>
+              ) : (
+                ""
+              ),
+            )
+          : ""}
       </div>
     </label>
   );

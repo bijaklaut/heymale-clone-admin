@@ -27,35 +27,12 @@ const UpdateProductModal = (props: thisProps) => {
   const [preview, setPreview] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const [disable, setDisable] = useState(true);
-  const [validation, setValidation] = useState({
-    name: {
+  const [validation, setValidation] = useState([
+    {
+      field: "",
       message: "",
     },
-    category: {
-      message: "",
-    },
-    "variant.s": {
-      message: "",
-    },
-    "variant.m": {
-      message: "",
-    },
-    "variant.l": {
-      message: "",
-    },
-    "variant.xl": {
-      message: "",
-    },
-    price: {
-      message: "",
-    },
-    description: {
-      message: "",
-    },
-    thumbnail: {
-      message: "",
-    },
-  });
+  ]);
   const [data, setData] = useState<PostProductTypes>({
     name: product.name,
     category: product.category._id,
@@ -103,35 +80,12 @@ const UpdateProductModal = (props: thisProps) => {
 
   const modalHandler = (id: string, show: boolean) => {
     const modal = document.getElementById(id) as HTMLDialogElement;
-    setValidation({
-      name: {
+    setValidation([
+      {
+        field: "",
         message: "",
       },
-      category: {
-        message: "",
-      },
-      "variant.s": {
-        message: "",
-      },
-      "variant.m": {
-        message: "",
-      },
-      "variant.l": {
-        message: "",
-      },
-      "variant.xl": {
-        message: "",
-      },
-      price: {
-        message: "",
-      },
-      description: {
-        message: "",
-      },
-      thumbnail: {
-        message: "",
-      },
-    });
+    ]);
 
     if (fileInput.current != null) {
       fileInput.current.value = "";
@@ -242,13 +196,15 @@ const UpdateProductModal = (props: thisProps) => {
               value={data.name}
             />
             <div className="label">
-              {validation.name?.message ? (
-                <span className="label-text-alt text-error">
-                  {validation.name?.message}
-                </span>
-              ) : (
-                ""
-              )}
+              {validation.map((val) => {
+                return val.field == "name" ? (
+                  <span className="label-text-alt text-error">
+                    {val.message}
+                  </span>
+                ) : (
+                  ""
+                );
+              })}
             </div>
           </label>
           {/* Category */}
@@ -314,13 +270,15 @@ const UpdateProductModal = (props: thisProps) => {
             />
 
             <div className="label">
-              {validation.price?.message ? (
-                <span className="label-text-alt text-error">
-                  {validation.price?.message}
-                </span>
-              ) : (
-                ""
-              )}
+              {validation.map((val) => {
+                return val.field == "price" ? (
+                  <span className="label-text-alt text-error">
+                    {val.message}
+                  </span>
+                ) : (
+                  ""
+                );
+              })}
             </div>
           </label>
           {/* Description */}
@@ -341,13 +299,15 @@ const UpdateProductModal = (props: thisProps) => {
               value={data.description}
             ></textarea>
             <div className="label">
-              {validation.description?.message ? (
-                <span className="label-text-alt text-error">
-                  {validation.description?.message}
-                </span>
-              ) : (
-                ""
-              )}
+              {validation.map((val) => {
+                return val.field == "description" ? (
+                  <span className="label-text-alt text-error">
+                    {val.message}
+                  </span>
+                ) : (
+                  ""
+                );
+              })}
             </div>
           </label>
           {/* Thumbnail */}
@@ -399,13 +359,15 @@ const UpdateProductModal = (props: thisProps) => {
                 }}
               />
               <div className="label">
-                {validation.thumbnail?.message ? (
-                  <span className="label-text-alt text-error">
-                    {validation.thumbnail?.message}
-                  </span>
-                ) : (
-                  ""
-                )}
+                {validation.map((val) => {
+                  return val.field == "thumbnail" ? (
+                    <span className="label-text-alt text-error">
+                      {val.message}
+                    </span>
+                  ) : (
+                    ""
+                  );
+                })}
               </div>
             </label>
           </div>
