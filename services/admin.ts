@@ -95,7 +95,7 @@ export const getProducts = async (data?: { query: string; search: string }) => {
 
   return callApi({
     url,
-    method: data ? "POST" : "GET",
+    method: "POST",
     data,
   });
 };

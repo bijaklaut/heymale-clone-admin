@@ -86,8 +86,6 @@ const AddCategoryModal = () => {
             },
           ]);
         }
-
-        return toast.error(error.message, { containerId: "CreateCategory" });
       }
 
       return toast.error(error.message, { containerId: "CreateCategory" });

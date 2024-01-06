@@ -1,18 +1,11 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { cookies } from "next/headers";
 
 interface CallAPIProps extends AxiosRequestConfig {
   token?: string;
   serverToken?: string;
 }
 
-const callApi = async ({
-  url,
-  method,
-  data,
-  token = "",
-  serverToken,
-}: CallAPIProps) => {
+const callApi = async ({ url, method, data, token = "" }: CallAPIProps) => {
   let headers = {};
   if (token) {
     const jwt = Buffer.from(token, "base64").toString("ascii");

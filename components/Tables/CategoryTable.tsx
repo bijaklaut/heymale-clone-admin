@@ -3,8 +3,9 @@ import { CategoryTypes } from "../../services/types";
 import DeleteCategoryModal from "../Modals/Category/DeleteCategory";
 import UpdateCategoryModal from "../Modals/Category/UpdateCategory";
 
-const CategoryTable = async () => {
-  const { payload } = await getCategories();
+const CategoryTable = (props: { categories: CategoryTypes[] }) => {
+  const { categories } = props;
+
   return (
     <div data-theme="nord" className="mt-3 max-w-3xl rounded-md py-3">
       <table className="table">
@@ -16,7 +17,7 @@ const CategoryTable = async () => {
           </tr>
         </thead>
         <tbody>
-          {payload.map((category: CategoryTypes, i: any) => {
+          {categories.map((category: CategoryTypes, i: any) => {
             return (
               <tr key={i} className="hover">
                 <th className="">{i + 1}</th>

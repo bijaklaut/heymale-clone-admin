@@ -3,7 +3,6 @@ import DeleteUserModal from "../Modals/User/DeleteUser";
 import UpdateUserModal from "../Modals/User/UpdateUser";
 import ChangePasswordModal from "../Modals/User/ChangePassword";
 import AddressListModal from "../Modals/User/AddressList";
-import { useEffect } from "react";
 
 interface ProductTableProps {
   users: UserTypes[];

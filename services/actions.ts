@@ -33,8 +33,7 @@ export const getProvince = async () => {
 
     return response.data;
   } catch (error: any) {
-    console.log(error);
-    return error;
+    throw error;
   }
 };
 
@@ -49,6 +48,6 @@ export const getCity = async (prov_id: string) => {
 
     return response.data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 };

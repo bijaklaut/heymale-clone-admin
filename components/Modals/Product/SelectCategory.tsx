@@ -3,7 +3,7 @@ import { CategoryTypes, PostProductTypes } from "../../../services/types";
 
 interface SelectCategoryProps {
   handler(event: ChangeEvent<HTMLSelectElement>): void;
-  data: any;
+  data: PostProductTypes;
   categories: CategoryTypes[];
   validation: { field: string; message: string }[];
 }
