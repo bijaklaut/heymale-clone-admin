@@ -3,7 +3,7 @@
 import { ChangeEvent, useRef, useState } from "react";
 import { updatePayment, updateProduct } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import {
   CategoryTypes,
   PostProductTypes,
@@ -14,26 +14,18 @@ import SelectCategory from "./SelectCategory";
 import VariantInput from "./VariantInput";
 import { NumericFormat } from "react-number-format";
 import { EditSvg } from "../../Misc/SvgGroup";
+import TextInput from "../../Form/TextInput";
+import { revalidatePath } from "next/cache";
 
-interface thisProps {
+interface ThisProps {
   product: ProductTypes;
   index: number;
   categories: CategoryTypes[];
+  stateChanges(): void;
 }
-const UpdateProductModal = (props: thisProps) => {
-  const { product, index, categories } = props;
-  const IMG_API = process.env.NEXT_PUBLIC_IMG;
-  const router = useRouter();
-  const [preview, setPreview] = useState("");
-  const fileInput = useRef<HTMLInputElement>(null);
-  const [disable, setDisable] = useState(true);
-  const [validation, setValidation] = useState([
-    {
-      field: "",
-      message: "",
-    },
-  ]);
-  const [data, setData] = useState<PostProductTypes>({
+
+const initialData = (product: ProductTypes) => {
+  return {
     name: product.name,
     category: product.category._id,
     variant: {
@@ -45,16 +37,46 @@ const UpdateProductModal = (props: thisProps) => {
     price: product.price,
     description: product.description,
     thumbnail: product.thumbnail,
-  });
+  };
+};
 
-  const buttonCheck = () => {
-    const { name, category, price, description } = data;
+const UpdateProductModal = (props: ThisProps) => {
+  const { product, index, categories, stateChanges } = props;
+  const IMG_API = process.env.NEXT_PUBLIC_IMG;
+  const router = useRouter();
+  const [preview, setPreview] = useState("");
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [disable, setDisable] = useState(true);
+  const [validation, setValidation] = useState([
+    {
+      field: "",
+      message: "",
+    },
+  ]);
+  const [data, setData] = useState<PostProductTypes>(initialData(product));
 
-    if (!name || !category || !price || !description) {
-      setDisable(true);
-    } else {
-      setDisable(false);
+  const buttonCheck = (
+    event: ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
+    if (!event.target.value) {
+      return setDisable(true);
     }
+
+    return setDisable(false);
+  };
+
+  const changeHandler = (
+    event: ChangeEvent<HTMLInputElement>,
+    label: string,
+  ) => {
+    setData({
+      ...data,
+      [label]: event.target.value,
+    });
+
+    buttonCheck(event);
   };
 
   const variantHandler = (
@@ -75,23 +97,26 @@ const UpdateProductModal = (props: thisProps) => {
       ...data,
       category: event.target.value,
     });
-    buttonCheck();
+    buttonCheck(event);
   };
 
   const modalHandler = (id: string, show: boolean) => {
     const modal = document.getElementById(id) as HTMLDialogElement;
-    setValidation([
-      {
-        field: "",
-        message: "",
-      },
-    ]);
 
     if (fileInput.current != null) {
       fileInput.current.value = "";
     }
 
     if (modal && show) {
+      setValidation([
+        {
+          field: "",
+          message: "",
+        },
+      ]);
+      setData(initialData(product));
+      setDisable(true);
+
       modal.showModal();
     } else if (modal && show == false) {
       modal.close();
@@ -124,34 +149,23 @@ const UpdateProductModal = (props: thisProps) => {
 
         modalHandler(`updateProd${index}`, false);
         router.refresh();
+        return stateChanges();
       }
     } catch (error: any) {
-      if (error.message == "Validation Error") {
-        toast.update(loading, {
-          render: error.message,
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-          containerId: "updateProduct",
-        });
-        setValidation(error.errorDetail);
-      } else if (error.code == 11000) {
-        toast.update(loading, {
-          render: error.message,
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-          containerId: "updateProduct",
-        });
-      } else {
-        toast.update(loading, {
-          render: error.message,
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-          containerId: "updateProduct",
-        });
+      if (error.message == "Validation Error" || error.code == 11000) {
+        for (const [key] of Object.entries(error.errorDetail)) {
+          setValidation((prev) => [
+            ...prev,
+            {
+              field: key,
+              message: error.errorDetail[key].message,
+            },
+          ]);
+        }
       }
+
+      toast.dismiss(loading);
+      toast.error(error.message, { containerId: "CreateProduct" });
     }
   };
 
@@ -163,139 +177,63 @@ const UpdateProductModal = (props: thisProps) => {
       >
         <EditSvg className="w-5 stroke-current" />
       </button>
-      <dialog
-        data-theme={"dracula"}
-        id={`updateProd${index}`}
-        className="modal"
-      >
+      <dialog data-theme={"nord"} id={`updateProd${index}`} className="modal">
         <ToastContainer
           enableMultiContainer
           containerId={"updateProduct"}
           theme="dark"
         />
-        <div className="modal-box max-w-4xl">
-          <h3 className=" mb-5 text-lg font-bold text-primary">
-            Update Product
-          </h3>
-          {/* Product Name */}
-          <label className="w-full max-w-xs">
-            <div className="label">
-              <span className="label-text -ms-1">Product Name</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Type here"
-              className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 text-white focus:outline-0 focus:ring-0"
-              onChange={(e) => {
-                setData({
-                  ...data,
-                  name: e.target.value,
-                });
-              }}
-              onKeyUp={buttonCheck}
-              value={data.name}
+        <div className="no-scrollbar modal-box absolute max-w-3xl bg-gray-700">
+          <h3 className=" mb-5 text-lg font-bold text-white">Update Product</h3>
+          {/* Product Name & Category */}
+          <div className="flex w-full gap-x-3">
+            <TextInput
+              data={data}
+              label={["Product Name", "name", "Enter product name"]}
+              onChange={changeHandler}
+              validation={validation}
             />
-            <div className="label">
-              {validation.map((val) => {
-                return val.field == "name" ? (
-                  <span className="label-text-alt text-error">
-                    {val.message}
-                  </span>
-                ) : (
-                  ""
-                );
-              })}
-            </div>
-          </label>
-          {/* Category */}
-          <SelectCategory
-            data={data}
-            handler={categoryHandler}
-            validation={validation}
-            categories={categories}
-          />
+            <SelectCategory
+              data={data}
+              handler={categoryHandler}
+              validation={validation}
+              categories={categories}
+            />
+          </div>
           {/* Variant */}
           <div>
             <label className="label">
-              <span className="label-text -ms-1 block">Variant</span>
+              <span className="label-text -ms-1 block text-white">Variant</span>
             </label>
-            <div className="flex flex-wrap gap-x-8">
-              <VariantInput
-                label="s"
-                handler={variantHandler}
-                data={data}
-                validation={validation}
-              />
-              <VariantInput
-                label="m"
-                handler={variantHandler}
-                data={data}
-                validation={validation}
-              />
-              <VariantInput
-                label="l"
-                handler={variantHandler}
-                data={data}
-                validation={validation}
-              />
-              <VariantInput
-                label="xl"
-                handler={variantHandler}
-                data={data}
-                validation={validation}
-              />
-            </div>
-          </div>
-          {/* Price */}
-          <label className="w-full max-w-xs">
-            <div className="label">
-              <span className="label-text -ms-1">Price</span>
-            </div>
-            <NumericFormat
-              allowNegative={false}
-              valueIsNumericString
-              thousandSeparator="."
-              decimalSeparator=","
-              prefix="Rp. "
-              value={data.price}
-              onValueChange={(e) => {
-                setData({
-                  ...data,
-                  price: Number(e.value),
-                });
-              }}
-              className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 text-white focus:outline-0 focus:ring-0"
-              placeholder="Input product price"
-              onKeyUp={buttonCheck}
-            />
-
-            <div className="label">
-              {validation.map((val) => {
-                return val.field == "price" ? (
-                  <span className="label-text-alt text-error">
-                    {val.message}
-                  </span>
-                ) : (
-                  ""
+            <div className="mb-3 flex flex-wrap justify-between">
+              {["s", "m", "l", "xl"].map((v, i) => {
+                return (
+                  <VariantInput
+                    key={i}
+                    label={v}
+                    handler={variantHandler}
+                    data={data}
+                    validation={validation}
+                  />
                 );
               })}
             </div>
-          </label>
+          </div>
           {/* Description */}
           <label className="form-control w-full">
             <div className="label">
-              <span className="label-text">Description</span>
+              <span className="label-text text-white">Description</span>
             </div>
             <textarea
-              className="textarea textarea-bordered h-24 text-white"
+              className="textarea textarea-bordered h-24 p-2"
               placeholder="Type product decription"
               onChange={(e) => {
                 setData({
                   ...data,
                   description: e.target.value,
                 });
+                buttonCheck(e);
               }}
-              onKeyUp={buttonCheck}
               value={data.description}
             ></textarea>
             <div className="label">
@@ -310,13 +248,84 @@ const UpdateProductModal = (props: thisProps) => {
               })}
             </div>
           </label>
-          {/* Thumbnail */}
-          <div className="flex gap-x-3">
+
+          {/* Thumbnail & Price */}
+          <div className="flex justify-between">
+            <div className="flex w-1/2 flex-col">
+              <label className="w-full">
+                <div className="label">
+                  <span className="label-text -ms-1 text-white">Price</span>
+                </div>
+                <NumericFormat
+                  allowNegative={false}
+                  valueIsNumericString
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="Rp. "
+                  value={data.price}
+                  onValueChange={(e) => {
+                    setData({
+                      ...data,
+                      price: Number(e.value),
+                    });
+
+                    if (!e.value) return setDisable(true);
+                    return setDisable(false);
+                  }}
+                  className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 text-neutral focus:outline-0 focus:ring-0"
+                  placeholder="Input product price"
+                />
+
+                <div className="label">
+                  {validation.map((val, i) =>
+                    val.field == "price" ? (
+                      <span key={i} className="label-text-alt text-error">
+                        {val.message}
+                      </span>
+                    ) : (
+                      ""
+                    ),
+                  )}
+                </div>
+              </label>
+              <label className="form-control w-full">
+                <div className="label">
+                  <span className="label-text text-white">Thumbnail</span>
+                </div>
+
+                <input
+                  type="file"
+                  ref={fileInput}
+                  className="file-input file-input-sm w-full border-0"
+                  accept="image/jpg, image/jpeg, image/png"
+                  onChange={(e) => {
+                    if (e.target.files instanceof FileList) {
+                      setPreview(URL.createObjectURL(e.target.files[0]));
+                      setData({
+                        ...data,
+                        thumbnail: e.target.files[0],
+                      });
+                    }
+                  }}
+                />
+                <div className="label">
+                  {validation.map((val) => {
+                    return val.field == "thumbnail" ? (
+                      <span className="label-text-alt text-error">
+                        {val.message}
+                      </span>
+                    ) : (
+                      ""
+                    );
+                  })}
+                </div>
+              </label>
+            </div>
             <div className="flex h-[250px] w-[250px] items-center justify-center rounded-md bg-neutral">
               {!preview ? (
                 <Image
                   src={
-                    data.thumbnail != ""
+                    data.thumbnail
                       ? `${IMG_API}/product/${data.thumbnail}`
                       : "icon/image.svg"
                   }
@@ -324,7 +333,7 @@ const UpdateProductModal = (props: thisProps) => {
                   height={150}
                   alt="upload-icon"
                   className={
-                    data.thumbnail != ""
+                    data.thumbnail
                       ? "h-full w-auto object-cover"
                       : "h-auto w-[100px]"
                   }
@@ -339,50 +348,21 @@ const UpdateProductModal = (props: thisProps) => {
                 />
               )}
             </div>
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">Thumbnail</span>
-              </div>
-              <input
-                type="file"
-                ref={fileInput}
-                className="file-input file-input-bordered w-full max-w-xs text-white"
-                accept="image/jpg, image/jpeg, image/png"
-                onChange={(e) => {
-                  if (e.target.files instanceof FileList) {
-                    setPreview(URL.createObjectURL(e.target.files[0]));
-                    setData({
-                      ...data,
-                      thumbnail: e.target.files[0],
-                    });
-                  }
-                }}
-              />
-              <div className="label">
-                {validation.map((val) => {
-                  return val.field == "thumbnail" ? (
-                    <span className="label-text-alt text-error">
-                      {val.message}
-                    </span>
-                  ) : (
-                    ""
-                  );
-                })}
-              </div>
-            </label>
           </div>
           {/* Submit */}
-          <div className="modal-action flex">
+          <div className="modal-action mt-16 flex">
             <button
-              className="btn btn-primary btn-sm"
+              className="btn btn-primary btn-sm text-white"
               disabled={disable}
               onClick={() => submitHandler(product._id, index)}
             >
-              Confirm
+              Update
             </button>
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-outline btn-sm">Close</button>
+              <button className="btn btn-sm border-transparent bg-transparent text-white hover:border-white hover:bg-transparent">
+                Close
+              </button>
             </form>
           </div>
         </div>

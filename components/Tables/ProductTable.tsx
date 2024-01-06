@@ -1,113 +1,32 @@
-"use client";
-
 import {
   CategoryFilterTypes,
   CategoryTypes,
   ProductTypes,
 } from "../../services/types";
 import Image from "next/image";
-import { NumericFormat } from "react-number-format";
 import DeleteProductModal from "../Modals/Product/DeleteProduct";
 import UpdateProductModal from "../Modals/Product/UpdateProduct";
-import { useEffect, useState } from "react";
-import { getProducts } from "../../services/admin";
 import { NoDisplaySvg } from "../Misc/SvgGroup";
 import cx from "classnames";
+import NumFormatWrapper from "../Misc/NumFormatWrapper";
 
 interface ProductTableProps {
-  categories: CategoryTypes[];
+  categories?: CategoryTypes[];
+  products?: ProductTypes[];
+  filters?: CategoryFilterTypes[];
 }
 
-interface ProductStatus {
-  activeProducts: ProductTypes[];
-  inactiveProducts: ProductTypes[];
-}
-
-const initialCriteria = (categories: CategoryTypes[]) => {
-  let returnValue: CategoryFilterTypes[] = [];
-
-  categories.map((category, i) => {
-    return returnValue.push({ name: category.name, include: true });
-  });
-
-  return returnValue;
-};
+// interface ProductStatus {
+//   activeProducts: ProductTypes[];
+//   inactiveProducts: ProductTypes[];
+// }
 
 const ProductTable = (props: ProductTableProps) => {
-  const { categories } = props;
-  const [products, setProducts] = useState<ProductTypes[]>([]);
-  const [filters, setFilters] = useState(initialCriteria(categories));
-  const [search, setSearch] = useState("");
+  const { categories, products, filters } = props;
   const IMG_API = process.env.NEXT_PUBLIC_IMG;
-
-  useEffect(() => {
-    let joinArray: string[] = [];
-    filters
-      .filter((crit) => crit.include)
-      .map((crit) => joinArray.push(crit.name));
-
-    const query = `((^)(${joinArray.join("|")}))+$`;
-
-    const getFiltered = async (data: { query: string; search: string }) => {
-      const { payload } = await getProducts(data);
-      return setProducts(payload);
-    };
-
-    getFiltered({ query, search });
-  }, [filters, search]);
-
   return (
-    <div className="mt-3 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
-      <div className="mb-3 flex gap-x-3">
-        <input
-          type="text"
-          placeholder="Search product by name"
-          value={search}
-          className="input input-bordered h-10 w-full max-w-xs transition-all focus:border-white focus:outline-none focus:ring-0"
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <div
-          data-theme={"nord"}
-          className="dropdown dropdown-right bg-transparent"
-        >
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-secondary btn-sm m-1 rounded-md px-3 text-white"
-          >
-            Filter
-          </div>
-          <div
-            tabIndex={0}
-            className="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow"
-          >
-            {filters.map((fil, i) => {
-              return (
-                <div key={i} className="form-control">
-                  <label className="label cursor-pointer justify-normal">
-                    <input
-                      type="checkbox"
-                      className="checkbox checkbox-sm me-4"
-                      checked={fil.include}
-                      onChange={() => {
-                        let copyFilter = [...filters];
-                        copyFilter.map((copy) => {
-                          if (copy.name == fil.name)
-                            return (copy.include = !copy.include);
-                        });
-
-                        setFilters(copyFilter);
-                      }}
-                    />
-                    <span className="label-text">{fil.name}</span>
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-      {products.length ? (
+    <>
+      {products?.length ? (
         <table data-theme={"nord"} className="table w-fit rounded-md">
           <thead>
             <tr>
@@ -124,16 +43,15 @@ const ProductTable = (props: ProductTableProps) => {
           </thead>
 
           <tbody>
-            {filters.map((fil, i) => {
+            {filters?.map((fil, index) => {
               let isExist = products.filter(
                 (product) => product.category.name == fil.name,
               ).length;
-
               if (fil.include && isExist)
                 return (
                   <>
-                    <tr key={i} className="bg-gray-300">
-                      <td colSpan={7} className="font-semibold">
+                    <tr key={index} className="bg-gray-300">
+                      <td colSpan={7} className="text-center font-semibold">
                         {fil.name}
                       </td>
                     </tr>
@@ -173,9 +91,9 @@ const ProductTable = (props: ProductTableProps) => {
                             <td>
                               <div className="flex gap-x-2">
                                 {Object.entries(product.variant).map(
-                                  ([k], i) => {
+                                  ([k], id) => {
                                     let variantClass = cx({
-                                      "tooltip relative flex h-[25px] font-semibold w-[30px] items-center justify-center rounded-md border px-2":
+                                      "tooltip relative flex h-[25px] font-semibold w-[30px] items-center justify-center rounded-md border px-2 cursor-default":
                                         true,
                                       "text-green-500 border-green-500":
                                         (product.variant as any)[k] >= 100,
@@ -190,7 +108,7 @@ const ProductTable = (props: ProductTableProps) => {
                                     });
                                     return (
                                       <div
-                                        key={i}
+                                        key={id}
                                         className={variantClass}
                                         data-tip={`${
                                           (product.variant as any)[k]
@@ -204,7 +122,7 @@ const ProductTable = (props: ProductTableProps) => {
                               </div>
                             </td>
                             <td className="w-[150px] text-center">
-                              <NumericFormat
+                              <NumFormatWrapper
                                 value={product.price}
                                 displayType="text"
                                 prefix="Rp. "
@@ -227,15 +145,15 @@ const ProductTable = (props: ProductTableProps) => {
                             </td>
                             <td>
                               <div className="flex min-h-full items-center justify-center gap-x-2 px-5">
-                                <UpdateProductModal
+                                {/* <UpdateProductModal
                                   product={product}
-                                  categories={categories}
+                                  categories={categories!}
                                   index={i}
                                 />
                                 <DeleteProductModal
                                   product={product}
                                   index={i}
-                                />
+                                /> */}
                               </div>
                             </td>
                           </tr>
@@ -308,7 +226,7 @@ const ProductTable = (props: ProductTableProps) => {
               </div>
             </div>
           </div> */}
-    </div>
+    </>
   );
 };
 

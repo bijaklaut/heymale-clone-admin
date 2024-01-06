@@ -9,10 +9,11 @@ import { TrashSvg } from "../../Misc/SvgGroup";
 interface thisProps {
   product: ProductTypes;
   index: number;
+  stateChanges(): void;
 }
 
 const DeleteProductModal = (props: thisProps) => {
-  const { product, index } = props;
+  const { product, index, stateChanges } = props;
   const router = useRouter();
 
   const modalHandler = (id: string, show: boolean) => {
@@ -39,6 +40,7 @@ const DeleteProductModal = (props: thisProps) => {
       });
       modalHandler(`delProd${index}`, false);
       router.refresh();
+      return stateChanges();
     } catch (error: any) {
       toast.update(loading, {
         render: error.message,

@@ -1,7 +1,6 @@
 import { Metadata } from "next";
-import ProductTable from "../../../../components/Tables/ProductTable";
-import CreateProductModal from "../../../../components/Modals/Product/CreateProduct";
-import { getCategories, getProducts } from "../../../../services/admin";
+import { getCategories } from "../../../../services/admin";
+import ProductTableWrapper from "../../../../components/Tables/ProductTableWrapper";
 
 export const metadata: Metadata = {
   title: "Heymale | Product Dashboard",
@@ -15,8 +14,7 @@ const ProductDashboard = async () => {
     <>
       <h2 className="text-2xl font-semibold">Product Dashboard</h2>
 
-      <CreateProductModal categories={categories} />
-      <ProductTable categories={categories} />
+      <ProductTableWrapper categories={categories} />
     </>
   );
 };

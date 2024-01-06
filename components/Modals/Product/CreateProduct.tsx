@@ -13,6 +13,7 @@ import TextInput from "../../Form/TextInput";
 
 interface CreateProductProps {
   categories: CategoryTypes[];
+  stateChanges(): void;
 }
 
 const initialState = () => {
@@ -32,7 +33,7 @@ const initialState = () => {
 };
 
 const CreateProductModal = (props: CreateProductProps) => {
-  const { categories } = props;
+  const { categories, stateChanges } = props;
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const [disable, setDisable] = useState(true);
@@ -120,6 +121,7 @@ const CreateProductModal = (props: CreateProductProps) => {
         message: "",
       },
     ]);
+
     const form = new FormData();
 
     for (const [key, value] of Object.entries(data)) {
@@ -147,16 +149,10 @@ const CreateProductModal = (props: CreateProductProps) => {
 
         modalHandler("addProd", false);
         router.refresh();
+        return stateChanges();
       }
     } catch (error: any) {
-      if (error.message == "Validation Error") {
-        toast.update(loading, {
-          render: error.message,
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-          containerId: "CreateProduct",
-        });
+      if (error.message == "Validation Error" || error.code == 11000) {
         for (const [key] of Object.entries(error.errorDetail)) {
           setValidation((prev) => [
             ...prev,
@@ -166,23 +162,10 @@ const CreateProductModal = (props: CreateProductProps) => {
             },
           ]);
         }
-      } else if (error.code == 11000) {
-        toast.update(loading, {
-          render: error.message,
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-          containerId: "CreateProduct",
-        });
-      } else {
-        toast.update(loading, {
-          render: error.message,
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-          containerId: "CreateProduct",
-        });
       }
+
+      toast.dismiss(loading);
+      toast.error(error.message, { containerId: "CreateProduct" });
     }
   };
 
@@ -369,7 +352,7 @@ const CreateProductModal = (props: CreateProductProps) => {
           <div className="modal-action mt-16 flex">
             <button
               className="btn btn-primary btn-sm text-white"
-              // disabled={disable}
+              disabled={disable}
               onClick={submitHandler}
             >
               Create
