@@ -82,6 +82,11 @@
 .for-arrange {
   @apply mx-auto flex h-full max-w-[1080px] flex-col justify-center p-5 transition-all duration-300;
 }
+
+.parent-hover:hover:not(:has(ul.dropdown-content:hover)) {
+  --tw-bg-opacity: 0.5;
+  background-color: var(--fallback-p, oklch(var(--p) / var(--tw-bg-opacity)));
+}
 /* End of Miscellaneous */
 
 @layer utilities {

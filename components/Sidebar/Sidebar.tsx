@@ -56,8 +56,6 @@ export const Sidebar = () => {
         <Link href={"/"}>
           <Image
             src={heymaleLogo}
-            width={180}
-            height={180}
             alt="heymale-logo"
             className="h-auto w-[180px]"
             priority

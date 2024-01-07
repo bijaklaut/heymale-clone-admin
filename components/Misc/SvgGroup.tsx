@@ -406,6 +406,35 @@ export const NoDisplaySvg = (props: { className?: string }) => {
   );
 };
 
+export const ArrowRightSvg = (props: { className?: string }) => {
+  const { className } = props;
+  return (
+    <svg
+      className={className}
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        <path
+          d="M4 12H20M20 12L14 6M20 12L14 18"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        ></path>
+      </g>
+    </svg>
+  );
+};
+
 export const Template = (props: { className?: string }) => {
   const { className } = props;
   return (

@@ -8,6 +8,7 @@ import { UserToken } from "../../services/types";
 import { jwtDecode } from "jwt-decode";
 import { authLogout } from "../../services/actions";
 import { getUser } from "../../services/admin";
+import { ArrowRightSvg } from "../Misc/SvgGroup";
 
 interface ThisProps {
   user: {
@@ -42,25 +43,14 @@ const UserAction = (props: ThisProps) => {
       )}
 
       <p className="text-sm font-semibold">{user.name}</p>
-      <button
+      <div
         tabIndex={0}
-        className="rounded-l-md p-3 shadow-none transition-all active:bg-primary active:bg-opacity-80"
+        className="parent-hover cursor-pointer rounded-l-md p-2 shadow-none transition-all active:bg-primary active:bg-opacity-80"
       >
-        <svg
-          height={12}
-          width={12}
-          viewBox="-4.5 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M.366 19.708c.405.39 1.06.39 1.464 0l8.563-8.264a1.95 1.95 0 0 0 0-2.827L1.768.292A1.063 1.063 0 0 0 .314.282a.976.976 0 0 0-.011 1.425l7.894 7.617a.975.975 0 0 1 0 1.414L.366 18.295a.974.974 0 0 0 0 1.413"
-            fill="#000"
-            fillRule="evenodd"
-          />
-        </svg>
+        <ArrowRightSvg className="w-5 stroke-current" />
         <ul
           tabIndex={0}
-          className="menu dropdown-content z-[1] w-52 -translate-y-10 rounded-box bg-base-100 p-2 shadow"
+          className="menu dropdown-content z-[1] w-52 -translate-y-10 translate-x-1 rounded-box bg-base-100 p-2 shadow-md"
         >
           <li>
             <Link href={"/profile"}>Profile</Link>
@@ -71,7 +61,7 @@ const UserAction = (props: ThisProps) => {
             </button>
           </li>
         </ul>
-      </button>
+      </div>
     </div>
   );
 };
