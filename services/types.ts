@@ -83,7 +83,7 @@ export interface UserToken {
   id: string;
 }
 
-export interface CategoryFilterTypes {
+export interface FilterTypes {
   name: string;
   include: boolean;
 }
