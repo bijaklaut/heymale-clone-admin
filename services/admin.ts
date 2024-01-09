@@ -90,8 +90,12 @@ export const deletePayment = async (id: string) => {
 // End of Payment Dashboard
 
 // Product Dashboard
-export const getProducts = async (data?: { query: string; search: string }) => {
-  const url = `${ROOT_API}/${API_VER}/product`;
+export const getProducts = async (
+  queryParams: number,
+  data?: { query: string; search: string },
+) => {
+  const queryString = `?p=${queryParams}` || "";
+  const url = `${ROOT_API}/${API_VER}/product${queryString}`;
 
   return callApi({
     url,

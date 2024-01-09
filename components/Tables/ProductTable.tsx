@@ -1,33 +1,40 @@
-import {
-  CategoryFilterTypes,
-  CategoryTypes,
-  ProductTypes,
-} from "../../services/types";
+import { Fragment } from "react";
+import { CategoryTypes, FilterTypes, ProductTypes } from "../../services/types";
 import Image from "next/image";
 import DeleteProductModal from "../Modals/Product/DeleteProduct";
 import UpdateProductModal from "../Modals/Product/UpdateProduct";
-import { NoDisplaySvg } from "../Misc/SvgGroup";
 import cx from "classnames";
-import NumFormatWrapper from "../Misc/NumFormatWrapper";
+import NumFormatWrapper from "../Wrapper/NumFormatWrapper";
+import NoDisplay from "../Misc/NoDisplay";
+import Pagination from "../Misc/Pagination";
 
 interface ProductTableProps {
-  categories?: CategoryTypes[];
-  products?: ProductTypes[];
-  filters?: CategoryFilterTypes[];
+  stateChanges(): void;
+  pageHandler(page: number | null): void;
+  categories: CategoryTypes[];
+  filters: FilterTypes[];
+  paginate: {
+    docs: ProductTypes[];
+    page: number;
+    totalPages: number;
+    pagingCounter: number;
+    hasPrevPage: boolean;
+    hasNextPage: boolean;
+    prevPage: number | null;
+    nextPage: number | null;
+  };
 }
 
-// interface ProductStatus {
-//   activeProducts: ProductTypes[];
-//   inactiveProducts: ProductTypes[];
-// }
-
 const ProductTable = (props: ProductTableProps) => {
-  const { categories, products, filters } = props;
+  const { categories, filters, stateChanges, paginate, pageHandler } = props;
+  const { docs: products } = paginate;
+
   const IMG_API = process.env.NEXT_PUBLIC_IMG;
+
   return (
-    <>
+    <div className="max-w-5xl">
       {products?.length ? (
-        <table data-theme={"nord"} className="table w-fit rounded-md">
+        <table data-theme={"nord"} className="table w-full rounded-md">
           <thead>
             <tr>
               <th className="text-center text-base font-semibold">#</th>
@@ -47,10 +54,10 @@ const ProductTable = (props: ProductTableProps) => {
               let isExist = products.filter(
                 (product) => product.category.name == fil.name,
               ).length;
-              if (fil.include && isExist)
+              if (fil.include && isExist) {
                 return (
-                  <>
-                    <tr key={index} className="bg-gray-300">
+                  <Fragment key={index}>
+                    <tr className="bg-gray-300">
                       <td colSpan={7} className="text-center font-semibold">
                         {fil.name}
                       </td>
@@ -64,8 +71,12 @@ const ProductTable = (props: ProductTableProps) => {
 
                       if (product.category.name == fil.name)
                         return (
-                          <tr key={i} className="">
-                            <th className="text-center">{i + 1}</th>
+                          <tr
+                            key={`${product._id}-${paginate.pagingCounter + i}`}
+                          >
+                            <th className="text-center">
+                              {paginate.pagingCounter + i}
+                            </th>
                             <td>
                               <div className="mb-3 flex min-h-[150px] w-full flex-col items-center justify-center gap-2">
                                 <span className="font-semibold">
@@ -106,6 +117,7 @@ const ProductTable = (props: ProductTableProps) => {
                                       "text-gray-500 border-gray-400":
                                         (product.variant as any)[k] == 0,
                                     });
+
                                     return (
                                       <div
                                         key={id}
@@ -145,33 +157,39 @@ const ProductTable = (props: ProductTableProps) => {
                             </td>
                             <td>
                               <div className="flex min-h-full items-center justify-center gap-x-2 px-5">
-                                {/* <UpdateProductModal
+                                <UpdateProductModal
                                   product={product}
                                   categories={categories!}
                                   index={i}
+                                  stateChanges={stateChanges}
                                 />
                                 <DeleteProductModal
                                   product={product}
                                   index={i}
-                                /> */}
+                                  stateChanges={stateChanges}
+                                />
                               </div>
                             </td>
                           </tr>
                         );
                     })}
-                  </>
+                  </Fragment>
                 );
+              }
             })}
           </tbody>
         </table>
       ) : (
-        <div className="mx-auto mt-10 flex w-max flex-col items-center justify-center rounded-md bg-white px-16 py-10 text-neutral">
-          <NoDisplaySvg className="h-10 w-10 stroke-current" />
-          <p className="mt-3">{"There's no products to display"}</p>
-        </div>
+        <NoDisplay text={"There's no products to display"} />
       )}
+      <Pagination paginate={paginate} pageHandler={pageHandler} />
+    </div>
+  );
+};
 
-      {/* <div
+export default ProductTable;
+{
+  /* <div
             data-theme="nord"
             key={i}
             className="collapse collapse-arrow bg-base-200"
@@ -225,9 +243,5 @@ const ProductTable = (props: ProductTableProps) => {
                 </div>
               </div>
             </div>
-          </div> */}
-    </>
-  );
-};
-
-export default ProductTable;
+          </div> */
+}
