@@ -1,16 +1,12 @@
 "use client";
 
 import { ToastContainer, toast } from "react-toastify";
-import {
-  AddressTypes,
-  PostAddressTypes,
-  UserTypes,
-} from "../../../services/types";
+import { AddressTypes, UserTypes } from "../../../services/types";
 import { useRef, useState } from "react";
 import { deleteAddress } from "../../../services/admin";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import PostAddressCollapse from "../../Collapse/Address/CreateAddress";
+import PostAddressCollapse from "../../Collapse/Address/PostAddress";
 
 interface thisProps {
   user: UserTypes;
@@ -25,7 +21,7 @@ const AddressListModal = (props: thisProps) => {
   const [modalShow, setModalShow] = useState(false);
   const [deleteShow, setDeleteShow] = useState(-1);
   const [data, setData] = useState<AddressTypes>();
-  const [show, setShow] = useState(false);
+  const [showUpdate, setShowUpdate] = useState(false);
 
   const modalHandler = (id: string, show: boolean) => {
     const checkbox = document.getElementById(id) as HTMLInputElement;
@@ -62,11 +58,11 @@ const AddressListModal = (props: thisProps) => {
   };
 
   const reset = () => {
-    setShow(false);
+    setShowUpdate(false);
   };
 
   const updateMisc = (address: AddressTypes) => {
-    setShow(!show);
+    setShowUpdate(!showUpdate);
     setData(address);
 
     if (modalRef.current) {
@@ -111,7 +107,7 @@ const AddressListModal = (props: thisProps) => {
               id={_id}
               modalShow={modalShow}
               address={data!}
-              showUpdate={show}
+              showUpdate={showUpdate}
               reset={reset}
             />
           ) : (
