@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 interface ThisProps {
   paginate: {
     page: number;
@@ -124,20 +126,26 @@ const Pagination = ({ paginate, pageHandler }: ThisProps) => {
   };
 
   return (
-    <div className="mt-3 flex w-full justify-center">
-      <div
-        data-theme={"nord"}
-        className="join items-center justify-center gap-x-2 bg-transparent first:rounded-l-lg last:rounded-r-lg"
-      >
-        {firstPage({ paginate, pageHandler })}
-        {prevPage({ paginate, pageHandler })}
-        <button className="btn btn-primary join-item btn-sm pointer-events-none text-white">
-          {paginate.page}
-        </button>
-        {nextPage({ paginate, pageHandler })}
-        {lastPage({ paginate, pageHandler })}
-      </div>
-    </div>
+    <Fragment>
+      {paginate.totalPages > 1 ? (
+        <div className="mt-3 flex w-full justify-center">
+          <div
+            data-theme={"nord"}
+            className="join items-center justify-center gap-x-2 bg-transparent first:rounded-l-lg last:rounded-r-lg"
+          >
+            {firstPage({ paginate, pageHandler })}
+            {prevPage({ paginate, pageHandler })}
+            <button className="btn btn-primary join-item btn-sm pointer-events-none text-white">
+              {paginate.page}
+            </button>
+            {nextPage({ paginate, pageHandler })}
+            {lastPage({ paginate, pageHandler })}
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+    </Fragment>
   );
 };
 

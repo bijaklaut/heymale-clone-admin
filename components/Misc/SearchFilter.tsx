@@ -3,14 +3,20 @@ import { FilterTypes } from "../../services/types";
 
 interface ThisProps {
   data: {
-    filters: FilterTypes[];
     search: string;
+    filters?: FilterTypes[];
   };
   changeSearch(event: ChangeEvent<HTMLInputElement>): void;
-  changeFilter(filters: FilterTypes[], filter: FilterTypes): void;
+  withFilter?: boolean;
+  changeFilter?: (filters: FilterTypes[], filter: FilterTypes) => void;
 }
 
-const SearchFilter = ({ data, changeSearch, changeFilter }: ThisProps) => {
+const SearchFilter = ({
+  data,
+  changeSearch,
+  changeFilter,
+  withFilter = true,
+}: ThisProps) => {
   const { filters, search } = data;
 
   return (
@@ -22,40 +28,44 @@ const SearchFilter = ({ data, changeSearch, changeFilter }: ThisProps) => {
         className="input input-bordered h-9 w-full max-w-xs transition-all focus:border-white focus:outline-none focus:ring-0"
         onChange={(e) => changeSearch(e)}
       />
-      <div
-        data-theme={"nord"}
-        className="dropdown dropdown-right bg-transparent"
-      >
+      {withFilter ? (
         <div
-          tabIndex={0}
-          role="button"
-          className="btn btn-outline btn-accent btn-sm m-1 rounded-md px-5 text-white"
+          data-theme={"nord"}
+          className="dropdown dropdown-right bg-transparent"
         >
-          Filter
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-outline btn-accent btn-sm m-1 rounded-md px-5 text-white"
+          >
+            Filter
+          </div>
+          <div
+            tabIndex={0}
+            className="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow"
+          >
+            {filters?.map((fil, i) => {
+              return (
+                <div key={i} className="form-control">
+                  <label className="label cursor-pointer justify-normal">
+                    <input
+                      type="checkbox"
+                      className="checkbox checkbox-sm me-4"
+                      checked={fil.include}
+                      onChange={() => {
+                        changeFilter!(filters, fil);
+                      }}
+                    />
+                    <span className="label-text">{fil.name}</span>
+                  </label>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <div
-          tabIndex={0}
-          className="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow"
-        >
-          {filters.map((fil, i) => {
-            return (
-              <div key={i} className="form-control">
-                <label className="label cursor-pointer justify-normal">
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-sm me-4"
-                    checked={fil.include}
-                    onChange={() => {
-                      changeFilter(filters, fil);
-                    }}
-                  />
-                  <span className="label-text">{fil.name}</span>
-                </label>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };
