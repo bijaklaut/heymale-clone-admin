@@ -108,6 +108,7 @@ const ProductTableWrapper = (props: ThisProps) => {
           changeSearch={changeSearch}
           changeFilter={changeFilter}
           withFilter={true}
+          placeholder="Search product by name"
         />
         {!loading ? (
           <ProductTable

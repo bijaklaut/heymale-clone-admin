@@ -9,6 +9,7 @@ interface ThisProps {
   changeSearch(event: ChangeEvent<HTMLInputElement>): void;
   withFilter?: boolean;
   changeFilter?: (filters: FilterTypes[], filter: FilterTypes) => void;
+  placeholder?: string;
 }
 
 const SearchFilter = ({
@@ -16,6 +17,7 @@ const SearchFilter = ({
   changeSearch,
   changeFilter,
   withFilter = true,
+  placeholder,
 }: ThisProps) => {
   const { filters, search } = data;
 
@@ -23,7 +25,7 @@ const SearchFilter = ({
     <div className="mb-3 flex items-center gap-x-3">
       <input
         type="text"
-        placeholder="Search product by name"
+        placeholder={placeholder || "Search table"}
         value={search}
         className="input input-bordered h-9 w-full max-w-xs transition-all focus:border-white focus:outline-none focus:ring-0"
         onChange={(e) => changeSearch(e)}

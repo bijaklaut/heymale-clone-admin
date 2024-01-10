@@ -75,6 +75,7 @@ const CategoryTableWrapper = () => {
           data={{ search }}
           changeSearch={changeSearch}
           withFilter={false}
+          placeholder="Search category by name"
         />
         {!loading ? (
           <CategoryTable
