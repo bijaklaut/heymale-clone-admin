@@ -5,7 +5,7 @@ import { createCategory } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
-const AddCategoryModal = () => {
+const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
   const router = useRouter();
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -71,7 +71,9 @@ const AddCategoryModal = () => {
 
         modalHandler("addCat", false);
         setTimeout(() => setLoading(false), 600);
-        return router.refresh();
+        router.refresh();
+
+        return stateChanges();
       }
     } catch (error: any) {
       setTimeout(() => setLoading(false), 600);
@@ -163,4 +165,4 @@ const AddCategoryModal = () => {
   );
 };
 
-export default AddCategoryModal;
+export default CreateCategoryModal;

@@ -10,10 +10,11 @@ import { useState } from "react";
 interface thisProps {
   category: CategoryTypes;
   index: number;
+  stateChanges(): void;
 }
 
 const DeleteCategoryModal = (props: thisProps) => {
-  const { category, index } = props;
+  const { category, index, stateChanges } = props;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -44,6 +45,8 @@ const DeleteCategoryModal = (props: thisProps) => {
         modalHandler(`delCat${index}`, false);
         setLoading(false);
         router.refresh();
+
+        return stateChanges();
       }
     } catch (error: any) {
       setLoading(false);

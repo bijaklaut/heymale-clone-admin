@@ -10,10 +10,11 @@ import { EditSvg } from "../../Misc/SvgGroup";
 interface thisProps {
   category: CategoryTypes;
   index: number;
+  stateChanges(): void;
 }
 const UpdateCategoryModal = (props: thisProps) => {
   const router = useRouter();
-  const { category, index } = props;
+  const { category, index, stateChanges } = props;
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
@@ -79,7 +80,8 @@ const UpdateCategoryModal = (props: thisProps) => {
         modalHandler(`updateCat${index}`, false);
         setTimeout(() => setLoading(false), 600);
 
-        return router.refresh();
+        router.refresh();
+        return stateChanges();
       }
     } catch (error: any) {
       setTimeout(() => setLoading(false), 600);
