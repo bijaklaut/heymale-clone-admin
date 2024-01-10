@@ -11,7 +11,6 @@ import ComplexTableLoading from "../Loading/ComplexTableLoading";
 interface ThisProps {
   categories: CategoryTypes[];
 }
-
 const initialCriteria = (categories: CategoryTypes[]) => {
   let returnValue: FilterTypes[] = [];
 
@@ -108,6 +107,7 @@ const ProductTableWrapper = (props: ThisProps) => {
           data={{ filters, search }}
           changeSearch={changeSearch}
           changeFilter={changeFilter}
+          withFilter={true}
         />
         {!loading ? (
           <ProductTable
@@ -116,7 +116,6 @@ const ProductTableWrapper = (props: ThisProps) => {
             stateChanges={stateChanges}
             paginate={pagination}
             pageHandler={pageHandler}
-            // stateLoading={stateLoading}
           />
         ) : (
           <ComplexTableLoading />

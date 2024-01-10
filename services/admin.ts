@@ -8,8 +8,10 @@ const AREA_API = process.env.NEXT_PUBLIC_AREA_API;
 const API_VER = "api/v1";
 
 // Category Dashboard
-export const getCategories = async () => {
-  const url = `${ROOT_API}/${API_VER}/category`;
+export const getCategories = async (search: string, page?: number) => {
+  const searchQuery = `?search=${search}` || "";
+  const pageQuery = page ? (searchQuery ? `&p=${page}` : `?p=${page}`) : "";
+  const url = `${ROOT_API}/${API_VER}/category${searchQuery}${pageQuery}`;
 
   return callApi({
     url,

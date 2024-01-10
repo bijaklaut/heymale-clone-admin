@@ -1,3 +1,13 @@
+export interface PaginationTypes {
+  page: number;
+  totalPages: number;
+  pagingCounter: number;
+  hasPrevPage: boolean;
+  hasNextPage: boolean;
+  prevPage: number | null;
+  nextPage: number | null;
+}
+
 export interface CategoryTypes {
   _id: string;
   name: string;

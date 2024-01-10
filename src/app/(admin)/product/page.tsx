@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 };
 
 const ProductDashboard = async () => {
-  const { payload: categories } = await getCategories();
-
+  const { payload } = await getCategories("");
+  const { docs: categories } = payload;
   return (
     <>
       <h2 className="text-2xl font-semibold">Product Dashboard</h2>
