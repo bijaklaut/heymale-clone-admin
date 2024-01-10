@@ -8,10 +8,11 @@ import { PaymentTypes } from "../../../services/types";
 interface thisProps {
   payment: PaymentTypes;
   index: number;
+  stateChanges(): void;
 }
 
 const DeletePaymentModal = (props: thisProps) => {
-  const { payment, index } = props;
+  const { payment, index, stateChanges } = props;
   const router = useRouter();
 
   const modalHandler = (id: string, show: boolean) => {
@@ -40,6 +41,7 @@ const DeletePaymentModal = (props: thisProps) => {
 
         modalHandler(`delPay${index}`, false);
         router.refresh();
+        return stateChanges();
       }
     } catch (error: any) {
       toast.update(loading, {

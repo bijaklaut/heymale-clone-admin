@@ -5,7 +5,12 @@ import { createPayment } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
-const CreatePaymentModal = () => {
+interface ThisProps {
+  stateChanges(): void;
+}
+
+const CreatePaymentModal = (props: ThisProps) => {
+  const { stateChanges } = props;
   const router = useRouter();
   const [data, setData] = useState({
     ownerName: "",
@@ -79,6 +84,7 @@ const CreatePaymentModal = () => {
 
         modalHandler("addPay", false);
         router.refresh();
+        return stateChanges();
       }
     } catch (error: any) {
       if (error.message == "Validation Error") {

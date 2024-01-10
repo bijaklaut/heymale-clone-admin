@@ -1,11 +1,11 @@
 "use client";
 
 import { ChangeEvent, useEffect, useState } from "react";
-import { getCategories } from "../../services/admin";
+import { getPayments } from "../../services/admin";
 import SearchFilter from "../Misc/SearchFilter";
-import CategoryTable from "../Tables/CategoryTable";
 import SimpleTableLoading from "../Loading/SimpleTableLoading";
-import CreateCategoryModal from "../Modals/Category/CreateCategory";
+import PaymentTable from "../Tables/PaymentTable";
+import CreatePaymentModal from "../Modals/Payment/CreatePayment";
 
 const initialPagination = (payload?: any) => {
   return {
@@ -20,7 +20,7 @@ const initialPagination = (payload?: any) => {
   };
 };
 
-const CategoryTableWrapper = () => {
+const PaymentTableWrapper = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(initialPagination());
@@ -28,17 +28,15 @@ const CategoryTableWrapper = () => {
   const [loading, setLoading] = useState(true);
 
   const stateChanges = () => setChanges((prev) => !prev);
+  const pageHandler = (pageNumber: number) => setPage(pageNumber);
   const changeSearch = (event: ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
     setLoading(true);
   };
-  const pageHandler = (pageNumber: number) => {
-    setPage(pageNumber);
-  };
 
   useEffect(() => {
     const getFiltered = async (search: string, page: number) => {
-      const { payload } = await getCategories(search, page);
+      const { payload } = await getPayments(search, page);
 
       setPagination(initialPagination(payload));
       return setTimeout(() => setLoading(false), 500);
@@ -50,7 +48,7 @@ const CategoryTableWrapper = () => {
 
   useEffect(() => {
     const getFiltered = async (search: string, page: number) => {
-      const { payload } = await getCategories(search, page);
+      const { payload } = await getPayments(search, page);
 
       setPagination(initialPagination(payload));
     };
@@ -60,17 +58,17 @@ const CategoryTableWrapper = () => {
 
   return (
     <>
-      <CreateCategoryModal stateChanges={stateChanges} />
+      <CreatePaymentModal stateChanges={stateChanges} />
 
       <div className="mt-3 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
         <SearchFilter
           data={{ search }}
           changeSearch={changeSearch}
           withFilter={false}
-          placeholder="Search category by name"
+          placeholder="Search payment by account number"
         />
         {!loading ? (
-          <CategoryTable
+          <PaymentTable
             pageHandler={pageHandler}
             stateChanges={stateChanges}
             paginate={pagination}
@@ -83,4 +81,4 @@ const CategoryTableWrapper = () => {
   );
 };
 
-export default CategoryTableWrapper;
+export default PaymentTableWrapper;

@@ -1,6 +1,5 @@
 import { Metadata } from "next";
-import CreatePaymentModal from "../../../../components/Modals/Payment/CreatePayment";
-import PaymentTable from "../../../../components/Tables/PaymentTable";
+import PaymentTableWrapper from "../../../../components/Wrapper/PaymentTableWrapper";
 
 export const metadata: Metadata = {
   title: "Heymale | Payment Dashboard",
@@ -11,9 +10,7 @@ const PaymentDashboard = () => {
   return (
     <>
       <h2 className="text-2xl font-semibold">Payment Dashboard</h2>
-
-      <CreatePaymentModal />
-      <PaymentTable />
+      <PaymentTableWrapper />
     </>
   );
 };

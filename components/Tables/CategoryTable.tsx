@@ -60,7 +60,7 @@ const CategoryTable = ({ paginate, pageHandler, stateChanges }: ThisProps) => {
           <Pagination paginate={paginate} pageHandler={pageHandler} />
         </Fragment>
       ) : (
-        <NoDisplay text="There's no categories to display" />
+        <NoDisplay text="There's no category to display" />
       )}
     </div>
   );

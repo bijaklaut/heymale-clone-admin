@@ -1,10 +1,7 @@
-import axios from "axios";
 import callApi from "./callApi";
 import { PostPaymentTypes, SignInTypes } from "./types";
-import Cookies from "js-cookie";
 
 const ROOT_API = process.env.NEXT_PUBLIC_API;
-const AREA_API = process.env.NEXT_PUBLIC_AREA_API;
 const API_VER = "api/v1";
 
 // Category Dashboard
@@ -51,8 +48,10 @@ export const deleteCategory = async (id: string) => {
 // End of Category Dashboard
 
 // Payment Dashboard
-export const getPayments = async () => {
-  const url = `${ROOT_API}/${API_VER}/payment`;
+export const getPayments = async (search: string, page?: number) => {
+  const searchQuery = `?search=${search}` || "";
+  const pageQuery = page ? (searchQuery ? `&p=${page}` : `?p=${page}`) : "";
+  const url = `${ROOT_API}/${API_VER}/payment${searchQuery}${pageQuery}`;
 
   return callApi({
     url,

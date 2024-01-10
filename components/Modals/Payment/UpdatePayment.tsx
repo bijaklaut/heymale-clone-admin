@@ -9,10 +9,11 @@ import { PaymentTypes } from "../../../services/types";
 interface thisProps {
   payment: PaymentTypes;
   index: number;
+  stateChanges(): void;
 }
 const UpdatePaymentModal = (props: thisProps) => {
   const router = useRouter();
-  const { payment, index } = props;
+  const { payment, index, stateChanges } = props;
   const [data, setData] = useState({
     ownerName: payment.ownerName,
     bankName: payment.bankName,
@@ -85,6 +86,7 @@ const UpdatePaymentModal = (props: thisProps) => {
 
         modalHandler(`updatePay${index}`, false);
         router.refresh();
+        return stateChanges();
       }
     } catch (error: any) {
       if (error.message == "Validation Error") {
