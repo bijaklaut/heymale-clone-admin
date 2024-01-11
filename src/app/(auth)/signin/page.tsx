@@ -5,6 +5,7 @@ import { signIn } from "../../../../services/admin";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import heymaleLogo from "@/../public/images/logo/heymale-logo.png";
 
 const Signin = () => {
   const router = useRouter();
@@ -63,10 +64,9 @@ const Signin = () => {
         className="mx-auto mb-8 flex w-full max-w-[700px] flex-col items-center rounded-xl bg-white px-5 py-8 transition-all duration-300 sm:px-10"
       >
         <Image
-          className="mx-auto my-3 w-16 sm:w-32 lg:w-40"
-          width={100}
-          height={100}
-          src="/images/logo/heymale-logo.png"
+          className="mx-auto my-3 w-16 sm:w-32 lg:w-48"
+          width={150}
+          src={heymaleLogo}
           alt="heymale-logo"
         />
         <h2 className="mb-5 mt-3 text-center text-xl font-semibold text-black md:mb-8">
