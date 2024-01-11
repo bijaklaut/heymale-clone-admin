@@ -47,7 +47,7 @@ const PaymentTable = ({ paginate, pageHandler, stateChanges }: ThisProps) => {
             <tbody>
               {payments.map((payment: PaymentTypes, i: any) => {
                 return (
-                  <tr key={i} className="hover h-full">
+                  <tr key={i}>
                     <th className="text-center">{i + 1}</th>
                     <td className="text-center">{payment.ownerName}</td>
                     <td>
@@ -62,7 +62,7 @@ const PaymentTable = ({ paginate, pageHandler, stateChanges }: ThisProps) => {
                         <span>No: {payment.accountNo}</span>
                       </div>
                     </td>
-                    <td className="flex min-h-[70px] w-full items-center justify-center">
+                    <td className="flex justify-center gap-x-2">
                       <UpdatePaymentModal
                         payment={payment}
                         index={i}
