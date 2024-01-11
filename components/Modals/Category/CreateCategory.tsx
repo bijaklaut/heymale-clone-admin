@@ -4,6 +4,7 @@ import { ChangeEvent, useState } from "react";
 import { createCategory } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import TextInput from "../../Form/TextInput";
 
 const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
   const router = useRouter();
@@ -19,37 +20,46 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
     },
   ]);
 
+  const textInputHandler = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    inputLabel: string,
+  ) => {
+    setData({
+      ...data,
+      [inputLabel]: event.target.value,
+    });
+    buttonCheck(event);
+  };
+
+  const buttonCheck = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    if (!event.target.value) {
+      setDisable(true);
+    } else {
+      setDisable(false);
+    }
+  };
+
   const modalHandler = (id: string, show: boolean) => {
     const modal = document.getElementById(id) as HTMLDialogElement;
 
     if (modal && show) {
-      setValidation([
-        {
-          field: "",
-          message: "",
-        },
-      ]);
-      setData({
-        name: "",
-      });
-
       return modal.showModal();
     }
+    setValidation([
+      {
+        field: "",
+        message: "",
+      },
+    ]);
+    setData({
+      name: "",
+    });
+    setDisable(true);
+    setLoading(false);
 
     return modal.close();
-  };
-
-  const changeHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    setData({
-      ...data,
-      name: event.target.value,
-    });
-
-    if (!event.target.value) {
-      return setDisable(true);
-    }
-
-    return setDisable(false);
   };
 
   const submitHandler = async () => {
@@ -64,19 +74,17 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
     try {
       const result = await createCategory(data);
 
-      if (result.payload) {
+      setTimeout(() => {
+        setLoading(false);
         toast.success(result.message, {
           containerId: "Main",
         });
-
         modalHandler("addCat", false);
-        setTimeout(() => setLoading(false), 600);
         router.refresh();
-
         return stateChanges();
-      }
+      }, 1000);
     } catch (error: any) {
-      setTimeout(() => setLoading(false), 600);
+      setTimeout(() => setLoading(false), 1000);
 
       if (error.message == "Validation Error" || error.code == 11000) {
         for (const [key] of Object.entries(error.errorDetail)) {
@@ -109,46 +117,26 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
           containerId={"CreateCategory"}
           theme="dark"
         />
-        <div className="modal-box absolute">
-          <h3 className=" mb-5 text-lg font-bold text-primary">Add Category</h3>
-          <label className="w-full max-w-xs">
-            <div className="label">
-              <span className="label-text -ms-1 font-semibold">
-                Category Name
-              </span>
-            </div>
-            <input
-              type="text"
-              placeholder="Enter category name"
-              className="input h-10 w-full rounded-md border border-neutral p-2 focus:outline-0 focus:ring-0"
-              onChange={(e) => {
-                changeHandler(e);
-              }}
-              value={data.name}
-            />
-            <div className="label">
-              {validation.map((val) => {
-                return val.field == "name" ? (
-                  <span className="label-text-alt text-error">
-                    {val.message}
-                  </span>
-                ) : (
-                  ""
-                );
-              })}
-            </div>
-          </label>
+        <div className="modal-box absolute bg-slate-800 [&>*:not(h3)]:text-slate-800">
+          <h3 className=" mb-5 text-lg font-bold text-white">Add Category</h3>
+          <TextInput
+            data={data}
+            label={["Category Name", "name", "Enter category name"]}
+            validation={validation}
+            onChange={textInputHandler}
+          />
+
           <div className="modal-action flex">
             {!loading ? (
               <button
-                className="btn btn-primary btn-sm text-white"
+                className="btn btn-primary btn-sm px-8 text-white"
                 disabled={disable}
                 onClick={submitHandler}
               >
                 Create
               </button>
             ) : (
-              <button className="btn btn-disabled btn-sm">
+              <button className="btn btn-primary btn-sm pointer-events-none text-white">
                 <span className="loading loading-spinner loading-sm"></span>
                 Creating..
               </button>
@@ -156,7 +144,12 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
 
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-outline btn-sm">Close</button>
+              <button
+                className="btn btn-sm border-white bg-transparent text-white hover:bg-white hover:text-slate-800 active:bg-white active:text-slate-800 "
+                onClick={() => modalHandler("addCat", false)}
+              >
+                Close
+              </button>
             </form>
           </div>
         </div>

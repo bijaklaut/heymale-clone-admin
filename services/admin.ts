@@ -59,23 +59,29 @@ export const getPayments = async (search: string, page?: number) => {
   });
 };
 
-export const createPayment = async (data: PostPaymentTypes) => {
+export const createPayment = async (data: PostPaymentTypes, token: string) => {
   const url = `${ROOT_API}/${API_VER}/payment/create`;
 
   return callApi({
     url,
     method: "POST",
     data,
+    token,
   });
 };
 
-export const updatePayment = async (data: PostPaymentTypes, id: string) => {
+export const updatePayment = async (
+  data: PostPaymentTypes,
+  id: string,
+  token: string,
+) => {
   const url = `${ROOT_API}/${API_VER}/payment/${id}`;
 
   return callApi({
     url,
     method: "PUT",
     data,
+    token,
   });
 };
 

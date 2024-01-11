@@ -1,9 +1,10 @@
 "use client";
 
 import { deletePayment } from "../../../services/admin";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { PaymentTypes } from "../../../services/types";
+import { TrashSvg } from "../../Misc/SvgGroup";
 
 interface thisProps {
   payment: PaymentTypes;
@@ -58,26 +59,27 @@ const DeletePaymentModal = (props: thisProps) => {
   return (
     <>
       <button
-        className="btn btn-error btn-xs ms-1 text-white"
+        className="text-gray-600 transition-all hover:text-error"
         onClick={() => modalHandler(`delPay${index}`, true)}
       >
-        Delete
+        <TrashSvg className="w-5 stroke-current" />
       </button>
+
       <dialog data-theme={"dracula"} id={`delPay${index}`} className="modal">
         <div className="modal-box">
-          <h3 className=" mb-5 font-semibold text-primary">
+          <h3 className=" mb-5 font-semibold text-white">
             Are you sure to delete {payment.bankName} - {payment.accountNo}?
           </h3>
           <div className="modal-action flex">
             <button
-              className="btn btn-primary btn-xs"
+              className="btn btn-xs bg-red-500 px-4"
               onClick={() => submitHandler(payment._id, index)}
             >
-              Confirm
+              Delete
             </button>
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-outline btn-xs">Close</button>
+              <button className="btn btn-outline btn-xs px-4">Close</button>
             </form>
           </div>
         </div>

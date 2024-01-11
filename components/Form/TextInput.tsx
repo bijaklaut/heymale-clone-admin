@@ -2,7 +2,7 @@ import { ChangeEvent } from "react";
 
 interface TextInputProps {
   data: any;
-  label: string[];
+  label: [textLabel: string, fieldLabel: string, placeholder?: string];
   onChange(event: ChangeEvent, label: string): void;
   validation: { field: string; message: string }[];
 }
@@ -17,7 +17,7 @@ const TextInput = (props: TextInputProps) => {
       </div>
       <input
         type="text"
-        placeholder={placeholder ? placeholder : "Type here"}
+        placeholder={placeholder || "Type here"}
         className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 text-sm focus:outline-0 focus:ring-0"
         onChange={(e) => onChange(e, fieldLabel)}
         value={(data as any)[fieldLabel]}
@@ -25,7 +25,7 @@ const TextInput = (props: TextInputProps) => {
       <div className="label">
         {validation.map((val, i) =>
           val.field == fieldLabel ? (
-            <span key={i} className="label-text-alt text-red-600">
+            <span key={i} className="label-text-alt text-red-500">
               {val.message}
             </span>
           ) : (

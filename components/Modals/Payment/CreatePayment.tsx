@@ -1,125 +1,121 @@
 "use client";
 
-import { useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { createPayment } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import TextInput from "../../Form/TextInput";
+import { PostPaymentTypes } from "../../../services/types";
+import Cookies from "js-cookie";
 
 interface ThisProps {
   stateChanges(): void;
 }
 
-const CreatePaymentModal = (props: ThisProps) => {
-  const { stateChanges } = props;
-  const router = useRouter();
-  const [data, setData] = useState({
+const initialState = () => {
+  return {
     ownerName: "",
     bankName: "",
     accountNo: "",
-  });
+  };
+};
+
+const CreatePaymentModal = (props: ThisProps) => {
+  const { stateChanges } = props;
+  const router = useRouter();
+  const [data, setData] = useState(initialState());
   const [disable, setDisable] = useState(true);
-  const [validation, setValidation] = useState({
-    ownerName: {
+  const [loading, setLoading] = useState(false);
+  const [validation, setValidation] = useState([
+    {
+      field: "",
       message: "",
     },
-    bankName: {
-      message: "",
-    },
-    accountNo: {
-      message: "",
-    },
-  });
+  ]);
 
-  const buttonCheck = () => {
-    const { ownerName, bankName, accountNo } = data;
-
-    if (!ownerName || !bankName || !accountNo) {
-      setDisable(true);
-    } else {
-      setDisable(false);
-    }
+  const textInputHandler = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    inputLabel: string,
+  ) => {
+    setData({
+      ...data,
+      [inputLabel]: event.target.value,
+    });
   };
 
   const modalHandler = (id: string, show: boolean) => {
     const modal = document.getElementById(id) as HTMLDialogElement;
 
     if (modal && show) {
-      setDisable(true);
-      setData({
-        ownerName: "",
-        bankName: "",
-        accountNo: "",
-      });
-      setValidation({
-        ownerName: {
-          message: "",
-        },
-        bankName: {
-          message: "",
-        },
-        accountNo: {
-          message: "",
-        },
-      });
-
-      modal.showModal();
-    } else if (modal && show == false) {
-      modal.close();
+      return modal.showModal();
     }
+
+    setDisable(true);
+    setLoading(false);
+    setData(initialState());
+    setValidation([{ field: "", message: "" }]);
+    return modal.close();
   };
 
   const submitHandler = async () => {
-    const loading = toast.loading("Processing..", {
-      containerId: "CreatePayment",
-    });
-
+    setLoading(true);
+    setValidation([
+      {
+        field: "",
+        message: "",
+      },
+    ]);
     try {
-      const result = await createPayment(data);
+      const token = Cookies.get("token");
+      const result = await createPayment(data, token!);
 
-      if (result.payload) {
-        toast.dismiss(loading);
+      setTimeout(() => {
+        setLoading(false);
         toast.success(result.message, {
           containerId: "Main",
         });
-
         modalHandler("addPay", false);
         router.refresh();
-        return stateChanges();
-      }
+
+        stateChanges();
+      }, 1000);
     } catch (error: any) {
-      if (error.message == "Validation Error") {
-        toast.update(loading, {
-          render: error.message,
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-          containerId: "CreatePayment",
-        });
-        setValidation(error.errorDetail);
-      } else if (error.code == 11000) {
-        toast.update(loading, {
-          render: error.message,
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-          containerId: "CreatePayment",
-        });
-      } else {
-        toast.update(loading, {
-          render: error.message,
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-          containerId: "CreatePayment",
-        });
-      }
+      setTimeout(() => {
+        setLoading(false);
+        if (error.message == "Validation Error" || error.code == 11000) {
+          for (const [key] of Object.entries(error.errorDetail)) {
+            setValidation((prev) => [
+              ...prev,
+              {
+                field: key,
+                message: error.errorDetail[key].message,
+              },
+            ]);
+          }
+        }
+
+        return toast.error(error.message, { containerId: "CreatePayment" });
+      }, 1000);
     }
   };
+
+  useEffect(() => {
+    const buttonCheck = (data: PostPaymentTypes) => {
+      const { accountNo, ownerName, bankName } = data;
+
+      if (!accountNo || !ownerName || !bankName) return setDisable(true);
+
+      setDisable(false);
+    };
+
+    buttonCheck(data);
+  }, [data]);
 
   return (
     <>
       <button
-        className="btn btn-primary btn-sm mb-3 mt-5 "
+        data-theme={"nord"}
+        className="btn btn-primary btn-sm mb-3 mt-5 rounded-md text-white"
         onClick={() => modalHandler("addPay", true)}
       >
         Add Payment
@@ -130,102 +126,52 @@ const CreatePaymentModal = (props: ThisProps) => {
           enableMultiContainer
           containerId={"CreatePayment"}
         />
-        <div className="modal-box">
-          <h3 className=" mb-5 text-lg font-bold text-primary">
+        <div className="modal-box absolute">
+          <h3 className="mb-5 text-lg font-bold text-sky-500">
             Create New Payment
           </h3>
-          <label className="w-full max-w-xs">
-            <div className="label">
-              <span className="label-text -ms-1">Owner Name</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Type here"
-              className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 focus:outline-0 focus:ring-0"
-              onChange={(e) => {
-                setData({
-                  ...data,
-                  ownerName: e.target.value,
-                });
-              }}
-              onKeyUp={buttonCheck}
-              value={data.ownerName}
-            />
-            <div className="label">
-              {validation.ownerName?.message ? (
-                <span className="label-text-alt text-error">
-                  {validation.ownerName?.message}
-                </span>
-              ) : (
-                ""
-              )}
-            </div>
-          </label>
-          <label className="w-full max-w-xs">
-            <div className="label">
-              <span className="label-text -ms-1">Bank Name</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Type here"
-              className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 focus:outline-0 focus:ring-0"
-              onChange={(e) => {
-                setData({
-                  ...data,
-                  bankName: e.target.value,
-                });
-              }}
-              onKeyUp={buttonCheck}
-              value={data.bankName}
-            />
-            <div className="label">
-              {validation.bankName?.message ? (
-                <span className="label-text-alt text-error">
-                  {validation.bankName?.message}
-                </span>
-              ) : (
-                ""
-              )}
-            </div>
-          </label>
-          <label className="w-full max-w-xs">
-            <div className="label">
-              <span className="label-text -ms-1">Account Number</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Type here"
-              className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 focus:outline-0 focus:ring-0"
-              onChange={(e) => {
-                setData({
-                  ...data,
-                  accountNo: e.target.value,
-                });
-              }}
-              onKeyUp={buttonCheck}
-              value={data.accountNo}
-            />
-            <div className="label">
-              {validation.accountNo?.message ? (
-                <span className="label-text-alt text-error">
-                  {validation.accountNo?.message}
-                </span>
-              ) : (
-                ""
-              )}
-            </div>
-          </label>
+          <TextInput
+            data={data}
+            label={["Owner Name", "ownerName", "Enter account owner name"]}
+            onChange={textInputHandler}
+            validation={validation}
+          />
+          <TextInput
+            data={data}
+            label={["Bank Name", "bankName", "Enter bank name"]}
+            onChange={textInputHandler}
+            validation={validation}
+          />
+          <TextInput
+            data={data}
+            label={["Account Number", "accountNo", "Enter account number"]}
+            onChange={textInputHandler}
+            validation={validation}
+          />
           <div className="modal-action flex">
-            <button
-              className="btn btn-primary btn-sm"
-              disabled={disable}
-              onClick={submitHandler}
-            >
-              Confirm
-            </button>
+            {!loading ? (
+              <button
+                className="btn btn-sm bg-sky-500 px-8 text-white hover:bg-sky-600 active:bg-sky-600"
+                disabled={disable}
+                onClick={submitHandler}
+              >
+                Create
+              </button>
+            ) : (
+              <button className="btn-sky-500 btn btn-sm pointer-events-none text-white">
+                <span className="loading loading-spinner loading-sm"></span>
+                Creating..
+              </button>
+            )}
+
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-outline btn-sm">Close</button>
+              <button
+                className="btn btn-sm border-white bg-transparent px-5 text-white hover:bg-white hover:text-slate-800 active:bg-white active:text-slate-800 "
+                onClick={() => modalHandler("addPay", false)}
+              >
+                Close
+              </button>
             </form>
           </div>
         </div>
