@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import PaymentTableWrapper from "../../../../components/Wrapper/PaymentTableWrapper";
+import PaymentWrapper from "../../../../components/Wrapper/PaymentWrapper";
 
 export const metadata: Metadata = {
   title: "Heymale | Payment Dashboard",
@@ -7,12 +7,7 @@ export const metadata: Metadata = {
 };
 
 const PaymentDashboard = () => {
-  return (
-    <>
-      <h2 className="text-2xl font-semibold">Payment Dashboard</h2>
-      <PaymentTableWrapper />
-    </>
-  );
+  return <PaymentWrapper />;
 };
 
 export default PaymentDashboard;

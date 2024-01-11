@@ -114,8 +114,7 @@ const CreatePaymentModal = (props: ThisProps) => {
   return (
     <>
       <button
-        data-theme={"nord"}
-        className="btn btn-primary btn-sm mb-3 mt-5 rounded-md text-white"
+        className="btn btn-sm mb-3 mt-5 rounded-md bg-blue-500 text-white hover:bg-white hover:text-blue-500"
         onClick={() => modalHandler("addPay", true)}
       >
         Add Payment

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState, Fragment } from "react";
 import { getPayments } from "../../services/admin";
 import SearchFilter from "../Misc/SearchFilter";
 import SimpleTableLoading from "../Loading/SimpleTableLoading";
@@ -20,7 +20,7 @@ const initialPagination = (payload?: any) => {
   };
 };
 
-const PaymentTableWrapper = () => {
+const PaymentWrapper = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(initialPagination());
@@ -57,7 +57,8 @@ const PaymentTableWrapper = () => {
   }, [page]);
 
   return (
-    <>
+    <Fragment>
+      <h2 className="text-2xl font-semibold">Payment Dashboard</h2>
       <CreatePaymentModal stateChanges={stateChanges} />
 
       <div className="mt-3 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
@@ -65,7 +66,7 @@ const PaymentTableWrapper = () => {
           data={{ search }}
           changeSearch={changeSearch}
           withFilter={false}
-          placeholder="Search payment by account number"
+          placeholder="Search by account number"
         />
         {!loading ? (
           <PaymentTable
@@ -77,8 +78,8 @@ const PaymentTableWrapper = () => {
           <SimpleTableLoading />
         )}
       </div>
-    </>
+    </Fragment>
   );
 };
 
-export default PaymentTableWrapper;
+export default PaymentWrapper;
