@@ -23,7 +23,24 @@ const config: Config = {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["nord", "dracula"],
+    themes: [
+      {
+        skies: {
+          primary: "#2793F2",
+          secondary: "#7abfeb",
+          accent: "#F27405",
+          neutral: "#1c1917",
+          "base-100": "#232e3d",
+          info: "#22d3ee",
+          success: "#4ade80",
+          warning: "#facc15",
+          error: "#ef4444",
+        },
+      },
+      "nord",
+      "dracula",
+    ],
+    darkTheme: "skies",
   },
 };
 export default config;
