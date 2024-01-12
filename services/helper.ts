@@ -27,6 +27,7 @@ export const populateError = (
     label!.innerHTML = "";
   }
 };
+
 export const populateErrorFloating = (
   validation: { field: string; message: string }[],
   data: PostDataTypes,
@@ -58,21 +59,18 @@ export const modalHandler = (
   const { setData, setValidation, setLoading, setDisable } = setState;
   const modal = document.getElementById(id) as HTMLDialogElement;
 
-  setValidation([
-    {
-      field: "",
-      message: "",
-    },
-  ]);
-  setDisable(true);
-  setLoading(false);
-
   if (!show && data) {
+    setValidation([]);
+    setDisable(true);
+    setLoading(false);
     setData(initialData(data));
     return modal.close();
   }
 
   if (!show) {
+    setValidation([]);
+    setDisable(true);
+    setLoading(false);
     setData(initialData());
     return modal.close();
   }
@@ -84,9 +82,14 @@ export const buttonCheck = (
   data: PostDataTypes,
   requiredField: Array<string>,
   setDisable: Dispatch<SetStateAction<boolean>>,
+  oldData?: DataTypes,
 ) => {
   requiredField.map((field) => {
-    if (!(data as any)[field]) return setDisable(true);
+    if (
+      !(data as any)[field] ||
+      (data as any)[field] == (oldData as any)[field]
+    )
+      return setDisable(true);
     setDisable(false);
   });
 };

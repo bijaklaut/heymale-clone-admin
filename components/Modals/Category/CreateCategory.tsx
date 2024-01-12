@@ -7,9 +7,10 @@ import { useRouter } from "next/navigation";
 import TextInput from "../../Form/TextInput";
 import Cookies from "js-cookie";
 import {
-  PopulateError,
+  populateError,
   buttonCheck,
   modalHandler,
+  populateValidation,
 } from "../../../services/helper";
 import {
   PostCategoryTypes,
@@ -20,7 +21,7 @@ import {
 const initialData = () => {
   return {
     name: "",
-  } as PostCategoryTypes;
+  };
 };
 
 const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
@@ -72,15 +73,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
       setTimeout(() => {
         setLoading(false);
         if (error.message == "Validation Error" || error.code == 11000) {
-          for (const [key] of Object.entries(error.errorDetail)) {
-            setValidation((prev) => [
-              ...prev,
-              {
-                field: key,
-                message: error.errorDetail[key].message,
-              },
-            ]);
-          }
+          populateValidation(error, setValidation);
         }
 
         toast.error(error.message, { containerId: "CreateCategory" });
@@ -93,7 +86,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
   }, [data]);
 
   useEffect(() => {
-    PopulateError(validation, data);
+    populateError(validation, data);
   }, [validation]);
 
   return (

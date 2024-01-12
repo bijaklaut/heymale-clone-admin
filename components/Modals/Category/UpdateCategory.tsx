@@ -3,54 +3,42 @@
 import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { CategoryTypes, PostCategoryTypes } from "../../../services/types";
+import {
+  CategoryTypes,
+  DataTypes,
+  PostCategoryTypes,
+  ValidationTypes,
+} from "../../../services/types";
 import { updateCategory } from "../../../services/admin";
 import { EditSvg } from "../../Misc/SvgGroup";
 import TextInput from "../../Form/TextInput";
 import Cookies from "js-cookie";
-import { PopulateError } from "../../../services/helper";
+import {
+  buttonCheck,
+  modalHandler,
+  populateError,
+  populateValidation,
+} from "../../../services/helper";
 
 interface thisProps {
   category: CategoryTypes;
   index: number;
   stateChanges(): void;
 }
+
+const initialData = (data: DataTypes | undefined) => {
+  return { name: (data as CategoryTypes).name };
+};
+
 const UpdateCategoryModal = (props: thisProps) => {
   const router = useRouter();
   const { category, index, stateChanges } = props;
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<PostCategoryTypes>({
-    name: category.name,
-  });
-  const [validation, setValidation] = useState([
-    {
-      field: "",
-      message: "",
-    },
-  ]);
+  const [data, setData] = useState<PostCategoryTypes>(initialData(category));
+  const [validation, setValidation] = useState<ValidationTypes[]>([]);
 
-  const modalHandler = (id: string, show: boolean) => {
-    const modal = document.getElementById(id) as HTMLDialogElement;
-
-    if (!show) {
-      setValidation([
-        {
-          field: "",
-          message: "",
-        },
-      ]);
-      setData({
-        name: category.name,
-      });
-      setDisable(true);
-      setLoading(false);
-
-      return modal.close();
-    }
-
-    return modal.showModal();
-  };
+  const setState = { setDisable, setLoading, setValidation, setData };
 
   const textInputHandler = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -64,12 +52,7 @@ const UpdateCategoryModal = (props: thisProps) => {
 
   const submitHandler = async (id: string, index: number) => {
     setLoading(true);
-    setValidation([
-      {
-        field: "",
-        message: "",
-      },
-    ]);
+    setValidation([]);
 
     try {
       const token = Cookies.get("token");
@@ -80,57 +63,36 @@ const UpdateCategoryModal = (props: thisProps) => {
         toast.success(result.message, {
           containerId: "Main",
         });
-        modalHandler(`updateCat${index}`, false);
+        modalHandler(
+          `updateCat${index}`,
+          false,
+          initialData,
+          setState,
+          category,
+        );
         router.refresh();
-        return stateChanges();
+        stateChanges();
       }, 700);
-      if (result.payload) {
-        toast.success(result.message, {
-          containerId: "Main",
-        });
-
-        setTimeout(() => setLoading(false), 600);
-
-        router.refresh();
-        return stateChanges();
-      }
     } catch (error: any) {
-      setTimeout(() => setLoading(false), 600);
-
-      if (error.message == "Validation Error" || error.code == 11000) {
-        for (const [key] of Object.entries(error.errorDetail)) {
-          setValidation((prev) => [
-            ...prev,
-            {
-              field: key,
-              message: error.errorDetail[key].message,
-            },
-          ]);
+      setTimeout(() => {
+        setLoading(false);
+        if (error.message == "Validation Error" || error.code == 11000) {
+          return populateValidation(error, setValidation);
         }
 
         return toast.error(error.message, {
           containerId: "UpdateCategory",
         });
-      }
-
-      return toast.error(error.message, {
-        containerId: "UpdateCategory",
-      });
+      }, 700);
     }
   };
 
   useEffect(() => {
-    const buttonCheck = (data: { name: string }) => {
-      if (!data.name) return setDisable(true);
-
-      setDisable(false);
-    };
-
-    buttonCheck(data);
+    buttonCheck(data, ["name"], setDisable, category);
   }, [data]);
 
   useEffect(() => {
-    PopulateError(validation, data);
+    populateError(validation, data);
   }, [validation]);
 
   return (
@@ -138,7 +100,15 @@ const UpdateCategoryModal = (props: thisProps) => {
       <button
         data-theme={"skies"}
         className="btn-icon-primary"
-        onClick={() => modalHandler(`updateCat${index}`, true)}
+        onClick={() =>
+          modalHandler(
+            `updateCat${index}`,
+            true,
+            initialData,
+            setState,
+            category,
+          )
+        }
       >
         <EditSvg className="w-5 stroke-current" />
       </button>
@@ -176,7 +146,15 @@ const UpdateCategoryModal = (props: thisProps) => {
               {/* if there is a button in form, it will close the modal */}
               <button
                 className="btn btn-outline btn-sm"
-                onClick={() => modalHandler(`updateCat${index}`, false)}
+                onClick={() =>
+                  modalHandler(
+                    `updateCat${index}`,
+                    false,
+                    initialData,
+                    setState,
+                    category,
+                  )
+                }
               >
                 Close
               </button>
