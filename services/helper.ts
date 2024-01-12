@@ -1,7 +1,13 @@
 import { Dispatch, SetStateAction } from "react";
-import { DataTypes, InitData, PostDataTypes, SetStateTypes } from "./types";
+import {
+  DataTypes,
+  InitData,
+  PostDataTypes,
+  SetStateTypes,
+  ValidationTypes,
+} from "./types";
 
-export const PopulateError = (
+export const populateError = (
   validation: { field: string; message: string }[],
   data: PostDataTypes,
 ) => {
@@ -18,6 +24,26 @@ export const PopulateError = (
     }
 
     element?.classList.remove("input-error");
+    label!.innerHTML = "";
+  }
+};
+export const populateErrorFloating = (
+  validation: { field: string; message: string }[],
+  data: PostDataTypes,
+) => {
+  for (const [key] of Object.entries(data)) {
+    const element = document.getElementById(key);
+    const val = validation.find((val) => val.field == key);
+    const label = element?.parentNode?.querySelector("span.invalid-feedback");
+
+    if (val && element) {
+      element.classList.add("is-invalid");
+      label!.innerHTML = val.message;
+
+      return 0;
+    }
+
+    element?.classList.remove("is-invalid");
     label!.innerHTML = "";
   }
 };
@@ -63,4 +89,19 @@ export const buttonCheck = (
     if (!(data as any)[field]) return setDisable(true);
     setDisable(false);
   });
+};
+
+export const populateValidation = (
+  error: any,
+  setValidation: Dispatch<SetStateAction<ValidationTypes[]>>,
+) => {
+  for (const [key] of Object.entries(error.errorDetail)) {
+    setValidation((prev) => [
+      ...prev,
+      {
+        field: key,
+        message: error.errorDetail[key].message,
+      },
+    ]);
+  }
 };

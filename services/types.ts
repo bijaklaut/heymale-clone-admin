@@ -36,7 +36,13 @@ export type PostDataTypes =
   | PostAddressTypes
   | PostPaymentTypes
   | PostProductTypes
-  | PostUserTypes;
+  | PostUserTypes
+  | SignInTypes;
+
+export interface LoginTypes {
+  email: string;
+  password: string;
+}
 
 export interface PostCategoryTypes {
   name: string;
@@ -130,7 +136,3 @@ export interface FilterTypes {
   name: string;
   include: boolean;
 }
-
-// export interface FilterCriteriaTypes {
-//   name: string;
-// }

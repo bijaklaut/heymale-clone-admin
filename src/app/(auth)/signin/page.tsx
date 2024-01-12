@@ -1,66 +1,64 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "../../../../services/admin";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import heymaleLogo from "@/../public/images/logo/heymale-logo.png";
+import { SignInTypes, ValidationTypes } from "../../../../services/types";
+import {
+  buttonCheck,
+  populateErrorFloating,
+  populateValidation,
+} from "../../../../services/helper";
 
 const Signin = () => {
   const router = useRouter();
-  const [data, setData] = useState({
+  const [data, setData] = useState<SignInTypes>({
     email: "",
     password: "",
   });
-  const [validation, setValidation] = useState({
-    email: {
-      message: "",
-    },
-    password: {
-      message: "",
-    },
-  });
+  const [validation, setValidation] = useState<ValidationTypes[]>([]);
+  const [disable, setDisable] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const submitHandler = async () => {
-    const loading = toast.loading("Processing..", {
-      containerId: "Main",
-    });
-
+    setLoading(true);
+    setValidation([]);
     try {
       const result = await signIn(data);
-      if (result.payload) {
-        toast.update(loading, {
-          render: result.message,
-          type: "success",
-          isLoading: false,
-          autoClose: 3000,
-          containerId: "Main",
-        });
+
+      setTimeout(() => {
+        setLoading(false);
+        toast.success(result.message, { containerId: "Main" });
         Cookies.set("token", btoa(result.payload), { expires: 1 });
         router.push("/");
-      }
+      }, 700);
     } catch (error: any) {
-      console.log("ERROR: ", error);
-      if (error.status == 401) {
-        toast.dismiss(loading);
-        setValidation(error.errorDetail);
-      } else {
-        toast.update(loading, {
-          render: error.message,
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-          containerId: "Main",
-        });
-      }
+      setTimeout(() => {
+        setLoading(false);
+        if (error.status == 401) {
+          return populateValidation(error, setValidation);
+        }
+
+        toast.error(error.message, { containerId: "Main" });
+      }, 700);
     }
   };
+
+  useEffect(() => {
+    buttonCheck(data, ["email", "password"], setDisable);
+  }, [data]);
+
+  useEffect(() => {
+    populateErrorFloating(validation, data);
+  }, [validation]);
 
   return (
     <section className="flex h-screen items-center justify-center">
       <div
-        data-theme="nord"
+        data-theme="skies"
         className="mx-auto mb-8 flex w-full max-w-[700px] flex-col items-center rounded-xl bg-white px-5 py-8 transition-all duration-300 sm:px-10"
       >
         <Image
@@ -90,13 +88,11 @@ const Signin = () => {
           <label htmlFor="email" className="floating-label">
             Email
           </label>
-          <span className="invalid-feedback">
-            {validation.email?.message ? validation.email?.message : ""}
-          </span>
+          <span className="invalid-feedback"></span>
         </div>
         <div className="relative my-4 w-[300px]">
           <input
-            id="pass"
+            id="password"
             placeholder="password"
             autoComplete="off"
             type="password"
@@ -108,20 +104,26 @@ const Signin = () => {
               })
             }
           />
-          <label htmlFor="pass" className="floating-label">
+          <label htmlFor="password" className="floating-label">
             Password
           </label>
-          <span className="invalid-feedback">
-            {validation.password?.message ? validation.password?.message : ""}
-          </span>
+          <span className="invalid-feedback"></span>
         </div>
         <div className="mt-10 flex w-full flex-col items-center">
-          <button
-            onClick={submitHandler}
-            className="btn btn-outline btn-sm rounded-md px-5"
-          >
-            Sign in
-          </button>
+          {!loading ? (
+            <button
+              onClick={submitHandler}
+              disabled={disable}
+              className="outline-base btn btn-outline btn-sm "
+            >
+              Sign in
+            </button>
+          ) : (
+            <button className="btn btn-sm pointer-events-none">
+              <span className="loading loading-spinner loading-sm"></span>
+              Signing..
+            </button>
+          )}
         </div>
       </div>
     </section>
