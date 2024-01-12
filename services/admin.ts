@@ -16,32 +16,39 @@ export const getCategories = async (search: string, page?: number) => {
   });
 };
 
-export const createCategory = async (data: { name: string }) => {
+export const createCategory = async (data: { name: string }, token: string) => {
   const url = `${ROOT_API}/${API_VER}/category/create`;
 
   return callApi({
     url,
     method: "POST",
     data,
+    token,
   });
 };
 
-export const updateCategory = async (data: { name: string }, id: string) => {
+export const updateCategory = async (
+  data: { name: string },
+  id: string,
+  token: string,
+) => {
   const url = `${ROOT_API}/${API_VER}/category/${id}`;
 
   return callApi({
     url,
     method: "PUT",
     data,
+    token,
   });
 };
 
-export const deleteCategory = async (id: string) => {
+export const deleteCategory = async (id: string, token: string) => {
   const url = `${ROOT_API}/${API_VER}/category/${id}?_method=DELETE`;
 
   return callApi({
     url,
     method: "POST",
+    token,
   });
 };
 

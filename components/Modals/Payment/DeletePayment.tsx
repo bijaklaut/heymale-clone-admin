@@ -59,7 +59,7 @@ const DeletePaymentModal = (props: thisProps) => {
   return (
     <>
       <button
-        className="text-gray-600 transition-all hover:text-error"
+        className="error-icon-btn"
         onClick={() => modalHandler(`delPay${index}`, true)}
       >
         <TrashSvg className="w-5 stroke-current" />
@@ -72,14 +72,14 @@ const DeletePaymentModal = (props: thisProps) => {
           </h3>
           <div className="modal-action flex">
             <button
-              className="btn btn-xs bg-red-500 px-4"
+              className="error-btn"
               onClick={() => submitHandler(payment._id, index)}
             >
               Delete
             </button>
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-outline btn-xs px-4">Close</button>
+              <button className="outline-white-btn">Close</button>
             </form>
           </div>
         </div>

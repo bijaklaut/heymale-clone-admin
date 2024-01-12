@@ -184,7 +184,7 @@ const UpdateProductModal = (props: ThisProps) => {
           theme="dark"
         />
         <div className="no-scrollbar modal-box absolute max-w-3xl bg-gray-700">
-          <h3 className=" mb-5 text-lg font-bold text-white">Update Product</h3>
+          <h3 className="mb-5 text-lg font-bold text-white">Update Product</h3>
           {/* Product Name & Category */}
           <div className="flex w-full gap-x-3">
             <TextInput

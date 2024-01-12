@@ -4,34 +4,31 @@ interface TextInputProps {
   data: any;
   label: [textLabel: string, fieldLabel: string, placeholder?: string];
   onChange(event: ChangeEvent, label: string): void;
-  validation: { field: string; message: string }[];
+  validation?: { field: string; message: string }[];
 }
 
 const TextInput = (props: TextInputProps) => {
   const { label, onChange, validation, data } = props;
   const [textLabel, fieldLabel, placeholder] = label;
+
   return (
-    <label className="w-full">
+    <label data-theme={"skies"} className="w-full transition-all">
       <div className="label">
-        <span className="label-text -ms-1 text-white">{textLabel}</span>
+        <span className="label-text -ms-1 text-base text-white">
+          {textLabel}
+        </span>
       </div>
       <input
         type="text"
+        id={fieldLabel}
         placeholder={placeholder || "Type here"}
-        className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 text-sm focus:outline-0 focus:ring-0"
+        className="input input-bordered input-sm w-full rounded-md py-5 text-lg transition-all "
+        autoComplete="off"
         onChange={(e) => onChange(e, fieldLabel)}
         value={(data as any)[fieldLabel]}
       />
       <div className="label">
-        {validation.map((val, i) =>
-          val.field == fieldLabel ? (
-            <span key={i} className="label-text-alt text-red-500">
-              {val.message}
-            </span>
-          ) : (
-            ""
-          ),
-        )}
+        <span className="label-text-alt text-red-500"></span>
       </div>
     </label>
   );

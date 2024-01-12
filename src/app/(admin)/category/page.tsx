@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 const CategoryDashboard = async () => {
   return (
     <>
-      <h2 className="text-2xl font-semibold">Category Dashboard</h2>
       <CategoryTableWrapper />
     </>
   );

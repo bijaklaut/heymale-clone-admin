@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { CategoryTypes } from "../../../services/types";
 import { TrashSvg } from "../../Misc/SvgGroup";
 import { useState } from "react";
+import Cookies from "js-cookie";
 
 interface thisProps {
   category: CategoryTypes;
@@ -29,15 +30,12 @@ const DeleteCategoryModal = (props: thisProps) => {
   };
 
   const submitHandler = async (id: string, index: number) => {
-    const loading = toast.loading("Processing..", {
-      containerId: "DeleteCategory",
-    });
-
+    setLoading(true);
     try {
-      const result = await deleteCategory(id);
+      const token = Cookies.get("token");
+      const result = await deleteCategory(id, token!);
 
-      if (result.payload) {
-        toast.dismiss(loading);
+      setTimeout(() => {
         toast.success(result.message, {
           containerId: "Main",
         });
@@ -47,44 +45,49 @@ const DeleteCategoryModal = (props: thisProps) => {
         router.refresh();
 
         return stateChanges();
-      }
+      }, 700);
     } catch (error: any) {
-      setLoading(false);
-      toast.update(loading, {
-        render: error.message,
-        type: "error",
-        isLoading: false,
-        autoClose: 5000,
-        containerId: "Main",
-      });
-      modalHandler(`delCat${index}`, false);
+      setTimeout(() => {
+        setLoading(false);
+        toast.error(error.message, {
+          containerId: "Main",
+        });
+        modalHandler(`delCat${index}`, false);
+      }, 700);
     }
   };
 
   return (
     <>
       <button
-        className="text-gray-600 transition-all hover:text-error"
+        data-theme={"skies"}
+        className="btn-icon-error"
         onClick={() => modalHandler(`delCat${index}`, true)}
       >
         <TrashSvg className="w-5 stroke-current" />
       </button>
-      <dialog data-theme={"nord"} id={`delCat${index}`} className="modal">
-        <div className="modal-box">
-          <h3 className="mb-5 font-semibold">
-            Are you sure to delete {`"${category.name}"`}?
+      <dialog data-theme={"skies"} id={`delCat${index}`} className="modal">
+        <div className="modal-box flex flex-col items-center px-5 py-8">
+          <h3 className="mb-3 text-base text-white">
+            Are you sure to delete {`${category.name}`}?
           </h3>
           <div className="modal-action flex">
-            {!loading ? "" : ""}
-            <button
-              className="btn btn-error btn-xs text-white"
-              onClick={() => submitHandler(category._id, index)}
-            >
-              Delete
-            </button>
+            {!loading ? (
+              <button
+                className="btn btn-error btn-sm"
+                onClick={() => submitHandler(category._id, index)}
+              >
+                Delete
+              </button>
+            ) : (
+              <button disabled className="btn btn-error btn-sm">
+                <span className="loading loading-spinner loading-sm"></span>
+                Deleting..
+              </button>
+            )}
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-outline btn-xs">Close</button>
+              <button className="btn btn-outline btn-sm">Close</button>
             </form>
           </div>
         </div>

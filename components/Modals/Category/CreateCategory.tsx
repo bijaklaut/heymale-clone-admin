@@ -1,16 +1,19 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { createCategory } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import TextInput from "../../Form/TextInput";
+import Cookies from "js-cookie";
+import { PopulateError } from "../../../services/helper";
+import { PostCategoryTypes } from "../../../services/types";
 
 const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
   const router = useRouter();
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({
+  const [data, setData] = useState<PostCategoryTypes>({
     name: "",
   });
   const [validation, setValidation] = useState([
@@ -28,38 +31,28 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
       ...data,
       [inputLabel]: event.target.value,
     });
-    buttonCheck(event);
-  };
-
-  const buttonCheck = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    if (!event.target.value) {
-      setDisable(true);
-    } else {
-      setDisable(false);
-    }
   };
 
   const modalHandler = (id: string, show: boolean) => {
     const modal = document.getElementById(id) as HTMLDialogElement;
 
-    if (modal && show) {
-      return modal.showModal();
-    }
-    setValidation([
-      {
-        field: "",
-        message: "",
-      },
-    ]);
-    setData({
-      name: "",
-    });
-    setDisable(true);
-    setLoading(false);
+    if (!show) {
+      setValidation([
+        {
+          field: "",
+          message: "",
+        },
+      ]);
+      setData({
+        name: "",
+      });
+      setDisable(true);
+      setLoading(false);
 
-    return modal.close();
+      return modal.close();
+    }
+
+    return modal.showModal();
   };
 
   const submitHandler = async () => {
@@ -72,7 +65,8 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
     ]);
 
     try {
-      const result = await createCategory(data);
+      const token = Cookies.get("token");
+      const result = await createCategory(data, token!);
 
       setTimeout(() => {
         setLoading(false);
@@ -82,61 +76,74 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
         modalHandler("addCat", false);
         router.refresh();
         return stateChanges();
-      }, 1000);
+      }, 700);
     } catch (error: any) {
-      setTimeout(() => setLoading(false), 1000);
-
-      if (error.message == "Validation Error" || error.code == 11000) {
-        for (const [key] of Object.entries(error.errorDetail)) {
-          setValidation((prev) => [
-            ...prev,
-            {
-              field: key,
-              message: error.errorDetail[key].message,
-            },
-          ]);
+      setTimeout(() => {
+        setLoading(false);
+        if (error.message == "Validation Error" || error.code == 11000) {
+          for (const [key] of Object.entries(error.errorDetail)) {
+            setValidation((prev) => [
+              ...prev,
+              {
+                field: key,
+                message: error.errorDetail[key].message,
+              },
+            ]);
+          }
         }
-      }
 
-      return toast.error(error.message, { containerId: "CreateCategory" });
+        toast.error(error.message, { containerId: "CreateCategory" });
+      }, 700);
     }
   };
+
+  useEffect(() => {
+    const buttonCheck = (data: { name: string }) => {
+      if (!data.name) return setDisable(true);
+
+      setDisable(false);
+    };
+
+    buttonCheck(data);
+  }, [data]);
+
+  useEffect(() => {
+    PopulateError(validation, data);
+  }, [validation]);
 
   return (
     <>
       <button
-        data-theme={"nord"}
-        className="btn btn-primary btn-sm mb-3 mt-5 text-white"
+        className="btn btn-primary btn-sm"
         onClick={() => modalHandler("addCat", true)}
       >
         Add Category
       </button>
-      <dialog data-theme={"nord"} id="addCat" className="modal text-neutral">
+      <dialog data-theme={"skies"} id="addCat" className="modal">
         <ToastContainer
           enableMultiContainer
           containerId={"CreateCategory"}
           theme="dark"
         />
-        <div className="modal-box absolute bg-slate-800 [&>*:not(h3)]:text-slate-800">
-          <h3 className=" mb-5 text-lg font-bold text-white">Add Category</h3>
+        <div className="modal-box absolute text-white">
+          <h3 className="modal-title mb-5">Add Category</h3>
           <TextInput
             data={data}
             label={["Category Name", "name", "Enter category name"]}
             validation={validation}
             onChange={textInputHandler}
           />
-
           <div className="modal-action flex">
             {!loading ? (
               <button
-                className="btn btn-primary btn-sm px-8 text-white"
+                className="btn btn-primary btn-sm"
                 disabled={disable}
                 onClick={submitHandler}
               >
                 Create
               </button>
             ) : (
-              <button className="btn btn-primary btn-sm pointer-events-none text-white">
+              <button disabled className="btn btn-sm pointer-events-none">
                 <span className="loading loading-spinner loading-sm"></span>
                 Creating..
               </button>
@@ -145,7 +152,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
               <button
-                className="btn btn-sm border-white bg-transparent text-white hover:bg-white hover:text-slate-800 active:bg-white active:text-slate-800 "
+                className="btn btn-outline btn-sm"
                 onClick={() => modalHandler("addCat", false)}
               >
                 Close

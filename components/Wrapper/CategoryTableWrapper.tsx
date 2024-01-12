@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { getCategories } from "../../services/admin";
 import SearchFilter from "../Misc/SearchFilter";
 import CategoryTable from "../Tables/CategoryTable";
@@ -20,7 +20,7 @@ const initialPagination = (payload?: any) => {
   };
 };
 
-const CategoryTableWrapper = () => {
+const CategoryWrapper = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(initialPagination());
@@ -59,10 +59,10 @@ const CategoryTableWrapper = () => {
   }, [page]);
 
   return (
-    <>
-      <CreateCategoryModal stateChanges={stateChanges} />
-
-      <div className="mt-3 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
+    <Fragment>
+      <h2 className="text-3xl font-semibold">Category Dashboard</h2>
+      <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
+        <CreateCategoryModal stateChanges={stateChanges} />
         <SearchFilter
           data={{ search }}
           changeSearch={changeSearch}
@@ -79,8 +79,8 @@ const CategoryTableWrapper = () => {
           <SimpleTableLoading />
         )}
       </div>
-    </>
+    </Fragment>
   );
 };
 
-export default CategoryTableWrapper;
+export default CategoryWrapper;

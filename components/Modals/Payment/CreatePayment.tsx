@@ -114,7 +114,7 @@ const CreatePaymentModal = (props: ThisProps) => {
   return (
     <>
       <button
-        className="btn btn-sm mb-3 mt-5 rounded-md bg-blue-500 text-white hover:bg-white hover:text-blue-500"
+        className="btn btn-sm mt-5 rounded-md bg-blue-500 text-white hover:bg-white hover:text-blue-500"
         onClick={() => modalHandler("addPay", true)}
       >
         Add Payment
@@ -150,7 +150,7 @@ const CreatePaymentModal = (props: ThisProps) => {
           <div className="modal-action flex">
             {!loading ? (
               <button
-                className="btn btn-sm bg-sky-500 px-8 text-white hover:bg-sky-600 active:bg-sky-600"
+                className="btn btn-sm bg-sky-500 px-8 text-white hover:bg-sky-600"
                 disabled={disable}
                 onClick={submitHandler}
               >

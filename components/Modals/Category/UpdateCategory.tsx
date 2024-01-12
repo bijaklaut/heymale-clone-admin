@@ -1,11 +1,14 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { CategoryTypes } from "../../../services/types";
+import { CategoryTypes, PostCategoryTypes } from "../../../services/types";
 import { updateCategory } from "../../../services/admin";
 import { EditSvg } from "../../Misc/SvgGroup";
+import TextInput from "../../Form/TextInput";
+import Cookies from "js-cookie";
+import { PopulateError } from "../../../services/helper";
 
 interface thisProps {
   category: CategoryTypes;
@@ -17,7 +20,7 @@ const UpdateCategoryModal = (props: thisProps) => {
   const { category, index, stateChanges } = props;
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({
+  const [data, setData] = useState<PostCategoryTypes>({
     name: category.name,
   });
   const [validation, setValidation] = useState([
@@ -30,34 +33,33 @@ const UpdateCategoryModal = (props: thisProps) => {
   const modalHandler = (id: string, show: boolean) => {
     const modal = document.getElementById(id) as HTMLDialogElement;
 
-    if (modal && show) {
-      setData({
-        name: category.name,
-      });
+    if (!show) {
       setValidation([
         {
           field: "",
           message: "",
         },
       ]);
+      setData({
+        name: category.name,
+      });
+      setDisable(true);
+      setLoading(false);
 
-      return modal.showModal();
+      return modal.close();
     }
 
-    return modal.close();
+    return modal.showModal();
   };
 
-  const changeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+  const textInputHandler = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    inputLabel: string,
+  ) => {
     setData({
       ...data,
-      name: event.target.value,
+      [inputLabel]: event.target.value,
     });
-
-    if (!event.target.value) {
-      return setDisable(true);
-    }
-
-    return setDisable(false);
   };
 
   const submitHandler = async (id: string, index: number) => {
@@ -70,14 +72,23 @@ const UpdateCategoryModal = (props: thisProps) => {
     ]);
 
     try {
-      const result = await updateCategory(data, id);
+      const token = Cookies.get("token");
+      const result = await updateCategory(data, id, token!);
 
+      setTimeout(() => {
+        setLoading(false);
+        toast.success(result.message, {
+          containerId: "Main",
+        });
+        modalHandler(`updateCat${index}`, false);
+        router.refresh();
+        return stateChanges();
+      }, 700);
       if (result.payload) {
         toast.success(result.message, {
           containerId: "Main",
         });
 
-        modalHandler(`updateCat${index}`, false);
         setTimeout(() => setLoading(false), 600);
 
         router.refresh();
@@ -108,62 +119,54 @@ const UpdateCategoryModal = (props: thisProps) => {
     }
   };
 
+  useEffect(() => {
+    const buttonCheck = (data: { name: string }) => {
+      if (!data.name) return setDisable(true);
+
+      setDisable(false);
+    };
+
+    buttonCheck(data);
+  }, [data]);
+
+  useEffect(() => {
+    PopulateError(validation, data);
+  }, [validation]);
+
   return (
-    <>
+    <Fragment>
       <button
-        className="text-gray-600 transition-all hover:text-blue-500"
+        data-theme={"skies"}
+        className="btn-icon-primary"
         onClick={() => modalHandler(`updateCat${index}`, true)}
       >
         <EditSvg className="w-5 stroke-current" />
       </button>
-      <dialog
-        data-theme={"nord"}
-        id={`updateCat${index}`}
-        className="modal text-neutral"
-      >
+      <dialog data-theme={"skies"} id={`updateCat${index}`} className="modal">
         <ToastContainer
           enableMultiContainer
           containerId={"UpdateCategory"}
           theme="dark"
         />
-        <div className="modal-box absolute">
-          <h3 className="mb-5 text-lg font-bold text-primary">
-            Update Category
-          </h3>
-          <label className="w-full max-w-xs">
-            <div className="label">
-              <span className="label-text -ms-1">Category Name</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Type here"
-              className="input h-10 w-full rounded-md border border-neutral p-2 focus:outline-0 focus:ring-0"
-              onChange={(e) => changeHandler(e)}
-              value={data.name}
-            />
-            <div className="label">
-              {validation.map((val) => {
-                return val.field == "name" ? (
-                  <span className="label-text-alt text-error">
-                    {val.message}
-                  </span>
-                ) : (
-                  ""
-                );
-              })}
-            </div>
-          </label>
+        <div className="modal-box absolute text-white">
+          <h3 className="modal-title mb-5">Update Category</h3>
+          <TextInput
+            data={data}
+            label={["Category Name", "name", "Enter category name"]}
+            validation={validation}
+            onChange={textInputHandler}
+          />
           <div className="modal-action flex">
             {!loading ? (
               <button
-                className="btn btn-primary btn-sm text-white"
+                className="btn btn-primary btn-sm"
                 disabled={disable}
                 onClick={() => submitHandler(category._id, index)}
               >
                 Update
               </button>
             ) : (
-              <button className="btn btn-disabled btn-sm">
+              <button disabled className="primary-btn pointer-events-none">
                 <span className="loading loading-spinner loading-sm"></span>
                 Updating..
               </button>
@@ -171,12 +174,17 @@ const UpdateCategoryModal = (props: thisProps) => {
 
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-outline btn-sm">Close</button>
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => modalHandler(`updateCat${index}`, false)}
+              >
+                Close
+              </button>
             </form>
           </div>
         </div>
       </dialog>
-    </>
+    </Fragment>
   );
 };
 

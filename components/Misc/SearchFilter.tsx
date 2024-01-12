@@ -22,7 +22,7 @@ const SearchFilter = ({
   const { filters, search } = data;
 
   return (
-    <div className="mb-3 flex items-center gap-x-3">
+    <div className="flex items-center gap-x-3">
       <input
         type="text"
         placeholder={placeholder || "Search table"}
