@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 export interface PaginationTypes {
   page: number;
   totalPages: number;
@@ -8,9 +10,40 @@ export interface PaginationTypes {
   nextPage: number | null;
 }
 
-export interface CategoryTypes {
-  _id: string;
+export interface ValidationTypes {
+  field: string;
+  message: string;
+}
+
+export interface SetStateTypes {
+  setData: Dispatch<SetStateAction<any>>;
+  setValidation: Dispatch<SetStateAction<ValidationTypes[]>>;
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  setDisable: Dispatch<SetStateAction<boolean>>;
+}
+
+export type InitData = (data?: DataTypes) => any;
+
+export type DataTypes =
+  | CategoryTypes
+  | AddressTypes
+  | PaymentTypes
+  | ProductTypes
+  | UserTypes;
+
+export type PostDataTypes =
+  | PostCategoryTypes
+  | PostAddressTypes
+  | PostPaymentTypes
+  | PostProductTypes
+  | PostUserTypes;
+
+export interface PostCategoryTypes {
   name: string;
+}
+
+export interface CategoryTypes extends PostCategoryTypes {
+  _id: string;
 }
 
 export interface PostPaymentTypes {

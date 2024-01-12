@@ -6,22 +6,35 @@ import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import TextInput from "../../Form/TextInput";
 import Cookies from "js-cookie";
-import { PopulateError } from "../../../services/helper";
-import { PostCategoryTypes } from "../../../services/types";
+import {
+  PopulateError,
+  buttonCheck,
+  modalHandler,
+} from "../../../services/helper";
+import {
+  PostCategoryTypes,
+  SetStateTypes,
+  ValidationTypes,
+} from "../../../services/types";
+
+const initialData = () => {
+  return {
+    name: "",
+  } as PostCategoryTypes;
+};
 
 const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
   const router = useRouter();
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<PostCategoryTypes>({
-    name: "",
-  });
-  const [validation, setValidation] = useState([
-    {
-      field: "",
-      message: "",
-    },
-  ]);
+  const [data, setData] = useState<PostCategoryTypes>(initialData());
+  const [validation, setValidation] = useState<ValidationTypes[]>([]);
+  const setState: SetStateTypes = {
+    setData,
+    setLoading,
+    setDisable,
+    setValidation,
+  };
 
   const textInputHandler = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -31,28 +44,6 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
       ...data,
       [inputLabel]: event.target.value,
     });
-  };
-
-  const modalHandler = (id: string, show: boolean) => {
-    const modal = document.getElementById(id) as HTMLDialogElement;
-
-    if (!show) {
-      setValidation([
-        {
-          field: "",
-          message: "",
-        },
-      ]);
-      setData({
-        name: "",
-      });
-      setDisable(true);
-      setLoading(false);
-
-      return modal.close();
-    }
-
-    return modal.showModal();
   };
 
   const submitHandler = async () => {
@@ -73,7 +64,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
         toast.success(result.message, {
           containerId: "Main",
         });
-        modalHandler("addCat", false);
+        modalHandler("addCat", false, initialData, setState);
         router.refresh();
         return stateChanges();
       }, 700);
@@ -98,13 +89,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
   };
 
   useEffect(() => {
-    const buttonCheck = (data: { name: string }) => {
-      if (!data.name) return setDisable(true);
-
-      setDisable(false);
-    };
-
-    buttonCheck(data);
+    buttonCheck(data, ["name"], setDisable);
   }, [data]);
 
   useEffect(() => {
@@ -115,7 +100,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
     <>
       <button
         className="btn btn-primary btn-sm"
-        onClick={() => modalHandler("addCat", true)}
+        onClick={() => modalHandler("addCat", true, initialData, setState)}
       >
         Add Category
       </button>
@@ -130,7 +115,6 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
           <TextInput
             data={data}
             label={["Category Name", "name", "Enter category name"]}
-            validation={validation}
             onChange={textInputHandler}
           />
           <div className="modal-action flex">
@@ -153,7 +137,9 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
               {/* if there is a button in form, it will close the modal */}
               <button
                 className="btn btn-outline btn-sm"
-                onClick={() => modalHandler("addCat", false)}
+                onClick={() =>
+                  modalHandler("addCat", false, initialData, setState)
+                }
               >
                 Close
               </button>
