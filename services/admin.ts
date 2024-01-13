@@ -92,12 +92,13 @@ export const updatePayment = async (
   });
 };
 
-export const deletePayment = async (id: string) => {
+export const deletePayment = async (id: string, token: string) => {
   const url = `${ROOT_API}/${API_VER}/payment/${id}?_method=DELETE`;
 
   return callApi({
     url,
     method: "POST",
+    token,
   });
 };
 

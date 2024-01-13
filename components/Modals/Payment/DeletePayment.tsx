@@ -5,6 +5,9 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { PaymentTypes } from "../../../services/types";
 import { TrashSvg } from "../../Misc/SvgGroup";
+import { simpleModalHandler } from "../../../services/helper";
+import { useState } from "react";
+import Cookies from "js-cookie";
 
 interface thisProps {
   payment: PaymentTypes;
@@ -15,71 +18,72 @@ interface thisProps {
 const DeletePaymentModal = (props: thisProps) => {
   const { payment, index, stateChanges } = props;
   const router = useRouter();
-
-  const modalHandler = (id: string, show: boolean) => {
-    const modal = document.getElementById(id) as HTMLDialogElement;
-
-    if (modal && show) {
-      modal.showModal();
-    } else if (modal && show == false) {
-      modal.close();
-    }
-  };
+  const [loading, setLoading] = useState(false);
 
   const submitHandler = async (id: string, index: number) => {
-    const loading = toast.loading("Processing", {
-      containerId: "Main",
-    });
+    setLoading(true);
 
     try {
-      const result = await deletePayment(id);
+      const token = Cookies.get("token");
+      const result = await deletePayment(id, token!);
 
       if (result.payload) {
-        toast.dismiss(loading);
-        toast.success(result.message, {
-          containerId: "Main",
-        });
-
-        modalHandler(`delPay${index}`, false);
-        router.refresh();
-        return stateChanges();
+        setTimeout(() => {
+          setLoading(false);
+          toast.success(result.message, {
+            containerId: "Main",
+          });
+          simpleModalHandler(`delPay${index}`, false);
+          router.refresh();
+          return stateChanges();
+        }, 700);
       }
     } catch (error: any) {
-      toast.update(loading, {
-        render: error.message,
-        type: "error",
-        isLoading: false,
-        autoClose: 5000,
-        containerId: "Main",
-      });
-      modalHandler(`delPay${index}`, false);
+      setTimeout(() => {
+        setLoading(false);
+        toast.error(error.message, { containerId: "Main" });
+        simpleModalHandler(`delPay${index}`, false);
+      }, 700);
     }
   };
 
   return (
     <>
       <button
-        className="error-icon-btn"
-        onClick={() => modalHandler(`delPay${index}`, true)}
+        data-theme={"skies"}
+        className="btn-icon-error"
+        onClick={() => simpleModalHandler(`delPay${index}`, true)}
       >
         <TrashSvg className="w-5 stroke-current" />
       </button>
 
-      <dialog data-theme={"dracula"} id={`delPay${index}`} className="modal">
-        <div className="modal-box">
-          <h3 className=" mb-5 font-semibold text-white">
+      <dialog data-theme={"skies"} id={`delPay${index}`} className="modal">
+        <div className="modal-box flex flex-col items-center px-5 py-8">
+          <h3 className="mb-3 font-semibold text-white">
             Are you sure to delete {payment.bankName} - {payment.accountNo}?
           </h3>
           <div className="modal-action flex">
-            <button
-              className="error-btn"
-              onClick={() => submitHandler(payment._id, index)}
-            >
-              Delete
-            </button>
+            {!loading ? (
+              <button
+                className="btn btn-error btn-sm"
+                onClick={() => submitHandler(payment._id, index)}
+              >
+                Delete
+              </button>
+            ) : (
+              <button className="btn btn-error btn-sm">
+                <span className="loading loading-spinner loading-sm"></span>
+                Deleting..
+              </button>
+            )}
+
             <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button className="outline-white-btn">Close</button>
+              <button
+                onClick={() => simpleModalHandler(`delCat${index}`, false)}
+                className="btn btn-outline btn-sm"
+              >
+                Close
+              </button>
             </form>
           </div>
         </div>

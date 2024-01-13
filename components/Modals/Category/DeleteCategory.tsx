@@ -60,7 +60,7 @@ const DeleteCategoryModal = (props: thisProps) => {
       <dialog data-theme={"skies"} id={`delCat${index}`} className="modal">
         <div className="modal-box flex flex-col items-center px-5 py-8">
           <h3 className="mb-3 text-base text-white">
-            Are you sure to delete {`${category.name}`}?
+            Are you sure to delete {category.name}?
           </h3>
           <div className="modal-action flex">
             {!loading ? (
@@ -71,14 +71,18 @@ const DeleteCategoryModal = (props: thisProps) => {
                 Delete
               </button>
             ) : (
-              <button disabled className="btn btn-error btn-sm">
+              <button className="btn btn-error btn-sm">
                 <span className="loading loading-spinner loading-sm"></span>
                 Deleting..
               </button>
             )}
             <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-outline btn-sm">Close</button>
+              <button
+                onClick={() => simpleModalHandler(`delCat${index}`, false)}
+                className="btn btn-outline btn-sm"
+              >
+                Close
+              </button>
             </form>
           </div>
         </div>
