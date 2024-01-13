@@ -78,6 +78,16 @@ export const modalHandler = (
   return modal.showModal();
 };
 
+export const simpleModalHandler = (id: string, show: boolean) => {
+  const modal = document.getElementById(id) as HTMLDialogElement;
+
+  if (modal && show) {
+    modal.showModal();
+  } else if (modal && show == false) {
+    modal.close();
+  }
+};
+
 export const buttonCheck = (
   data: PostDataTypes,
   requiredField: Array<string>,
@@ -85,11 +95,14 @@ export const buttonCheck = (
   oldData?: DataTypes,
 ) => {
   requiredField.map((field) => {
-    if (
-      !(data as any)[field] ||
-      (data as any)[field] == (oldData as any)[field]
-    )
-      return setDisable(true);
+    if (oldData) {
+      if (
+        !(data as any)[field] ||
+        (data as any)[field] == (oldData as any)[field]
+      )
+        return setDisable(true);
+    }
+    if (!(data as any)[field]) return setDisable(true);
     setDisable(false);
   });
 };

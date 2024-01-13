@@ -7,6 +7,7 @@ import { CategoryTypes } from "../../../services/types";
 import { TrashSvg } from "../../Misc/SvgGroup";
 import { useState } from "react";
 import Cookies from "js-cookie";
+import { simpleModalHandler } from "../../../services/helper";
 
 interface thisProps {
   category: CategoryTypes;
@@ -19,16 +20,6 @@ const DeleteCategoryModal = (props: thisProps) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const modalHandler = (id: string, show: boolean) => {
-    const modal = document.getElementById(id) as HTMLDialogElement;
-
-    if (modal && show) {
-      modal.showModal();
-    } else if (modal && show == false) {
-      modal.close();
-    }
-  };
-
   const submitHandler = async (id: string, index: number) => {
     setLoading(true);
     try {
@@ -40,7 +31,7 @@ const DeleteCategoryModal = (props: thisProps) => {
           containerId: "Main",
         });
 
-        modalHandler(`delCat${index}`, false);
+        simpleModalHandler(`delCat${index}`, false);
         setLoading(false);
         router.refresh();
 
@@ -52,7 +43,7 @@ const DeleteCategoryModal = (props: thisProps) => {
         toast.error(error.message, {
           containerId: "Main",
         });
-        modalHandler(`delCat${index}`, false);
+        simpleModalHandler(`delCat${index}`, false);
       }, 700);
     }
   };
@@ -62,7 +53,7 @@ const DeleteCategoryModal = (props: thisProps) => {
       <button
         data-theme={"skies"}
         className="btn-icon-error"
-        onClick={() => modalHandler(`delCat${index}`, true)}
+        onClick={() => simpleModalHandler(`delCat${index}`, true)}
       >
         <TrashSvg className="w-5 stroke-current" />
       </button>
