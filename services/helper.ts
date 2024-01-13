@@ -19,12 +19,12 @@ export const populateError = (
     if (val && element) {
       element.classList.add("input-error");
       label!.innerHTML = val.message;
-
-      return 0;
     }
 
-    element?.classList.remove("input-error");
-    label!.innerHTML = "";
+    if (!val) {
+      element?.classList.remove("input-error");
+      label!.innerHTML = "";
+    }
   }
 };
 
