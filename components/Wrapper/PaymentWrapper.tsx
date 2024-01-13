@@ -59,9 +59,9 @@ const PaymentWrapper = () => {
   return (
     <Fragment>
       <h2 className="text-2xl font-semibold">Payment Dashboard</h2>
-      <CreatePaymentModal stateChanges={stateChanges} />
 
-      <div className="mt-3 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
+      <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
+        <CreatePaymentModal stateChanges={stateChanges} />
         <SearchFilter
           data={{ search }}
           changeSearch={changeSearch}

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import CategoryTableWrapper from "../../../../components/Wrapper/CategoryTableWrapper";
+import CategoryWrapper from "../../../../components/Wrapper/CategoryWrapper";
 
 export const metadata: Metadata = {
   title: "Heymale | Category Dashboard",
@@ -7,11 +7,7 @@ export const metadata: Metadata = {
 };
 
 const CategoryDashboard = async () => {
-  return (
-    <>
-      <CategoryTableWrapper />
-    </>
-  );
+  return <CategoryWrapper />;
 };
 
 export default CategoryDashboard;
