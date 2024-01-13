@@ -81,10 +81,12 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
     }
   };
 
+  // Button Check
   useEffect(() => {
     buttonCheck(data, ["name"], setDisable);
   }, [data]);
 
+  // Populating validation error
   useEffect(() => {
     populateError(validation, data);
   }, [validation]);
@@ -120,14 +122,13 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
                 Create
               </button>
             ) : (
-              <button disabled className="btn btn-sm pointer-events-none">
+              <button className="btn btn-sm pointer-events-none">
                 <span className="loading loading-spinner loading-sm"></span>
                 Creating..
               </button>
             )}
 
             <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
               <button
                 className="btn btn-outline btn-sm"
                 onClick={() =>
