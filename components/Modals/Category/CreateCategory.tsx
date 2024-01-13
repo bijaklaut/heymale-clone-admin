@@ -1,22 +1,17 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { createCategory } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import TextInput from "../../Form/TextInput";
 import Cookies from "js-cookie";
 import {
-  populateError,
   buttonCheck,
   modalHandler,
   populateValidation,
 } from "../../../services/helper";
-import {
-  PostCategoryTypes,
-  SetStateTypes,
-  ValidationTypes,
-} from "../../../services/types";
+import { PostCategoryTypes, ValidationTypes } from "../../../services/types";
 
 const initialData = () => {
   return {
@@ -30,11 +25,11 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<PostCategoryTypes>(initialData());
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
-  const setState: SetStateTypes = {
-    setData,
-    setLoading,
+  const setState = { setData, setLoading, setDisable, setValidation };
+  const btnCheckProps = {
+    data,
+    requiredField: ["name"],
     setDisable,
-    setValidation,
   };
 
   const textInputHandler = (
@@ -49,12 +44,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
 
   const submitHandler = async () => {
     setLoading(true);
-    setValidation([
-      {
-        field: "",
-        message: "",
-      },
-    ]);
+    setValidation([]);
 
     try {
       const token = Cookies.get("token");
@@ -73,23 +63,13 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
       setTimeout(() => {
         setLoading(false);
         if (error.message == "Validation Error" || error.code == 11000) {
-          populateValidation(error, setValidation);
+          return populateValidation(error, setValidation);
         }
 
-        toast.error(error.message, { containerId: "CreateCategory" });
+        return toast.error(error.message, { containerId: "CreateCategory" });
       }, 700);
     }
   };
-
-  // Button Check
-  useEffect(() => {
-    buttonCheck(data, ["name"], setDisable);
-  }, [data]);
-
-  // Populating validation error
-  useEffect(() => {
-    populateError(validation, data);
-  }, [validation]);
 
   return (
     <>
@@ -110,7 +90,9 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
           <TextInput
             data={data}
             label={["Category Name", "name", "Enter category name"]}
-            onChange={textInputHandler}
+            changeHandler={textInputHandler}
+            onKeyUp={() => buttonCheck(btnCheckProps)}
+            validations={validation}
           />
           <div className="modal-action flex">
             {!loading ? (

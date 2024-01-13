@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, Fragment, useEffect, useState } from "react";
+import { ChangeEvent, Fragment, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import {
@@ -16,7 +16,6 @@ import Cookies from "js-cookie";
 import {
   buttonCheck,
   modalHandler,
-  populateError,
   populateValidation,
 } from "../../../services/helper";
 
@@ -37,8 +36,12 @@ const UpdateCategoryModal = (props: thisProps) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<PostCategoryTypes>(initialData(category));
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
-
   const setState = { setDisable, setLoading, setValidation, setData };
+  const btnCheckProps = {
+    data,
+    requiredField: ["name"],
+    setDisable,
+  };
 
   const textInputHandler = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -87,14 +90,6 @@ const UpdateCategoryModal = (props: thisProps) => {
     }
   };
 
-  useEffect(() => {
-    buttonCheck(data, ["name"], setDisable, category);
-  }, [data]);
-
-  useEffect(() => {
-    populateError(validation, data);
-  }, [validation]);
-
   return (
     <Fragment>
       <button
@@ -121,10 +116,11 @@ const UpdateCategoryModal = (props: thisProps) => {
         <div className="modal-box absolute text-white">
           <h3 className="modal-title mb-5">Update Category</h3>
           <TextInput
-            data={data}
             label={["Category Name", "name", "Enter category name"]}
-            validation={validation}
-            onChange={textInputHandler}
+            data={data}
+            changeHandler={textInputHandler}
+            onKeyUp={() => buttonCheck(btnCheckProps)}
+            validations={validation}
           />
           <div className="modal-action flex">
             {!loading ? (
@@ -136,7 +132,7 @@ const UpdateCategoryModal = (props: thisProps) => {
                 Update
               </button>
             ) : (
-              <button disabled className="primary-btn pointer-events-none">
+              <button className="btn btn-sm pointer-events-none">
                 <span className="loading loading-spinner loading-sm"></span>
                 Updating..
               </button>

@@ -1,18 +1,23 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, Fragment, useState } from "react";
 import { createPayment } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import TextInput from "../../Form/TextInput";
-import { PostPaymentTypes } from "../../../services/types";
+import { ValidationTypes } from "../../../services/types";
 import Cookies from "js-cookie";
+import {
+  buttonCheck,
+  modalHandler,
+  populateValidation,
+} from "../../../services/helper";
 
 interface ThisProps {
   stateChanges(): void;
 }
 
-const initialState = () => {
+const initialData = () => {
   return {
     ownerName: "",
     bankName: "",
@@ -23,15 +28,16 @@ const initialState = () => {
 const CreatePaymentModal = (props: ThisProps) => {
   const { stateChanges } = props;
   const router = useRouter();
-  const [data, setData] = useState(initialState());
+  const [data, setData] = useState(initialData());
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [validation, setValidation] = useState([
-    {
-      field: "",
-      message: "",
-    },
-  ]);
+  const [validation, setValidation] = useState<ValidationTypes[]>([]);
+  const setState = { setDisable, setData, setLoading, setValidation };
+  const btnCheckProps = {
+    data,
+    requiredField: ["ownerName", "bankName", "accountNo"],
+    setDisable,
+  };
 
   const textInputHandler = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -43,28 +49,10 @@ const CreatePaymentModal = (props: ThisProps) => {
     });
   };
 
-  const modalHandler = (id: string, show: boolean) => {
-    const modal = document.getElementById(id) as HTMLDialogElement;
-
-    if (modal && show) {
-      return modal.showModal();
-    }
-
-    setDisable(true);
-    setLoading(false);
-    setData(initialState());
-    setValidation([{ field: "", message: "" }]);
-    return modal.close();
-  };
-
   const submitHandler = async () => {
     setLoading(true);
-    setValidation([
-      {
-        field: "",
-        message: "",
-      },
-    ]);
+    setValidation([]);
+
     try {
       const token = Cookies.get("token");
       const result = await createPayment(data, token!);
@@ -74,100 +62,81 @@ const CreatePaymentModal = (props: ThisProps) => {
         toast.success(result.message, {
           containerId: "Main",
         });
-        modalHandler("addPay", false);
+        modalHandler("addPay", false, initialData, setState);
         router.refresh();
-
         stateChanges();
-      }, 1000);
+      }, 700);
     } catch (error: any) {
       setTimeout(() => {
         setLoading(false);
         if (error.message == "Validation Error" || error.code == 11000) {
-          for (const [key] of Object.entries(error.errorDetail)) {
-            setValidation((prev) => [
-              ...prev,
-              {
-                field: key,
-                message: error.errorDetail[key].message,
-              },
-            ]);
-          }
+          return populateValidation(error, setValidation);
         }
 
         return toast.error(error.message, { containerId: "CreatePayment" });
-      }, 1000);
+      }, 700);
     }
   };
 
-  useEffect(() => {
-    const buttonCheck = (data: PostPaymentTypes) => {
-      const { accountNo, ownerName, bankName } = data;
-
-      if (!accountNo || !ownerName || !bankName) return setDisable(true);
-
-      setDisable(false);
-    };
-
-    buttonCheck(data);
-  }, [data]);
-
   return (
-    <>
+    <Fragment>
       <button
-        className="btn btn-sm mt-5 rounded-md bg-blue-500 text-white hover:bg-white hover:text-blue-500"
-        onClick={() => modalHandler("addPay", true)}
+        className="btn btn-primary btn-sm"
+        onClick={() => modalHandler("addPay", true, initialData, setState)}
       >
         Add Payment
       </button>
-      <dialog data-theme={"dracula"} id="addPay" className="modal">
+      <dialog data-theme={"skies"} id="addPay" className="modal">
         <ToastContainer
           theme="dark"
           enableMultiContainer
           containerId={"CreatePayment"}
         />
-        <div className="modal-box absolute">
-          <h3 className="mb-5 text-lg font-bold text-sky-500">
-            Create New Payment
-          </h3>
+        <div className="modal-box absolute text-white">
+          <h3 className="modal-title mb-5">Create New Payment</h3>
           <TextInput
             data={data}
             label={["Owner Name", "ownerName", "Enter account owner name"]}
-            onChange={textInputHandler}
-            validation={validation}
+            changeHandler={textInputHandler}
+            onKeyUp={() => buttonCheck(btnCheckProps)}
+            validations={validation}
           />
           <TextInput
             data={data}
             label={["Bank Name", "bankName", "Enter bank name"]}
-            onChange={textInputHandler}
-            validation={validation}
+            changeHandler={textInputHandler}
+            onKeyUp={() => buttonCheck(btnCheckProps)}
+            validations={validation}
           />
           <TextInput
             data={data}
             label={["Account Number", "accountNo", "Enter account number"]}
-            onChange={textInputHandler}
-            validation={validation}
+            changeHandler={textInputHandler}
+            onKeyUp={() => buttonCheck(btnCheckProps)}
+            validations={validation}
           />
           <div className="modal-action flex">
             {!loading ? (
               <button
-                className="btn btn-sm bg-sky-500 px-8 text-white hover:bg-sky-600"
+                className="btn btn-primary btn-sm"
                 disabled={disable}
                 onClick={submitHandler}
               >
                 Create
               </button>
             ) : (
-              <button className="btn-sky-500 btn btn-sm pointer-events-none text-white">
+              <button className="btn btn-sm pointer-events-none">
                 <span className="loading loading-spinner loading-sm"></span>
                 Creating..
               </button>
             )}
 
             <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
               <button
-                className="btn btn-sm border-white bg-transparent px-5 text-white hover:bg-white hover:text-slate-800 active:bg-white active:text-slate-800 "
-                onClick={() => modalHandler("addPay", false)}
+                className="btn btn-outline btn-sm"
+                onClick={() =>
+                  modalHandler("addPay", false, initialData, setState)
+                }
               >
                 Close
               </button>
@@ -175,7 +144,7 @@ const CreatePaymentModal = (props: ThisProps) => {
           </div>
         </div>
       </dialog>
-    </>
+    </Fragment>
   );
 };
 

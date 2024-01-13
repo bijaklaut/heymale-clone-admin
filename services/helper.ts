@@ -7,21 +7,24 @@ import {
   ValidationTypes,
 } from "./types";
 
-export const populateError = (
-  validation: { field: string; message: string }[],
+// Need further research about bug on update modal (many)
+const populateError = (
+  validations: { field: string; message: string }[],
   data: PostDataTypes,
+  index?: number,
 ) => {
+  index = index || 0;
   for (const [key] of Object.entries(data)) {
-    const element = document.getElementById(key);
-    const val = validation.find((val) => val.field == key);
+    const element = document.getElementById(`${key}${index}`);
+    const validation = validations.find((val) => val.field == key);
     const label = element?.parentNode?.querySelector("span.label-text-alt");
 
-    if (val && element) {
+    if (validation && element) {
       element.classList.add("input-error");
-      label!.innerHTML = val.message;
+      label!.innerHTML = validation.message;
     }
 
-    if (!val) {
+    if (!validation) {
       element?.classList.remove("input-error");
       label!.innerHTML = "";
     }
@@ -59,23 +62,23 @@ export const modalHandler = (
   const { setData, setValidation, setLoading, setDisable } = setState;
   const modal = document.getElementById(id) as HTMLDialogElement;
 
-  if (!show && data) {
+  if (show && data) {
     setValidation([]);
     setDisable(true);
     setLoading(false);
     setData(initialData(data));
-    return modal.close();
+    return modal.showModal();
   }
 
-  if (!show) {
+  if (show) {
     setValidation([]);
     setDisable(true);
     setLoading(false);
     setData(initialData());
-    return modal.close();
+    return modal.showModal();
   }
 
-  return modal.showModal();
+  return modal.close();
 };
 
 export const simpleModalHandler = (id: string, show: boolean) => {
@@ -88,23 +91,22 @@ export const simpleModalHandler = (id: string, show: boolean) => {
   }
 };
 
-export const buttonCheck = (
-  data: PostDataTypes,
-  requiredField: Array<string>,
-  setDisable: Dispatch<SetStateAction<boolean>>,
-  oldData?: DataTypes,
-) => {
-  requiredField.map((field) => {
-    if (oldData) {
-      if (
-        !(data as any)[field] ||
-        (data as any)[field] == (oldData as any)[field]
-      )
-        return setDisable(true);
+export const buttonCheck = (props: {
+  data: PostDataTypes;
+  requiredField: Array<string>;
+  setDisable: Dispatch<SetStateAction<boolean>>;
+}) => {
+  const { data, requiredField, setDisable } = props;
+  if (requiredField)
+    for (let i = 0; i < requiredField.length; i++) {
+      const field = requiredField[i];
+      if (!(data as any)[field]) {
+        setDisable(true);
+        break;
+      }
+
+      setDisable(false);
     }
-    if (!(data as any)[field]) return setDisable(true);
-    setDisable(false);
-  });
 };
 
 export const populateValidation = (

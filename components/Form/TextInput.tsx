@@ -1,15 +1,23 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, InputHTMLAttributes } from "react";
+import cx from "classnames";
+import { ValidationTypes } from "../../services/types";
 
-interface TextInputProps {
+interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
   data: any;
   label: [textLabel: string, fieldLabel: string, placeholder?: string];
-  onChange(event: ChangeEvent, label: string): void;
-  validation?: { field: string; message: string }[];
+  changeHandler(event: ChangeEvent, label: string): void;
+  validations: ValidationTypes[];
 }
 
 const TextInput = (props: TextInputProps) => {
-  const { label, onChange, validation, data } = props;
+  const { label, changeHandler, data, onKeyUp, validations } = props;
   const [textLabel, fieldLabel, placeholder] = label;
+  const validation = validations.find((val) => val.field == fieldLabel);
+  const inputClass = cx({
+    "input input-bordered input-sm w-full rounded-md py-5 text-lg transition-all":
+      true,
+    "input-error": validation,
+  });
 
   return (
     <label data-theme={"skies"} className="w-full transition-all">
@@ -20,15 +28,18 @@ const TextInput = (props: TextInputProps) => {
       </div>
       <input
         type="text"
-        id={fieldLabel}
+        // id={`${fieldLabel}${index}`}
         placeholder={placeholder || "Type here"}
-        className="input input-bordered input-sm w-full rounded-md py-5 text-lg transition-all "
+        className={inputClass}
         autoComplete="off"
-        onChange={(e) => onChange(e, fieldLabel)}
+        onChange={(e) => changeHandler(e, fieldLabel)}
+        onKeyUp={onKeyUp}
         value={(data as any)[fieldLabel]}
       />
       <div className="label">
-        <span className="label-text-alt text-red-500"></span>
+        <span className="label-text-alt text-red-500">
+          {validation ? validation.message : ""}
+        </span>
       </div>
     </label>
   );
