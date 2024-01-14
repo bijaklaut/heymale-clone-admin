@@ -5,12 +5,12 @@ import { ValidationTypes } from "../../services/types";
 interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
   data: any;
   label: [textLabel: string, fieldLabel: string, placeholder?: string];
-  changeHandler(event: ChangeEvent, label: string): void;
+  changeHandler?: (event: ChangeEvent, label: string) => void;
   validations: ValidationTypes[];
 }
 
 const TextInput = (props: TextInputProps) => {
-  const { label, changeHandler, data, onKeyUp, validations } = props;
+  const { label, data, onKeyUp, validations, onChange } = props;
   const [textLabel, fieldLabel, placeholder] = label;
   const validation = validations.find((val) => val.field == fieldLabel);
   const inputClass = cx({
@@ -28,11 +28,10 @@ const TextInput = (props: TextInputProps) => {
       </div>
       <input
         type="text"
-        // id={`${fieldLabel}${index}`}
         placeholder={placeholder || "Type here"}
         className={inputClass}
         autoComplete="off"
-        onChange={(e) => changeHandler(e, fieldLabel)}
+        onChange={onChange}
         onKeyUp={onKeyUp}
         value={(data as any)[fieldLabel]}
       />

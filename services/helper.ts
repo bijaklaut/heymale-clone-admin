@@ -117,32 +117,14 @@ export const buttonCheck = (props: {
     }
 };
 
-export const btnCheckExp = (
-  event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  props: {
-    requiredField: Array<string>;
-    setDisable: Dispatch<SetStateAction<boolean>>;
-  },
+export const singleButtonCheck = (
+  event: ChangeEvent<
+    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+  >,
+  setDisable: Dispatch<SetStateAction<boolean>>,
 ) => {
-  const { requiredField, setDisable } = props;
-  const { name, value } = event.target;
-  const field = requiredField.find((req) => req == name);
-  if (field) {
-    if (!value) {
-      return setDisable(true);
-    }
-
-    return setDisable(false);
-  }
-  for (let i = 0; i < requiredField.length; i++) {
-    const sameField = requiredField[i] == name;
-    if (sameField && !value) {
-      setDisable(true);
-      break;
-    }
-
-    if (sameField && value) setDisable(false);
-  }
+  if (!event.target.value) return setDisable(true);
+  setDisable(false);
 };
 
 export const populateValidation = (
@@ -158,4 +140,16 @@ export const populateValidation = (
       },
     ]);
   }
+};
+
+export const textInputHandler = (
+  event: ChangeEvent<HTMLInputElement>,
+  label: string,
+  data: PostDataTypes,
+  setData: Dispatch<SetStateAction<any>>,
+) => {
+  setData({
+    ...data,
+    [label]: event.target.value,
+  });
 };

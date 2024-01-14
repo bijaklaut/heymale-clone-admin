@@ -10,6 +10,7 @@ import {
   buttonCheck,
   modalHandler,
   populateValidation,
+  textInputHandler,
 } from "../../../services/helper";
 import { PostCategoryTypes, ValidationTypes } from "../../../services/types";
 
@@ -31,20 +32,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
     requiredField: ["name"],
     setDisable,
   };
-
-  const textInputHandler = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    inputLabel: string,
-  ) => {
-    setData({
-      ...data,
-      [inputLabel]: event.target.value,
-    });
-  };
-
-  useEffect(() => {
-    buttonCheck(btnCheckProps);
-  }, [data]);
+  const textInputProps = { data, setData };
 
   const submitHandler = async () => {
     setLoading(true);
@@ -75,6 +63,10 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
     }
   };
 
+  useEffect(() => {
+    buttonCheck(btnCheckProps);
+  }, [data]);
+
   return (
     <>
       <button
@@ -94,7 +86,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
           <TextInput
             data={data}
             label={["Category Name", "name", "Enter category name"]}
-            changeHandler={textInputHandler}
+            onChange={(e) => textInputHandler(e, "name", data, setData)}
             validations={validation}
           />
           <div className="modal-action flex">

@@ -17,6 +17,7 @@ import {
   buttonCheck,
   modalHandler,
   populateValidation,
+  textInputHandler,
 } from "../../../services/helper";
 
 interface thisProps {
@@ -41,16 +42,6 @@ const UpdateCategoryModal = (props: thisProps) => {
     data,
     requiredField: ["name"],
     setDisable,
-  };
-
-  const textInputHandler = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    inputLabel: string,
-  ) => {
-    setData({
-      ...data,
-      [inputLabel]: event.target.value,
-    });
   };
 
   const submitHandler = async (id: string, index: number) => {
@@ -119,12 +110,14 @@ const UpdateCategoryModal = (props: thisProps) => {
         />
         <div className="modal-box absolute text-white">
           <h3 className="modal-title mb-5">Update Category</h3>
+
           <TextInput
             label={["Category Name", "name", "Enter category name"]}
             data={data}
-            changeHandler={textInputHandler}
+            onChange={(e) => textInputHandler(e, "name", data, setData)}
             validations={validation}
           />
+
           <div className="modal-action flex">
             {!loading ? (
               <button
