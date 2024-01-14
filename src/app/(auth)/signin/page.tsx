@@ -1,6 +1,12 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { signIn } from "../../../../services/admin";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -8,6 +14,7 @@ import Cookies from "js-cookie";
 import heymaleLogo from "@/../public/images/logo/heymale-logo.png";
 import { SignInTypes, ValidationTypes } from "../../../../services/types";
 import {
+  btnCheckExp,
   buttonCheck,
   populateErrorFloating,
   populateValidation,
@@ -22,6 +29,23 @@ const Signin = () => {
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
+  const btnCheckProps = {
+    data,
+    requiredField: ["email", "password"],
+    setDisable,
+  };
+
+  const textInputHandler = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    inputLabel: string,
+    data: SignInTypes,
+    setData: Dispatch<SetStateAction<SignInTypes>>,
+  ) => {
+    setData({
+      ...data,
+      [inputLabel]: event.target.value,
+    });
+  };
 
   const submitHandler = async () => {
     setLoading(true);
@@ -48,12 +72,12 @@ const Signin = () => {
   };
 
   useEffect(() => {
-    buttonCheck(data, ["email", "password"], setDisable);
-  }, [data]);
-
-  useEffect(() => {
     populateErrorFloating(validation, data);
   }, [validation]);
+
+  useEffect(() => {
+    buttonCheck(btnCheckProps);
+  }, [data]);
 
   return (
     <section className="flex h-screen items-center justify-center">
@@ -78,14 +102,9 @@ const Signin = () => {
             placeholder="email"
             type="email"
             className="mini-input peer"
-            onChange={(e) =>
-              setData({
-                ...data,
-                email: e.target.value,
-              })
-            }
+            onChange={(e) => textInputHandler(e, "email", data, setData)}
           />
-          <label htmlFor="email" className="floating-label">
+          <label htmlFor="email" className="floating-label float-label-black">
             Email
           </label>
           <span className="invalid-feedback"></span>
@@ -97,14 +116,12 @@ const Signin = () => {
             autoComplete="off"
             type="password"
             className="mini-input peer shadow-transparent"
-            onChange={(e) =>
-              setData({
-                ...data,
-                password: e.target.value,
-              })
-            }
+            onChange={(e) => textInputHandler(e, "password", data, setData)}
           />
-          <label htmlFor="password" className="floating-label">
+          <label
+            htmlFor="password"
+            className="floating-label float-label-black"
+          >
             Password
           </label>
           <span className="invalid-feedback"></span>

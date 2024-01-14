@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import {
   DataTypes,
   InitData,
@@ -39,15 +39,23 @@ export const populateErrorFloating = (
     const element = document.getElementById(key);
     const val = validation.find((val) => val.field == key);
     const label = element?.parentNode?.querySelector("span.invalid-feedback");
+    const floatingLabel = element?.parentNode?.querySelector(
+      "label.floating-label",
+    );
 
     if (val && element) {
       element.classList.add("is-invalid");
+      floatingLabel?.classList.replace(
+        "float-label-black",
+        "float-label-error",
+      );
       label!.innerHTML = val.message;
 
       return 0;
     }
 
     element?.classList.remove("is-invalid");
+    floatingLabel?.classList.replace("float-label-error", "float-label-black");
     label!.innerHTML = "";
   }
 };
@@ -107,6 +115,34 @@ export const buttonCheck = (props: {
 
       setDisable(false);
     }
+};
+
+export const btnCheckExp = (
+  event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  props: {
+    requiredField: Array<string>;
+    setDisable: Dispatch<SetStateAction<boolean>>;
+  },
+) => {
+  const { requiredField, setDisable } = props;
+  const { name, value } = event.target;
+  const field = requiredField.find((req) => req == name);
+  if (field) {
+    if (!value) {
+      return setDisable(true);
+    }
+
+    return setDisable(false);
+  }
+  for (let i = 0; i < requiredField.length; i++) {
+    const sameField = requiredField[i] == name;
+    if (sameField && !value) {
+      setDisable(true);
+      break;
+    }
+
+    if (sameField && value) setDisable(false);
+  }
 };
 
 export const populateValidation = (

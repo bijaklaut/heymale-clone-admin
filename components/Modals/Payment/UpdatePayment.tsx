@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, Fragment, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { updatePayment } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -24,18 +24,18 @@ interface thisProps {
   stateChanges(): void;
 }
 
-const initialData = (data: DataTypes | undefined) => {
+const initialData = (data?: DataTypes | undefined) => {
   return {
-    ownerName: (data as PaymentTypes).ownerName,
-    bankName: (data as PaymentTypes).bankName,
-    accountNo: (data as PaymentTypes).accountNo,
+    ownerName: (data as PaymentTypes)?.ownerName || "",
+    bankName: (data as PaymentTypes)?.bankName || "",
+    accountNo: (data as PaymentTypes)?.accountNo || "",
   };
 };
 
 const UpdatePaymentModal = (props: thisProps) => {
   const router = useRouter();
   const { payment, index, stateChanges } = props;
-  const [data, setData] = useState(initialData(payment));
+  const [data, setData] = useState(initialData());
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
@@ -92,6 +92,10 @@ const UpdatePaymentModal = (props: thisProps) => {
     }
   };
 
+  useEffect(() => {
+    buttonCheck(btnCheckProps);
+  }, [data]);
+
   return (
     <Fragment>
       <button
@@ -121,21 +125,18 @@ const UpdatePaymentModal = (props: thisProps) => {
             data={data}
             label={["Owner Name", "ownerName", "Enter account owner name"]}
             changeHandler={textInputHandler}
-            onKeyUp={() => buttonCheck(btnCheckProps)}
             validations={validation}
           />
           <TextInput
             data={data}
             label={["Bank Name", "bankName", "Enter bank name"]}
             changeHandler={textInputHandler}
-            onKeyUp={() => buttonCheck(btnCheckProps)}
             validations={validation}
           />
           <TextInput
             data={data}
             label={["Account Number", "accountNo", "Enter account number"]}
             changeHandler={textInputHandler}
-            onKeyUp={() => buttonCheck(btnCheckProps)}
             validations={validation}
           />
           <div className="modal-action flex">

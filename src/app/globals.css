@@ -26,7 +26,14 @@
 }
 
 .floating-label {
-  @apply absolute -top-2.5 left-2 z-10 rounded-md bg-white px-2 text-xs font-semibold text-black transition-all  peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-placeholder-shown:font-semibold peer-placeholder-shown:text-black peer-focus:text-sky-700 md:text-sm;
+  @apply absolute -top-2.5 left-2 z-10 rounded-md bg-white px-2 text-xs font-semibold  transition-all  peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-placeholder-shown:font-semibold peer-focus:text-sky-700 md:text-sm;
+}
+
+.float-label-black {
+  @apply text-black peer-placeholder-shown:text-black;
+}
+.float-label-error {
+  @apply text-red-500 peer-placeholder-shown:text-red-500;
 }
 
 .radio-label {
