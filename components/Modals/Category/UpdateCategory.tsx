@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, Fragment, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import {
@@ -90,6 +90,10 @@ const UpdateCategoryModal = (props: thisProps) => {
     }
   };
 
+  useEffect(() => {
+    buttonCheck(btnCheckProps);
+  }, [data]);
+
   return (
     <Fragment>
       <button
@@ -119,7 +123,6 @@ const UpdateCategoryModal = (props: thisProps) => {
             label={["Category Name", "name", "Enter category name"]}
             data={data}
             changeHandler={textInputHandler}
-            onKeyUp={() => buttonCheck(btnCheckProps)}
             validations={validation}
           />
           <div className="modal-action flex">

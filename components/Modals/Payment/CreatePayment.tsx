@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, Fragment, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { createPayment } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -78,6 +78,10 @@ const CreatePaymentModal = (props: ThisProps) => {
     }
   };
 
+  useEffect(() => {
+    buttonCheck(btnCheckProps);
+  }, [data]);
+
   return (
     <Fragment>
       <button
@@ -98,21 +102,18 @@ const CreatePaymentModal = (props: ThisProps) => {
             data={data}
             label={["Owner Name", "ownerName", "Enter account owner name"]}
             changeHandler={textInputHandler}
-            onKeyUp={() => buttonCheck(btnCheckProps)}
             validations={validation}
           />
           <TextInput
             data={data}
             label={["Bank Name", "bankName", "Enter bank name"]}
             changeHandler={textInputHandler}
-            onKeyUp={() => buttonCheck(btnCheckProps)}
             validations={validation}
           />
           <TextInput
             data={data}
             label={["Account Number", "accountNo", "Enter account number"]}
             changeHandler={textInputHandler}
-            onKeyUp={() => buttonCheck(btnCheckProps)}
             validations={validation}
           />
           <div className="modal-action flex">

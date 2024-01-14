@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { createCategory } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -41,6 +41,10 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
       [inputLabel]: event.target.value,
     });
   };
+
+  useEffect(() => {
+    buttonCheck(btnCheckProps);
+  }, [data]);
 
   const submitHandler = async () => {
     setLoading(true);
@@ -91,7 +95,6 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
             data={data}
             label={["Category Name", "name", "Enter category name"]}
             changeHandler={textInputHandler}
-            onKeyUp={() => buttonCheck(btnCheckProps)}
             validations={validation}
           />
           <div className="modal-action flex">
