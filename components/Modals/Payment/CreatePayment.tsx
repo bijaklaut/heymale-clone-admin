@@ -11,6 +11,7 @@ import {
   buttonCheck,
   modalHandler,
   populateValidation,
+  textInputHandler,
 } from "../../../services/helper";
 
 interface ThisProps {
@@ -37,16 +38,6 @@ const CreatePaymentModal = (props: ThisProps) => {
     data,
     requiredField: ["ownerName", "bankName", "accountNo"],
     setDisable,
-  };
-
-  const textInputHandler = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    inputLabel: string,
-  ) => {
-    setData({
-      ...data,
-      [inputLabel]: event.target.value,
-    });
   };
 
   const submitHandler = async () => {
@@ -101,19 +92,19 @@ const CreatePaymentModal = (props: ThisProps) => {
           <TextInput
             data={data}
             label={["Owner Name", "ownerName", "Enter account owner name"]}
-            changeHandler={textInputHandler}
+            onChange={(e) => textInputHandler(e, "ownerName", data, setData)}
             validations={validation}
           />
           <TextInput
             data={data}
             label={["Bank Name", "bankName", "Enter bank name"]}
-            changeHandler={textInputHandler}
+            onChange={(e) => textInputHandler(e, "bankName", data, setData)}
             validations={validation}
           />
           <TextInput
             data={data}
             label={["Account Number", "accountNo", "Enter account number"]}
-            changeHandler={textInputHandler}
+            onChange={(e) => textInputHandler(e, "accountNo", data, setData)}
             validations={validation}
           />
           <div className="modal-action flex">
