@@ -1,7 +1,7 @@
 "use client";
 
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { FilterTypes, CategoryTypes, ProductTypes } from "../../services/types";
+import { ChangeEvent, useEffect, useState } from "react";
+import { FilterTypes, CategoryTypes } from "../../services/types";
 import { getProducts } from "../../services/admin";
 import ProductTable from "../Tables/ProductTable";
 import CreateProductModal from "../Modals/Product/CreateProduct";
@@ -41,7 +41,7 @@ const queryGenerator = (filters: FilterTypes[]) => {
   return `((^)(${joinArray.join("|")}))+$` || "";
 };
 
-const ProductTableWrapper = (props: ThisProps) => {
+const ProductWrapper = (props: ThisProps) => {
   const { categories } = props;
   const [filters, setFilters] = useState(initialCriteria(categories || []));
   const [search, setSearch] = useState("");
@@ -100,9 +100,12 @@ const ProductTableWrapper = (props: ThisProps) => {
 
   return (
     <>
-      <CreateProductModal categories={categories} stateChanges={stateChanges} />
-
+      <h2 className="text-2xl font-semibold">Product Dashboard</h2>
       <div className="mt-3 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
+        <CreateProductModal
+          categories={categories}
+          stateChanges={stateChanges}
+        />
         <SearchFilter
           data={{ filters, search }}
           changeSearch={changeSearch}
@@ -126,4 +129,4 @@ const ProductTableWrapper = (props: ThisProps) => {
   );
 };
 
-export default ProductTableWrapper;
+export default ProductWrapper;

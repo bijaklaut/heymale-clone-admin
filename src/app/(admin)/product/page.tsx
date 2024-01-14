@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { getCategories } from "../../../../services/admin";
-import ProductTableWrapper from "../../../../components/Wrapper/ProductTableWrapper";
+import ProductWrapper from "../../../../components/Wrapper/ProductWrapper";
 
 export const metadata: Metadata = {
   title: "Heymale | Product Dashboard",
@@ -12,8 +12,7 @@ const ProductDashboard = async () => {
   const { docs: categories } = payload;
   return (
     <>
-      <h2 className="text-2xl font-semibold">Product Dashboard</h2>
-      <ProductTableWrapper categories={categories} />
+      <ProductWrapper categories={categories} />
     </>
   );
 };
