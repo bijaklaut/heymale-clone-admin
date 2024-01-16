@@ -1,21 +1,26 @@
 "use client";
 
-import { ChangeEvent, useRef, useState } from "react";
-import { updatePayment, updateProduct } from "../../../services/admin";
+import { useEffect, useRef, useState } from "react";
+import { updateProduct } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   CategoryTypes,
   PostProductTypes,
   ProductTypes,
+  ValidationTypes,
 } from "../../../services/types";
 import Image from "next/image";
-import SelectCategory from "./SelectCategory";
 import VariantInput from "./VariantInput";
-import { NumericFormat } from "react-number-format";
-import { EditSvg } from "../../Misc/SvgGroup";
+import { EditSvg, ImageSvg } from "../../Misc/SvgGroup";
 import TextInput from "../../Form/TextInput";
-import { revalidatePath } from "next/cache";
+import Cookies from "js-cookie";
+import { buttonCheck, populateValidation } from "../../../services/helper";
+import TextArea from "../../Form/TextAreaInput";
+import NumericInput from "../../Form/NumericInput";
+import FileInput from "../../Form/FileInput";
+import StatusInput from "./StatusInput";
+import SelectInput from "../../Form/SelectInput";
 
 interface ThisProps {
   product: ProductTypes;
@@ -37,6 +42,7 @@ const initialData = (product: ProductTypes) => {
     price: product.price,
     description: product.description,
     thumbnail: product.thumbnail,
+    status: product.status,
   };
 };
 
@@ -47,57 +53,13 @@ const UpdateProductModal = (props: ThisProps) => {
   const [preview, setPreview] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const [disable, setDisable] = useState(true);
-  const [validation, setValidation] = useState([
-    {
-      field: "",
-      message: "",
-    },
-  ]);
+  const [loading, setLoading] = useState(false);
+  const [validation, setValidation] = useState<ValidationTypes[]>([]);
   const [data, setData] = useState<PostProductTypes>(initialData(product));
-
-  const buttonCheck = (
-    event: ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
-  ) => {
-    if (!event.target.value) {
-      return setDisable(true);
-    }
-
-    return setDisable(false);
-  };
-
-  const changeHandler = (
-    event: ChangeEvent<HTMLInputElement>,
-    label: string,
-  ) => {
-    setData({
-      ...data,
-      [label]: event.target.value,
-    });
-
-    buttonCheck(event);
-  };
-
-  const variantHandler = (
-    event: ChangeEvent<HTMLInputElement>,
-    label: string,
-  ) => {
-    setData({
-      ...data,
-      variant: {
-        ...data.variant,
-        [label]: Number(event.target.value),
-      },
-    });
-  };
-
-  const categoryHandler = (event: ChangeEvent<HTMLSelectElement>) => {
-    setData({
-      ...data,
-      category: event.target.value,
-    });
-    buttonCheck(event);
+  const btnCheckProps = {
+    data,
+    requiredField: ["name", "category", "price", "description"],
+    setDisable,
   };
 
   const modalHandler = (id: string, show: boolean) => {
@@ -107,24 +69,23 @@ const UpdateProductModal = (props: ThisProps) => {
       fileInput.current.value = "";
     }
 
-    if (modal && show) {
-      setValidation([
-        {
-          field: "",
-          message: "",
-        },
-      ]);
+    if (show) {
       setData(initialData(product));
       setDisable(true);
+      setLoading(false);
+      setPreview("");
+      setValidation([]);
 
-      modal.showModal();
-    } else if (modal && show == false) {
-      modal.close();
+      return modal.showModal();
     }
+
+    modal.close();
   };
 
   const submitHandler = async (id: string, index: number) => {
     const form = new FormData();
+    setLoading(true);
+    setValidation([]);
 
     for (const [key, value] of Object.entries(data)) {
       if (key == "variant") {
@@ -136,68 +97,65 @@ const UpdateProductModal = (props: ThisProps) => {
       }
     }
 
-    const loading = toast.loading("Processing..", {
-      containerId: "UpdateProduct",
-    });
-
     try {
-      const result = await updateProduct(form, id);
+      const token = Cookies.get("token");
+      const result = await updateProduct(form, id, token!);
 
-      if (result.payload) {
-        toast.dismiss(loading);
+      setTimeout(() => {
+        setLoading(false);
         toast.success(result.message, { containerId: "Main" });
-
         modalHandler(`updateProd${index}`, false);
         router.refresh();
-        return stateChanges();
-      }
+        stateChanges();
+      }, 700);
     } catch (error: any) {
-      if (error.message == "Validation Error" || error.code == 11000) {
-        for (const [key] of Object.entries(error.errorDetail)) {
-          setValidation((prev) => [
-            ...prev,
-            {
-              field: key,
-              message: error.errorDetail[key].message,
-            },
-          ]);
+      setTimeout(() => {
+        setLoading(false);
+        if (error.message == "Validation Error" || error.code == 11000) {
+          return populateValidation(error, setValidation);
         }
-      }
 
-      toast.dismiss(loading);
-      toast.error(error.message, { containerId: "CreateProduct" });
+        toast.error(error.message, { containerId: "CreateProduct" });
+      }, 700);
     }
   };
+  useEffect(() => {
+    buttonCheck(btnCheckProps);
+  }, [data]);
 
   return (
     <>
       <button
-        className="text-gray-600 transition-all hover:text-blue-500"
+        data-theme={"skies"}
+        className="btn-icon-primary"
         onClick={() => modalHandler(`updateProd${index}`, true)}
       >
         <EditSvg className="w-5 stroke-current" />
       </button>
-      <dialog data-theme={"nord"} id={`updateProd${index}`} className="modal">
+      <dialog data-theme={"skies"} id={`updateProd${index}`} className="modal">
         <ToastContainer
           enableMultiContainer
           containerId={"updateProduct"}
           theme="dark"
         />
-        <div className="no-scrollbar modal-box absolute max-w-3xl bg-gray-700">
-          <h3 className="mb-5 text-lg font-bold text-white">Update Product</h3>
+        <div className="no-scrollbar modal-box absolute max-w-3xl text-white">
+          <h3 className="modal-title mb-5">Update Product</h3>
           {/* Product Name & Category */}
           <div className="flex w-full gap-x-3">
             <TextInput
-              data={data}
+              dataState={{ data, setData }}
               label={["Product Name", "name", "Enter product name"]}
-              onChange={changeHandler}
-              validation={validation}
+              validations={validation}
             />
-            <SelectCategory
-              data={data}
-              handler={categoryHandler}
-              validation={validation}
+            <SelectInput
               categories={categories}
+              dataState={{ data, setData }}
+              label={[
+                "Product Category",
+                "category",
+                "Select product category",
+              ]}
+              validations={validation}
             />
           </div>
           {/* Variant */}
@@ -211,8 +169,7 @@ const UpdateProductModal = (props: ThisProps) => {
                   <VariantInput
                     key={i}
                     label={v}
-                    handler={variantHandler}
-                    data={data}
+                    dataState={{ data, setData }}
                     validation={validation}
                   />
                 );
@@ -220,147 +177,73 @@ const UpdateProductModal = (props: ThisProps) => {
             </div>
           </div>
           {/* Description */}
-          <label className="form-control w-full">
-            <div className="label">
-              <span className="label-text text-white">Description</span>
-            </div>
-            <textarea
-              className="textarea textarea-bordered h-24 p-2"
-              placeholder="Type product decription"
-              onChange={(e) => {
-                setData({
-                  ...data,
-                  description: e.target.value,
-                });
-                buttonCheck(e);
-              }}
-              value={data.description}
-            ></textarea>
-            <div className="label">
-              {validation.map((val) => {
-                return val.field == "description" ? (
-                  <span className="label-text-alt text-error">
-                    {val.message}
-                  </span>
-                ) : (
-                  ""
-                );
-              })}
-            </div>
-          </label>
+          <TextArea
+            label={["Description", "description", "Enter product description"]}
+            dataState={{ data, setData }}
+            validations={validation}
+          />
 
           {/* Thumbnail & Price */}
-          <div className="flex justify-between">
+          <div className="flex items-center justify-between">
             <div className="flex w-1/2 flex-col">
-              <label className="w-full">
-                <div className="label">
-                  <span className="label-text -ms-1 text-white">Price</span>
-                </div>
-                <NumericFormat
-                  allowNegative={false}
-                  valueIsNumericString
-                  thousandSeparator="."
-                  decimalSeparator=","
-                  prefix="Rp. "
-                  value={data.price}
-                  onValueChange={(e) => {
-                    setData({
-                      ...data,
-                      price: Number(e.value),
-                    });
-
-                    if (!e.value) return setDisable(true);
-                    return setDisable(false);
-                  }}
-                  className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 text-neutral focus:outline-0 focus:ring-0"
-                  placeholder="Input product price"
-                />
-
-                <div className="label">
-                  {validation.map((val, i) =>
-                    val.field == "price" ? (
-                      <span key={i} className="label-text-alt text-error">
-                        {val.message}
-                      </span>
-                    ) : (
-                      ""
-                    ),
-                  )}
-                </div>
-              </label>
-              <label className="form-control w-full">
-                <div className="label">
-                  <span className="label-text text-white">Thumbnail</span>
-                </div>
-
-                <input
-                  type="file"
-                  ref={fileInput}
-                  className="file-input file-input-sm w-full border-0"
-                  accept="image/jpg, image/jpeg, image/png"
-                  onChange={(e) => {
-                    if (e.target.files instanceof FileList) {
-                      setPreview(URL.createObjectURL(e.target.files[0]));
-                      setData({
-                        ...data,
-                        thumbnail: e.target.files[0],
-                      });
-                    }
-                  }}
-                />
-                <div className="label">
-                  {validation.map((val) => {
-                    return val.field == "thumbnail" ? (
-                      <span className="label-text-alt text-error">
-                        {val.message}
-                      </span>
-                    ) : (
-                      ""
-                    );
-                  })}
-                </div>
-              </label>
+              <NumericInput
+                isCurrency
+                label={["Price", "price", "Enter product price"]}
+                validations={validation}
+                dataState={{ data, setData }}
+              />
+              <FileInput
+                ref={fileInput}
+                label={["Thumbnail", "thumbnail"]}
+                validations={validation}
+                fileSetState={{ setData, setPreview }}
+              />
+              <StatusInput dataState={{ data, setData }} label="status" />
             </div>
             <div className="flex h-[250px] w-[250px] items-center justify-center rounded-md bg-neutral">
-              {!preview ? (
-                <Image
-                  src={
-                    data.thumbnail
-                      ? `${IMG_API}/product/${data.thumbnail}`
-                      : "icon/image.svg"
-                  }
-                  width={150}
-                  height={150}
-                  alt="upload-icon"
-                  className={
-                    data.thumbnail
-                      ? "h-full w-auto object-cover"
-                      : "h-auto w-[100px]"
-                  }
-                />
-              ) : (
+              {preview ? (
                 <Image
                   src={preview}
                   width={150}
                   height={150}
-                  alt="upload-icon"
+                  alt="preview"
                   className={"h-full w-auto object-cover"}
                 />
+              ) : data.thumbnail ? (
+                <Image
+                  src={`${IMG_API}/product/${data.thumbnail}`}
+                  width={150}
+                  height={150}
+                  alt="preview"
+                  className={"h-full w-auto object-cover"}
+                />
+              ) : (
+                <ImageSvg className="h-auto w-[100px] fill-white" />
               )}
             </div>
           </div>
           {/* Submit */}
           <div className="modal-action mt-16 flex">
-            <button
-              className="btn btn-primary btn-sm text-white"
-              disabled={disable}
-              onClick={() => submitHandler(product._id, index)}
-            >
-              Update
-            </button>
+            {!loading ? (
+              <button
+                className="btn btn-primary btn-sm"
+                disabled={disable}
+                onClick={() => submitHandler(product._id, index)}
+              >
+                Update
+              </button>
+            ) : (
+              <button className="btn btn-sm pointer-events-none">
+                <span className="loading loading-spinner loading-sm"></span>
+                Updating..
+              </button>
+            )}
+
             <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-sm border-transparent bg-transparent text-white hover:border-white hover:bg-transparent">
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => modalHandler(`updateProd${index}`, false)}
+              >
                 Close
               </button>
             </form>

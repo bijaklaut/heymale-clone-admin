@@ -1,19 +1,22 @@
-import { Dispatch, InputHTMLAttributes, SetStateAction } from "react";
-import cx from "classnames";
+import React, { Dispatch, SetStateAction } from "react";
+import { NumericFormat } from "react-number-format";
+import { numInputHandler } from "../../services/helper";
 import { ValidationTypes } from "../../services/types";
-import { textInputHandler } from "../../services/helper";
+import cx from "classnames";
 
-interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface NumInputProps {
   dataState: { data: any; setData: Dispatch<SetStateAction<any>> };
   label: [textLabel: string, fieldLabel: string, placeholder?: string];
   validations: ValidationTypes[];
+  isCurrency?: boolean;
 }
 
-const TextInput = (props: TextInputProps) => {
+const NumericInput = (props: NumInputProps) => {
   const {
     dataState: { data, setData },
     label: [textLabel, fieldLabel, placeholder],
     validations,
+    isCurrency = false,
   } = props;
   const validation = validations.find((val) => val.field == fieldLabel);
   const inputClass = cx({
@@ -23,19 +26,22 @@ const TextInput = (props: TextInputProps) => {
   });
 
   return (
-    <label data-theme={"skies"} className="w-full transition-all">
+    <label className="w-full">
       <div className="label">
         <span className="label-text -ms-1 text-base text-white">
           {textLabel}
         </span>
       </div>
-      <input
-        type="text"
-        placeholder={placeholder || "Enter value"}
+      <NumericFormat
+        allowNegative={false}
+        valueIsNumericString
+        thousandSeparator="."
+        decimalSeparator=","
+        prefix={isCurrency ? "Rp. " : ""}
+        value={(data as any)[fieldLabel] || 0}
+        onValueChange={(e) => numInputHandler(e.value, "price", setData)}
         className={inputClass}
-        autoComplete="off"
-        onChange={(e) => textInputHandler(e.target.value, fieldLabel, setData)}
-        value={(data as any)[fieldLabel]}
+        placeholder={placeholder || "Enter value"}
       />
       <div className="label">
         <span className="label-text-alt text-error">
@@ -46,4 +52,4 @@ const TextInput = (props: TextInputProps) => {
   );
 };
 
-export default TextInput;
+export default NumericInput;

@@ -68,6 +68,11 @@ export interface VariantTypes {
   xl: number;
 }
 
+export enum StatusEnum {
+  Active,
+  Inactive,
+}
+
 export interface PostProductTypes {
   name: string;
   category: string;
@@ -75,6 +80,7 @@ export interface PostProductTypes {
   price: number;
   description: string;
   thumbnail?: Blob | string;
+  status: string;
 }
 
 export interface ProductTypes
@@ -82,7 +88,6 @@ export interface ProductTypes
   _id: string;
   category: CategoryTypes;
   thumbnail: string;
-  status: string;
 }
 
 export interface PostAddressTypes {

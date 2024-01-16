@@ -1,49 +1,47 @@
-import { Dispatch, InputHTMLAttributes, SetStateAction } from "react";
-import cx from "classnames";
+import React, { Dispatch, InputHTMLAttributes, SetStateAction } from "react";
 import { ValidationTypes } from "../../services/types";
 import { textInputHandler } from "../../services/helper";
+import cx from "classnames";
 
-interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface TextAreaProps extends InputHTMLAttributes<HTMLInputElement> {
   dataState: { data: any; setData: Dispatch<SetStateAction<any>> };
   label: [textLabel: string, fieldLabel: string, placeholder?: string];
   validations: ValidationTypes[];
 }
 
-const TextInput = (props: TextInputProps) => {
+const TextAreaInput = (props: TextAreaProps) => {
   const {
-    dataState: { data, setData },
-    label: [textLabel, fieldLabel, placeholder],
+    label,
+    onKeyUp,
     validations,
+    dataState: { data, setData },
   } = props;
+  const [textLabel, fieldLabel, placeholder] = label;
   const validation = validations.find((val) => val.field == fieldLabel);
   const inputClass = cx({
-    "input input-bordered input-sm w-full rounded-md py-5 text-lg transition-all":
-      true,
-    "input-error": validation,
+    "textarea textarea-bordered min-h-[96px] p-2 transition-color": true,
+    "textarea-error": validation,
   });
-
   return (
-    <label data-theme={"skies"} className="w-full transition-all">
+    <label className="form-control w-full">
       <div className="label">
         <span className="label-text -ms-1 text-base text-white">
           {textLabel}
         </span>
       </div>
-      <input
-        type="text"
-        placeholder={placeholder || "Enter value"}
+      <textarea
         className={inputClass}
-        autoComplete="off"
+        placeholder={placeholder}
         onChange={(e) => textInputHandler(e.target.value, fieldLabel, setData)}
         value={(data as any)[fieldLabel]}
-      />
+      ></textarea>
       <div className="label">
         <span className="label-text-alt text-error">
-          {validation?.message || ""}
+          {validation ? validation.message : ""}
         </span>
       </div>
     </label>
   );
 };
 
-export default TextInput;
+export default TextAreaInput;

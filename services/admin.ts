@@ -119,31 +119,38 @@ export const getProducts = async (
   });
 };
 
-export const createProduct = async (data: FormData) => {
+export const createProduct = async (data: FormData, token: string) => {
   const url = `${ROOT_API}/${API_VER}/product/create`;
   return callApi({
     url,
     method: "POST",
     data,
+    token,
   });
 };
 
-export const updateProduct = async (data: FormData, id: string) => {
+export const updateProduct = async (
+  data: FormData,
+  id: string,
+  token: string,
+) => {
   const url = `${ROOT_API}/${API_VER}/product/update/${id}`;
 
   return callApi({
     url,
     method: "PUT",
     data,
+    token,
   });
 };
 
-export const deleteProduct = async (id: string) => {
+export const deleteProduct = async (id: string, token: string) => {
   const url = `${ROOT_API}/${API_VER}/product/${id}?_method=DELETE`;
 
   return callApi({
     url,
     method: "POST",
+    token,
   });
 };
 // End of Product Dashboard

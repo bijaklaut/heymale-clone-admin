@@ -1,15 +1,24 @@
 "use client";
 
-import { ChangeEvent, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createProduct } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { CategoryTypes, PostProductTypes } from "../../../services/types";
-import VariantInput from "./VariantInput";
-import SelectCategory from "./SelectCategory";
+import {
+  CategoryTypes,
+  PostProductTypes,
+  ValidationTypes,
+} from "../../../services/types";
 import Image from "next/image";
-import { NumericFormat } from "react-number-format";
 import TextInput from "../../Form/TextInput";
+import { buttonCheck, populateValidation } from "../../../services/helper";
+import VariantInput from "./VariantInput";
+import TextArea from "../../Form/TextAreaInput";
+import NumericInput from "../../Form/NumericInput";
+import FileInput from "../../Form/FileInput";
+import Cookies from "js-cookie";
+import StatusInput from "./StatusInput";
+import SelectInput from "../../Form/SelectInput";
 
 interface CreateProductProps {
   categories: CategoryTypes[];
@@ -29,6 +38,7 @@ const initialState = () => {
     price: 0,
     description: "",
     thumbnail: "",
+    status: "Active",
   };
 };
 
@@ -37,57 +47,14 @@ const CreateProductModal = (props: CreateProductProps) => {
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const [disable, setDisable] = useState(true);
+  const [data, setData] = useState<PostProductTypes>(initialState());
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState("");
-  const [validation, setValidation] = useState([
-    {
-      field: "",
-      message: "",
-    },
-  ]);
-  const [data, setData] = useState<PostProductTypes>(initialState());
-
-  const buttonCheck = (
-    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    if (!event.target.value) {
-      return setDisable(true);
-    }
-
-    return setDisable(false);
-  };
-
-  const variantHandler = (
-    event: ChangeEvent<HTMLInputElement>,
-    label: string,
-  ) => {
-    setData({
-      ...data,
-      variant: {
-        ...data.variant,
-        [label]: Number(event.target.value),
-      },
-    });
-  };
-
-  const changeHandler = (
-    event: ChangeEvent<HTMLInputElement>,
-    label: string,
-  ) => {
-    setData({
-      ...data,
-      [label]: event.target.value,
-    });
-
-    buttonCheck(event);
-  };
-
-  const categoryHandler = (event: ChangeEvent<HTMLSelectElement>) => {
-    setData({
-      ...data,
-      category: event.target.value,
-    });
-    buttonCheck(event);
+  const [validation, setValidation] = useState<ValidationTypes[]>([]);
+  const btnCheckProps = {
+    data,
+    requiredField: ["name", "category", "price", "description"],
+    setDisable,
   };
 
   const modalHandler = (id: string, show: boolean) => {
@@ -97,32 +64,23 @@ const CreateProductModal = (props: CreateProductProps) => {
       fileInput.current.value = "";
     }
 
-    if (modal && show) {
+    if (show) {
       setDisable(true);
-      setPreview("");
       setData(initialState());
-      setValidation([
-        {
-          field: "",
-          message: "",
-        },
-      ]);
+      setLoading(false);
+      setPreview("");
+      setValidation([]);
 
       return modal.showModal();
     }
 
-    return modal.close();
+    modal.close();
   };
 
   const submitHandler = async () => {
-    setValidation([
-      {
-        field: "",
-        message: "",
-      },
-    ]);
-
     const form = new FormData();
+    setLoading(true);
+    setValidation([]);
 
     for (const [key, value] of Object.entries(data)) {
       if (key == "variant") {
@@ -134,232 +92,143 @@ const CreateProductModal = (props: CreateProductProps) => {
       }
     }
 
-    const loading = toast.loading("Processing..", {
-      containerId: "CreateProduct",
-    });
-
     try {
-      const result = await createProduct(form);
+      const token = Cookies.get("token");
+      const result = await createProduct(form, token!);
 
-      if (result.payload) {
-        toast.dismiss(loading);
-        toast.success(result.message, {
-          containerId: "Main",
-        });
-
+      setTimeout(() => {
+        setLoading(false);
+        toast.success(result.message, { containerId: "Main" });
         modalHandler("addProd", false);
         router.refresh();
-        return stateChanges();
-      }
+        stateChanges();
+      }, 700);
     } catch (error: any) {
-      if (error.message == "Validation Error" || error.code == 11000) {
-        for (const [key] of Object.entries(error.errorDetail)) {
-          setValidation((prev) => [
-            ...prev,
-            {
-              field: key,
-              message: error.errorDetail[key].message,
-            },
-          ]);
+      setTimeout(() => {
+        setLoading(false);
+        if (error.message == "Validation Error" || error.code == 11000) {
+          return populateValidation(error, setValidation);
         }
-      }
 
-      toast.dismiss(loading);
-      toast.error(error.message, { containerId: "CreateProduct" });
+        toast.error(error.message, { containerId: "CreateProduct" });
+      }, 700);
     }
   };
+
+  useEffect(() => {
+    buttonCheck(btnCheckProps);
+  }, [data]);
 
   return (
     <>
       <button
-        className="btn btn-primary btn-sm mb-3 mt-5 "
+        className="btn btn-primary btn-sm w-fit"
         onClick={() => modalHandler("addProd", true)}
       >
         Add Product
       </button>
-      <dialog id="addProd" data-theme={"nord"} className="modal text-neutral">
+      <dialog id="addProd" data-theme={"skies"} className="modal">
         <ToastContainer
           enableMultiContainer
           containerId={"CreateProduct"}
           theme="dark"
         />
-        <div className="no-scrollbar modal-box absolute max-w-3xl bg-gray-700">
-          <h3 className=" mb-5 text-lg font-bold text-white">
-            Add New Product
-          </h3>
+        <div className="no-scrollbar modal-box absolute max-w-3xl text-white">
+          <h3 className="modal-title mb-5">Add New Product</h3>
           {/* Product Name & Category */}
           <div className="flex w-full gap-x-3">
             <TextInput
-              data={data}
+              dataState={{ data, setData }}
               label={["Product Name", "name", "Enter product name"]}
-              onChange={changeHandler}
-              validation={validation}
+              validations={validation}
             />
-            <SelectCategory
-              data={data}
-              handler={categoryHandler}
-              validation={validation}
+            <SelectInput
               categories={categories}
+              dataState={{ data, setData }}
+              label={[
+                "Product Category",
+                "category",
+                "Select product category",
+              ]}
+              validations={validation}
             />
           </div>
-          {/* Variant */}
+          {/* Variants */}
           <div>
             <label className="label">
-              <span className="label-text -ms-1 block text-white">Variant</span>
+              <span className="label-text -ms-1 block text-base text-white">
+                Product Variant
+              </span>
             </label>
             <div className="mb-3 flex flex-wrap justify-between">
-              <VariantInput
-                data={data}
-                label="s"
-                validation={validation}
-                handler={variantHandler}
-              />
-              <VariantInput
-                label="m"
-                handler={variantHandler}
-                validation={validation}
-                data={data}
-              />
-              <VariantInput
-                data={data}
-                label="l"
-                validation={validation}
-                handler={variantHandler}
-              />
-              <VariantInput
-                data={data}
-                label="xl"
-                validation={validation}
-                handler={variantHandler}
-              />
-            </div>
-          </div>
-
-          {/* Description */}
-          <label className="form-control w-full">
-            <div className="label">
-              <span className="label-text text-white">Description</span>
-            </div>
-            <textarea
-              className="textarea textarea-bordered h-24 p-2"
-              placeholder="Type product decription"
-              onChange={(e) => {
-                setData({
-                  ...data,
-                  description: e.target.value,
-                });
-              }}
-              value={data.description}
-            ></textarea>
-            <div className="label">
-              {validation.map((val) => {
-                return val.field == "description" ? (
-                  <span className="label-text-alt text-error">
-                    {val.message}
-                  </span>
-                ) : (
-                  ""
+              {["s", "m", "l", "xl"].map((v, i) => {
+                return (
+                  <VariantInput
+                    key={i}
+                    label={v}
+                    dataState={{ data, setData }}
+                    validation={validation}
+                  />
                 );
               })}
             </div>
-          </label>
-          {/* Thumbnail & Price */}
-          <div className="flex justify-between">
+          </div>
+          {/* Description */}
+          <TextArea
+            label={["Description", "description", "Enter product description"]}
+            dataState={{ data, setData }}
+            validations={validation}
+          />
+          {/* Price, Thumbnail, Status */}
+          <div className="flex items-center justify-between">
             <div className="flex w-1/2 flex-col">
-              <label className="w-full">
-                <div className="label">
-                  <span className="label-text -ms-1 text-white">Price</span>
-                </div>
-                <NumericFormat
-                  allowNegative={false}
-                  valueIsNumericString
-                  thousandSeparator="."
-                  decimalSeparator=","
-                  prefix="Rp. "
-                  value={data.price}
-                  onValueChange={(e) => {
-                    setData({
-                      ...data,
-                      price: Number(e.value),
-                    });
-
-                    if (!e.value) return setDisable(true);
-                    return setDisable(false);
-                  }}
-                  className="input h-10 w-full rounded-md border-2 border-gray-700 p-2 text-neutral focus:outline-0 focus:ring-0"
-                  placeholder="Input product price"
-                />
-
-                <div className="label">
-                  {validation.map((val, i) =>
-                    val.field == "price" ? (
-                      <span key={i} className="label-text-alt text-error">
-                        {val.message}
-                      </span>
-                    ) : (
-                      ""
-                    ),
-                  )}
-                </div>
-              </label>
-              <label className="form-control w-full">
-                <div className="label">
-                  <span className="label-text text-white">Thumbnail</span>
-                </div>
-                <input
-                  type="file"
-                  ref={fileInput}
-                  className="file-input file-input-sm w-full border-0"
-                  accept="image/jpg, image/jpeg, image/png"
-                  onChange={(e) => {
-                    if (e.target.files instanceof FileList) {
-                      setPreview(URL.createObjectURL(e.target.files[0]));
-                      setData({
-                        ...data,
-                        thumbnail: e.target.files[0],
-                      });
-                    }
-                  }}
-                />
-                <div className="label">
-                  {validation.map((val) => {
-                    return val.field == "thumbnail" ? (
-                      <span className="label-text-alt text-error">
-                        {val.message}
-                      </span>
-                    ) : (
-                      ""
-                    );
-                  })}
-                </div>
-              </label>
+              <NumericInput
+                isCurrency
+                label={["Price", "price", "Enter product price"]}
+                validations={validation}
+                dataState={{ data, setData }}
+              />
+              <FileInput
+                ref={fileInput}
+                label={["Thumbnail", "thumbnail"]}
+                validations={validation}
+                fileSetState={{ setData, setPreview }}
+              />
+              <StatusInput dataState={{ data, setData }} label="status" />
             </div>
             <div className="flex h-[250px] w-[250px] items-center justify-center rounded-md bg-neutral">
               <Image
-                src={preview == "" ? "icon/image.svg" : preview}
-                width={preview == "" ? 60 : 150}
-                height={preview == "" ? 60 : 150}
+                src={preview || "icon/image.svg"}
+                width={!preview ? 60 : 150}
+                height={!preview ? 60 : 150}
                 alt="upload-icon"
                 className={
-                  preview != ""
-                    ? "h-full w-auto object-cover"
-                    : "h-auto w-[100px]"
+                  preview ? "h-full w-auto object-cover" : "h-auto w-[100px]"
                 }
               />
             </div>
           </div>
           {/* Submit */}
           <div className="modal-action mt-16 flex">
-            <button
-              className="btn btn-primary btn-sm text-white"
-              disabled={disable}
-              onClick={submitHandler}
-            >
-              Create
-            </button>
+            {!loading ? (
+              <button
+                className="btn btn-primary btn-sm"
+                disabled={disable}
+                onClick={submitHandler}
+              >
+                Create
+              </button>
+            ) : (
+              <button className="btn btn-sm pointer-events-none">
+                <span className="loading loading-spinner loading-sm"></span>
+                Creating..
+              </button>
+            )}
             <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-sm border-transparent bg-transparent text-white hover:border-white hover:bg-transparent">
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => modalHandler("addProd", false)}
+              >
                 Close
               </button>
             </form>

@@ -5,6 +5,9 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { ProductTypes } from "../../../services/types";
 import { TrashSvg } from "../../Misc/SvgGroup";
+import Cookies from "js-cookie";
+import { simpleModalHandler } from "../../../services/helper";
+import { useState } from "react";
 
 interface thisProps {
   product: ProductTypes;
@@ -15,67 +18,66 @@ interface thisProps {
 const DeleteProductModal = (props: thisProps) => {
   const { product, index, stateChanges } = props;
   const router = useRouter();
-
-  const modalHandler = (id: string, show: boolean) => {
-    const modal = document.getElementById(id) as HTMLDialogElement;
-
-    if (modal && show) {
-      modal.showModal();
-    } else if (modal && show == false) {
-      modal.close();
-    }
-  };
+  const [loading, setLoading] = useState(false);
 
   const submitHandler = async (id: string, index: number) => {
-    const loading = toast.loading("Processing", { containerId: "Main" });
+    setLoading(true);
     try {
-      const result = await deleteProduct(id);
+      const token = Cookies.get("token");
+      const result = await deleteProduct(id, token!);
 
-      toast.update(loading, {
-        render: result.message,
-        type: "success",
-        isLoading: false,
-        autoClose: 5000,
-        containerId: "Main",
-      });
-      modalHandler(`delProd${index}`, false);
-      router.refresh();
-      return stateChanges();
+      setTimeout(() => {
+        setLoading(false);
+        toast.success(result.message, { containerId: "Main" });
+        simpleModalHandler(`delProd${index}`, false);
+        router.refresh();
+        return stateChanges();
+      }, 700);
     } catch (error: any) {
-      toast.update(loading, {
-        render: error.message,
-        type: "error",
-        isLoading: false,
-        autoClose: 5000,
-        containerId: "Main",
-      });
-      modalHandler(`delProd${index}`, false);
+      setTimeout(() => {
+        setLoading(false);
+        simpleModalHandler(`delProd${index}`, false);
+        toast.error(error.message, { containerId: "Main" });
+      }, 700);
     }
   };
 
   return (
     <>
       <button
-        className="text-gray-600 transition-all hover:text-error"
-        onClick={() => modalHandler(`delProd${index}`, true)}
+        data-theme={"skies"}
+        className="btn-icon-error"
+        onClick={() => simpleModalHandler(`delProd${index}`, true)}
       >
         <TrashSvg className="w-5 stroke-current" />
       </button>
-      <dialog data-theme={"dracula"} id={`delProd${index}`} className="modal">
-        <div className="modal-box">
-          <h3 className=" mb-5 font-semibold text-primary">
-            Are you sure to delete {product.name}?
+      <dialog data-theme={"skies"} id={`delProd${index}`} className="modal">
+        <div className="modal-box flex flex-col items-center px-5 py-8">
+          <h3 className="mb-3 text-center text-base font-semibold text-white">
+            Are you sure to delete
+            <span className="text-error">{` ${product.name} `}</span>?
           </h3>
           <div className="modal-action flex">
-            <button
-              className="btn btn-primary btn-xs"
-              onClick={() => submitHandler(product._id, index)}
-            >
-              Confirm
-            </button>
+            {!loading ? (
+              <button
+                className="btn btn-error btn-sm"
+                onClick={() => submitHandler(product._id, index)}
+              >
+                Delete
+              </button>
+            ) : (
+              <button className="btn btn-error btn-sm">
+                <span className="loading loading-spinner loading-sm"></span>
+                Deleting..
+              </button>
+            )}
             <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-outline btn-xs">Close</button>
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => simpleModalHandler(`delProd${index}`, false)}
+              >
+                Close
+              </button>
             </form>
           </div>
         </div>

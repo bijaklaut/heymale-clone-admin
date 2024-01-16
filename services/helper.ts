@@ -143,13 +143,37 @@ export const populateValidation = (
 };
 
 export const textInputHandler = (
-  event: ChangeEvent<HTMLInputElement>,
+  value: string | number,
   label: string,
-  data: PostDataTypes,
   setData: Dispatch<SetStateAction<any>>,
 ) => {
-  setData({
-    ...data,
-    [label]: event.target.value,
-  });
+  setData((prev: any) => ({
+    ...prev,
+    [label]: value,
+  }));
+};
+
+export const numInputHandler = (
+  value: string | number,
+  label: string,
+  setData: Dispatch<SetStateAction<any>>,
+) => {
+  setData((prev: any) => ({
+    ...prev,
+    [label]: Number(value),
+  }));
+};
+
+export const variantHandler = (
+  value: string | number,
+  label: string,
+  setState: Dispatch<SetStateAction<any>>,
+) => {
+  setState((prev: any) => ({
+    ...prev,
+    variant: {
+      ...prev.variant,
+      [label]: Number(value),
+    },
+  }));
 };

@@ -52,14 +52,20 @@
   @apply cursor-not-allowed bg-gray-500 text-gray-400;
 }
 
-.input {
-  @apply outline-none ring-0 focus:outline-none focus:ring-0;
+.input,
+.select,
+.textarea {
+  @apply outline-none ring-0 focus:border-base-content/40 focus:outline-none focus:ring-0;
+}
+
+.select {
+  @apply h-10 min-h-[42px];
 }
 /* End of Form */
 
 /* Buttons */
 .btn {
-  @apply w-fit rounded-lg px-4;
+  @apply rounded-lg px-4;
 }
 
 .btn-primary,
