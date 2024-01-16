@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { updateUser } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -10,13 +10,18 @@ import {
   ValidationTypes,
 } from "../../../services/types";
 import Cookies from "js-cookie";
-import { buttonCheck, populateValidation } from "../../../services/helper";
+import {
+  buttonCheck,
+  populateValidation,
+  stateChanges,
+} from "../../../services/helper";
 import TextInput from "../../Form/TextInput";
 import { EditSvg } from "../../Misc/SvgGroup";
 
 interface thisProps {
   user: UserTypes;
   index: number;
+  setChanges: Dispatch<SetStateAction<boolean>>;
 }
 
 const initialData = (data: PostUserTypes) => {
@@ -29,7 +34,7 @@ const initialData = (data: PostUserTypes) => {
 
 const UpdateUserModal = (props: thisProps) => {
   const router = useRouter();
-  const { user, index } = props;
+  const { user, index, setChanges } = props;
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
@@ -71,6 +76,7 @@ const UpdateUserModal = (props: thisProps) => {
         toast.success(result.message, { containerId: "Main" });
         modalHandler(`updateUser${index}`, false);
         router.refresh();
+        stateChanges(setChanges);
       }, 700);
     } catch (error: any) {
       setTimeout(() => {

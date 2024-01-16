@@ -1,5 +1,10 @@
 import { Fragment } from "react";
-import { CategoryTypes, FilterTypes, ProductTypes } from "../../services/types";
+import {
+  CategoryTypes,
+  FilterTypes,
+  PaginationTypes,
+  ProductTypes,
+} from "../../services/types";
 import Image from "next/image";
 import DeleteProductModal from "../Modals/Product/DeleteProduct";
 import UpdateProductModal from "../Modals/Product/UpdateProduct";
@@ -13,16 +18,7 @@ interface ProductTableProps {
   pageHandler(page: number | null): void;
   categories: CategoryTypes[];
   filters: FilterTypes[];
-  paginate: {
-    docs: ProductTypes[];
-    page: number;
-    totalPages: number;
-    pagingCounter: number;
-    hasPrevPage: boolean;
-    hasNextPage: boolean;
-    prevPage: number | null;
-    nextPage: number | null;
-  };
+  paginate: PaginationTypes;
 }
 
 const ProductTable = (props: ProductTableProps) => {
@@ -52,7 +48,7 @@ const ProductTable = (props: ProductTableProps) => {
 
             <tbody>
               {filters?.map((fil, index) => {
-                let isExist = products.filter(
+                let isExist = (products as ProductTypes[]).filter(
                   (product) => product.category.name == fil.name,
                 ).length;
                 if (fil.include && isExist) {
@@ -63,120 +59,122 @@ const ProductTable = (props: ProductTableProps) => {
                           {fil.name}
                         </td>
                       </tr>
-                      {products.map((product: ProductTypes, i) => {
-                        let statusClass = cx({
-                          "inline-block h-2 w-2 rounded-full": true,
-                          "bg-green-400": product.status == "Active",
-                          "bg-red-400": product.status == "Inactive",
-                        });
+                      {(products as ProductTypes[]).map(
+                        (product: ProductTypes, i) => {
+                          let statusClass = cx({
+                            "inline-block h-2 w-2 rounded-full": true,
+                            "bg-green-400": product.status == "Active",
+                            "bg-red-400": product.status == "Inactive",
+                          });
 
-                        if (product.category.name == fil.name)
-                          return (
-                            <tr
-                              key={`${product._id}-${
-                                paginate.pagingCounter + i
-                              }`}
-                            >
-                              <th className="text-center">
-                                {paginate.pagingCounter + i}
-                              </th>
-                              <td>
-                                <div className="mb-3 flex min-h-[150px] w-full flex-col items-center justify-center gap-2">
-                                  <span className="font-semibold">
-                                    {product.name}
-                                  </span>
-                                  <Image
-                                    src={
-                                      product.thumbnail != ""
-                                        ? `${IMG_API}/product/${product.thumbnail}`
-                                        : "icon/image.svg"
-                                    }
-                                    width={90}
-                                    height={90}
-                                    alt={`thumbnail-${product.name}`}
-                                    className={
-                                      product.thumbnail != ""
-                                        ? "h-auto w-auto rounded-md border-2 border-neutral bg-cover"
-                                        : "h-[90px] w-auto rounded-md bg-neutral p-2"
-                                    }
-                                  />
-                                </div>
-                              </td>
-                              <td>
-                                <div className="flex gap-x-2">
-                                  {Object.entries(product.variant).map(
-                                    ([k], id) => {
-                                      let variantClass = cx({
-                                        "tooltip relative flex h-[25px] font-semibold w-[30px] items-center justify-center rounded-md border px-2 cursor-default":
-                                          true,
-                                        "text-green-500 border-green-500":
-                                          (product.variant as any)[k] >= 100,
-                                        "text-yellow-500 border-yellow-500":
-                                          (product.variant as any)[k] < 100 &&
-                                          (product.variant as any)[k] >= 50,
-                                        "text-red-500 border-red-500":
-                                          (product.variant as any)[k] < 50 &&
-                                          (product.variant as any)[k] > 0,
-                                        "text-gray-500 border-gray-400":
-                                          (product.variant as any)[k] == 0,
-                                      });
+                          if (product.category.name == fil.name)
+                            return (
+                              <tr
+                                key={`${product._id}-${
+                                  paginate.pagingCounter + i
+                                }`}
+                              >
+                                <th className="text-center">
+                                  {paginate.pagingCounter + i}
+                                </th>
+                                <td>
+                                  <div className="mb-3 flex min-h-[150px] w-full flex-col items-center justify-center gap-2">
+                                    <span className="font-semibold">
+                                      {product.name}
+                                    </span>
+                                    <Image
+                                      src={
+                                        product.thumbnail != ""
+                                          ? `${IMG_API}/product/${product.thumbnail}`
+                                          : "icon/image.svg"
+                                      }
+                                      width={90}
+                                      height={90}
+                                      alt={`thumbnail-${product.name}`}
+                                      className={
+                                        product.thumbnail != ""
+                                          ? "h-auto w-auto rounded-md border-2 border-neutral bg-cover"
+                                          : "h-[90px] w-auto rounded-md bg-neutral p-2"
+                                      }
+                                    />
+                                  </div>
+                                </td>
+                                <td>
+                                  <div className="flex gap-x-2">
+                                    {Object.entries(product.variant).map(
+                                      ([k], id) => {
+                                        let variantClass = cx({
+                                          "tooltip relative flex h-[25px] font-semibold w-[30px] items-center justify-center rounded-md border px-2 cursor-default":
+                                            true,
+                                          "text-green-500 border-green-500":
+                                            (product.variant as any)[k] >= 100,
+                                          "text-yellow-500 border-yellow-500":
+                                            (product.variant as any)[k] < 100 &&
+                                            (product.variant as any)[k] >= 50,
+                                          "text-red-500 border-red-500":
+                                            (product.variant as any)[k] < 50 &&
+                                            (product.variant as any)[k] > 0,
+                                          "text-gray-500 border-gray-400":
+                                            (product.variant as any)[k] == 0,
+                                        });
 
-                                      return (
-                                        <div
-                                          key={id}
-                                          className={variantClass}
-                                          data-tip={`${
-                                            (product.variant as any)[k]
-                                          } pcs`}
-                                        >
-                                          <p>{k.toUpperCase()}</p>
-                                        </div>
-                                      );
-                                    },
-                                  )}
-                                </div>
-                              </td>
-                              <td className="w-[150px] text-center">
-                                <NumFormatWrapper
-                                  value={product.price}
-                                  displayType="text"
-                                  prefix="Rp. "
-                                  thousandSeparator="."
-                                  decimalSeparator=","
-                                />
-                              </td>
-                              <td className="text-center">
-                                <div className="flex items-center gap-x-2">
-                                  <span className={statusClass}></span>
-                                  <p>{product.status}</p>
-                                </div>
-                              </td>
-                              <td className="text-justify">
-                                {product.description} Lorem ipsum dolor sit amet
-                                consectetur adipisicing elit. Tempora itaque
-                                aspernatur, explicabo ipsum soluta iusto fuga
-                                iste omnis dignissimos nihil officiis commodi
-                                magni, architecto voluptate nulla fugit in
-                                impedit nemo?
-                              </td>
-                              <td>
-                                <div className="flex min-h-full items-center justify-center gap-x-2 px-5">
-                                  <UpdateProductModal
-                                    product={product}
-                                    categories={categories!}
-                                    index={i}
-                                    stateChanges={stateChanges}
+                                        return (
+                                          <div
+                                            key={id}
+                                            className={variantClass}
+                                            data-tip={`${
+                                              (product.variant as any)[k]
+                                            } pcs`}
+                                          >
+                                            <p>{k.toUpperCase()}</p>
+                                          </div>
+                                        );
+                                      },
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="w-[150px] text-center">
+                                  <NumFormatWrapper
+                                    value={product.price}
+                                    displayType="text"
+                                    prefix="Rp. "
+                                    thousandSeparator="."
+                                    decimalSeparator=","
                                   />
-                                  <DeleteProductModal
-                                    product={product}
-                                    index={i}
-                                    stateChanges={stateChanges}
-                                  />
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                      })}
+                                </td>
+                                <td className="text-center">
+                                  <div className="flex items-center gap-x-2">
+                                    <span className={statusClass}></span>
+                                    <p>{product.status}</p>
+                                  </div>
+                                </td>
+                                <td className="text-justify">
+                                  {product.description} Lorem ipsum dolor sit
+                                  amet consectetur adipisicing elit. Tempora
+                                  itaque aspernatur, explicabo ipsum soluta
+                                  iusto fuga iste omnis dignissimos nihil
+                                  officiis commodi magni, architecto voluptate
+                                  nulla fugit in impedit nemo?
+                                </td>
+                                <td>
+                                  <div className="flex min-h-full items-center justify-center gap-x-2 px-5">
+                                    <UpdateProductModal
+                                      product={product}
+                                      categories={categories!}
+                                      index={i}
+                                      stateChanges={stateChanges}
+                                    />
+                                    <DeleteProductModal
+                                      product={product}
+                                      index={i}
+                                      stateChanges={stateChanges}
+                                    />
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                        },
+                      )}
                     </Fragment>
                   );
                 }

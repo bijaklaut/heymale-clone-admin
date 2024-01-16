@@ -5,7 +5,7 @@ import { MenuItem } from "./MenuItem";
 import UserAction from "./UserAction";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import { getUser } from "../../services/admin";
+import { getUserById } from "../../services/admin";
 import { jwtDecode } from "jwt-decode";
 import { UserToken } from "../../services/types";
 import SidebarLoading from "../Loading/SidebarLoading";
@@ -31,7 +31,7 @@ export const Sidebar = () => {
   useEffect(() => {
     const token = Cookies.get("token");
     const getUserAPI = async (id: string) => {
-      const { payload } = await getUser(token!, id);
+      const { payload } = await getUserById(id);
 
       setUser({
         avatar: payload.avatar,

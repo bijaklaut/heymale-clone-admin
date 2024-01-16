@@ -106,10 +106,10 @@ export const deletePayment = async (id: string, token: string) => {
 
 // Product Dashboard
 export const getProducts = async (
-  queryParams: number,
+  page: number,
   data?: { query: string; search: string },
 ) => {
-  const queryString = `?p=${queryParams}` || "";
+  const queryString = `?p=${page}` || "";
   const url = `${ROOT_API}/${API_VER}/product${queryString}`;
 
   return callApi({
@@ -156,17 +156,23 @@ export const deleteProduct = async (id: string, token: string) => {
 // End of Product Dashboard
 
 // User Dashboard
-export const getUser = async (token: string, id?: string) => {
-  let url = `${ROOT_API}/${API_VER}/user`;
-
-  if (id) {
-    url = `${ROOT_API}/${API_VER}/user/${id}`;
-  }
+export const getUsers = async (page: number, search: string) => {
+  const searchQuery = search ? `?search=${search}` : "";
+  const pageQuery = page ? (searchQuery ? `&p=${page}` : `?p=${page}`) : "";
+  const url = `${ROOT_API}/${API_VER}/user${searchQuery}${pageQuery}`;
 
   return callApi({
     url,
     method: "GET",
-    token,
+  });
+};
+
+export const getUserById = async (id: string) => {
+  const url = `${ROOT_API}/${API_VER}/user/${id}`;
+
+  return callApi({
+    url,
+    method: "GET",
   });
 };
 

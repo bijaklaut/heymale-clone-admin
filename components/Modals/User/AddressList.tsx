@@ -102,7 +102,7 @@ const AddressListModal = (props: thisProps) => {
           </button>
           <h3 className="text-xl font-bold text-primary">Address List</h3>
 
-          {addresses.length < 5 ? (
+          {/* {addresses.length < 5 ? (
             <PostAddressCollapse
               id={_id}
               modalShow={modalShow}
@@ -112,7 +112,7 @@ const AddressListModal = (props: thisProps) => {
             />
           ) : (
             <div className="mt-10"></div>
-          )}
+          )} */}
 
           <div className="flex flex-wrap justify-evenly gap-y-5">
             {addresses.map((address, i) => {

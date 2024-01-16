@@ -6,7 +6,7 @@ interface ThisProps {
     search: string;
     filters?: FilterTypes[];
   };
-  changeSearch(event: ChangeEvent<HTMLInputElement>): void;
+  changeSearch(search: string): void;
   withFilter?: boolean;
   changeFilter?: (filters: FilterTypes[], filter: FilterTypes) => void;
   placeholder?: string;
@@ -16,7 +16,7 @@ const SearchFilter = ({
   data,
   changeSearch,
   changeFilter,
-  withFilter = true,
+  withFilter = false,
   placeholder,
 }: ThisProps) => {
   const { filters, search } = data;
@@ -28,7 +28,7 @@ const SearchFilter = ({
         placeholder={placeholder || "Search table"}
         value={search}
         className="input input-bordered h-9 w-full max-w-xs transition-all focus:border-white focus:outline-none focus:ring-0"
-        onChange={(e) => changeSearch(e)}
+        onChange={(e) => changeSearch(e.target.value)}
       />
       {withFilter ? (
         <div

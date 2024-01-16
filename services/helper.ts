@@ -1,6 +1,7 @@
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import {
   DataTypes,
+  FilterTypes,
   InitData,
   PostDataTypes,
   SetStateTypes,
@@ -177,3 +178,43 @@ export const variantHandler = (
     },
   }));
 };
+
+export const initPagination = (payload?: any) => {
+  return {
+    docs: payload?.docs || [],
+    page: payload?.page || 1,
+    totalPages: payload?.totalPages || 1,
+    pagingCounter: payload?.pagingCounter || 1,
+    hasPrevPage: payload?.hasPrevPage || false,
+    hasNextPage: payload?.hasNextPage || false,
+    prevPage: payload?.prevPage || null,
+    nextPage: payload?.nextPage || null,
+  };
+};
+
+export const initCriteria = (data: DataTypes[], filterField: string) => {
+  let returnValue: FilterTypes[] = [];
+
+  data.map((d) => {
+    return returnValue.push({ name: (d as any)[filterField], include: true });
+  });
+
+  return returnValue;
+};
+
+export const queryGenerator = (filters: FilterTypes[]) => {
+  let joinArray: string[] = [];
+  filters
+    .filter((crit) => crit.include)
+    .map((crit) => joinArray.push(crit.name));
+
+  return `((^)(${joinArray.join("|")}))+$` || "";
+};
+
+export const pageHandler = (
+  pageNumber: number,
+  setPage: Dispatch<SetStateAction<number>>,
+) => setPage(pageNumber);
+
+export const stateChanges = (setChanges: Dispatch<SetStateAction<boolean>>) =>
+  setChanges((prev) => !prev);

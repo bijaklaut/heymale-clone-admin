@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 
 export interface PaginationTypes {
+  docs: DataTypes[] | [];
   page: number;
   totalPages: number;
   pagingCounter: number;
