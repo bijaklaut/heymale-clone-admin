@@ -66,7 +66,7 @@ const DeleteProductModal = (props: thisProps) => {
                 Delete
               </button>
             ) : (
-              <button className="btn btn-error btn-sm">
+              <button className="btn btn-sm pointer-events-none">
                 <span className="loading loading-spinner loading-sm"></span>
                 Deleting..
               </button>
