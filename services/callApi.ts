@@ -2,7 +2,6 @@ import axios, { AxiosRequestConfig } from "axios";
 
 interface CallAPIProps extends AxiosRequestConfig {
   token?: string;
-  serverToken?: string;
 }
 
 const callApi = async ({ url, method, data, token = "" }: CallAPIProps) => {
