@@ -76,7 +76,7 @@ const CreatePaymentModal = (props: ThisProps) => {
   return (
     <Fragment>
       <button
-        className="btn btn-primary btn-sm"
+        className="btn btn-primary btn-sm w-fit"
         onClick={() => modalHandler("addPay", true, initialData, setState)}
       >
         Add Payment

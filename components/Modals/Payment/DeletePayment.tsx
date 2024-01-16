@@ -55,7 +55,7 @@ const DeletePaymentModal = (props: thisProps) => {
 
       <dialog data-theme={"skies"} id={`delPay${index}`} className="modal">
         <div className="modal-box flex flex-col items-center px-5 py-8">
-          <h3 className="mb-3 text-center font-semibold text-white">
+          <h3 className="mb-3 text-center text-base font-semibold text-white">
             Are you sure to delete
             <span className="text-error">{` ${payment.bankName} - ${payment.accountNo} `}</span>
             ?

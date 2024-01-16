@@ -113,21 +113,18 @@ const UpdatePaymentModal = (props: thisProps) => {
         <div className="modal-box absolute text-white">
           <h3 className="modal-title mb-5">Update Payment</h3>
           <TextInput
-            data={data}
+            dataState={{ data, setData }}
             label={["Owner Name", "ownerName", "Enter account owner name"]}
-            onChange={(e) => textInputHandler(e, "ownerName", data, setData)}
             validations={validation}
           />
           <TextInput
-            data={data}
+            dataState={{ data, setData }}
             label={["Bank Name", "bankName", "Enter bank name"]}
-            onChange={(e) => textInputHandler(e, "bankName", data, setData)}
             validations={validation}
           />
           <TextInput
-            data={data}
+            dataState={{ data, setData }}
             label={["Account Number", "accountNo", "Enter account number"]}
-            onChange={(e) => textInputHandler(e, "accountNo", data, setData)}
             validations={validation}
           />
           <div className="modal-action flex">
