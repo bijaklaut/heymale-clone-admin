@@ -1,42 +1,43 @@
-import { ChangeEvent } from "react";
+import { Dispatch, InputHTMLAttributes, SetStateAction } from "react";
+import { NumericFormat } from "react-number-format";
+import { variantHandler } from "../../../services/helper";
 
-interface VariantInputProps {
-  data: any;
-  handler(event: ChangeEvent, label: string): void;
+interface VariantInputProps extends InputHTMLAttributes<HTMLInputElement> {
+  dataState: { data: any; setData: Dispatch<SetStateAction<any>> };
   label: string;
-  validation: { field: string; message: string }[];
+  validations: { field: string; message: string }[];
 }
 
 const VariantInput = (props: VariantInputProps) => {
-  const { handler, label, validation, data } = props;
+  const {
+    label,
+    validations,
+    dataState: { data, setData },
+  } = props;
   const joinLabel = `variant.${label}`;
+  const validation = validations.find((val) => val.field == joinLabel);
 
   return (
     <div className="join relative w-36 md:w-1/5">
-      <div className="label join-item bg-gray-800">
+      <div className="label join-item bg-neutral">
         <span className="label-text w-7 text-center font-bold text-white">
           {label.toUpperCase()}
         </span>
       </div>
-      <input
-        type="number"
-        min={0}
-        className="input join-horizontal h-10 w-full rounded-l-none border-2 border-white p-2 text-neutral focus:outline-0 focus:ring-0"
-        onChange={(e) => {
-          handler(e, label);
-        }}
-        value={(data.variant as any)[label]}
+      <NumericFormat
+        allowNegative={false}
+        valueIsNumericString
+        thousandSeparator="."
+        decimalSeparator=","
+        value={(data.variant as any)[label] || 0}
+        onValueChange={(e) => variantHandler(e.value, label, setData)}
+        className="input input-bordered join-horizontal h-10 w-full rounded-l-none p-2"
+        placeholder="Enter stock"
       />
       <div className="label absolute -bottom-10 left-0">
-        {validation.map((val, i) =>
-          val.field == joinLabel ? (
-            <span key={i} className="label-text-alt text-error">
-              {val.message}
-            </span>
-          ) : (
-            ""
-          ),
-        )}
+        <span className="label-text-alt text-error">
+          {validation?.message || ""}
+        </span>
       </div>
     </div>
   );

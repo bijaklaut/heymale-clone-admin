@@ -167,7 +167,7 @@ const CreateProductModal = (props: CreateProductProps) => {
                     key={i}
                     label={v}
                     dataState={{ data, setData }}
-                    validation={validation}
+                    validations={validation}
                   />
                 );
               })}

@@ -170,7 +170,7 @@ const UpdateProductModal = (props: ThisProps) => {
                     key={i}
                     label={v}
                     dataState={{ data, setData }}
-                    validation={validation}
+                    validations={validation}
                   />
                 );
               })}
