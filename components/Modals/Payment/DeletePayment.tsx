@@ -27,22 +27,18 @@ const DeletePaymentModal = (props: thisProps) => {
       const token = Cookies.get("token");
       const result = await deletePayment(id, token!);
 
-      if (result.payload) {
-        setTimeout(() => {
-          setLoading(false);
-          toast.success(result.message, {
-            containerId: "Main",
-          });
-          simpleModalHandler(`delPay${index}`, false);
-          router.refresh();
-          return stateChanges();
-        }, 700);
-      }
+      setTimeout(() => {
+        setLoading(false);
+        toast.success(result.message, { containerId: "Main" });
+        simpleModalHandler(`delPay${index}`, false);
+        router.refresh();
+        return stateChanges();
+      }, 700);
     } catch (error: any) {
       setTimeout(() => {
         setLoading(false);
-        toast.error(error.message, { containerId: "Main" });
         simpleModalHandler(`delPay${index}`, false);
+        toast.error(error.message, { containerId: "Main" });
       }, 700);
     }
   };
@@ -59,8 +55,10 @@ const DeletePaymentModal = (props: thisProps) => {
 
       <dialog data-theme={"skies"} id={`delPay${index}`} className="modal">
         <div className="modal-box flex flex-col items-center px-5 py-8">
-          <h3 className="mb-3 font-semibold text-white">
-            Are you sure to delete {payment.bankName} - {payment.accountNo}?
+          <h3 className="mb-3 text-center font-semibold text-white">
+            Are you sure to delete
+            <span className="text-error">{` ${payment.bankName} - ${payment.accountNo} `}</span>
+            ?
           </h3>
           <div className="modal-action flex">
             {!loading ? (
@@ -79,8 +77,8 @@ const DeletePaymentModal = (props: thisProps) => {
 
             <form method="dialog">
               <button
-                onClick={() => simpleModalHandler(`delCat${index}`, false)}
                 className="btn btn-outline btn-sm"
+                onClick={() => simpleModalHandler(`delCat${index}`, false)}
               >
                 Close
               </button>
