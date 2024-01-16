@@ -89,8 +89,13 @@
   @apply hover:text-error;
 }
 
+.btn-icon-accent {
+  @apply hover:text-accent;
+}
+
 .btn-icon-primary,
-.btn-icon-error {
+.btn-icon-error,
+.btn-icon-accent {
   @apply bg-transparent text-gray-600 transition-all;
 }
 /* End of Buttons */

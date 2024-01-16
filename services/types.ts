@@ -37,7 +37,8 @@ export type PostDataTypes =
   | PostPaymentTypes
   | PostProductTypes
   | PostUserTypes
-  | SignInTypes;
+  | SignInTypes
+  | ChangePassTypes;
 
 export interface LoginTypes {
   email: string;
@@ -117,6 +118,7 @@ export interface PostUserTypes {
   email: string;
   phoneNumber: string;
   password?: string;
+  confirm?: string;
   role?: string;
   avatar?: Blob | string;
   status?: string;
@@ -140,4 +142,10 @@ export interface UserToken {
 export interface FilterTypes {
   name: string;
   include: boolean;
+}
+
+export interface ChangePassTypes {
+  oldPassword: string;
+  newPassword: string;
+  confirm: string;
 }

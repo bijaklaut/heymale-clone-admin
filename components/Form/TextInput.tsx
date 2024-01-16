@@ -13,6 +13,7 @@ const TextInput = (props: TextInputProps) => {
   const {
     dataState: { data, setData },
     label: [textLabel, fieldLabel, placeholder],
+    type = "text",
     validations,
   } = props;
   const validation = validations.find((val) => val.field == fieldLabel);
@@ -30,7 +31,7 @@ const TextInput = (props: TextInputProps) => {
         </span>
       </div>
       <input
-        type="text"
+        type={type}
         placeholder={placeholder || "Enter value"}
         className={inputClass}
         autoComplete="off"
