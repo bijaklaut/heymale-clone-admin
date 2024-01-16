@@ -112,9 +112,8 @@ const UpdateCategoryModal = (props: thisProps) => {
           <h3 className="modal-title mb-5">Update Category</h3>
 
           <TextInput
+            dataState={{ data, setData }}
             label={["Category Name", "name", "Enter category name"]}
-            data={data}
-            onChange={(e) => textInputHandler(e, "name", data, setData)}
             validations={validation}
           />
 

@@ -32,7 +32,6 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
     requiredField: ["name"],
     setDisable,
   };
-  const textInputProps = { data, setData };
 
   const submitHandler = async () => {
     setLoading(true);
@@ -49,7 +48,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
         });
         modalHandler("addCat", false, initialData, setState);
         router.refresh();
-        return stateChanges();
+        stateChanges();
       }, 700);
     } catch (error: any) {
       setTimeout(() => {
@@ -58,7 +57,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
           return populateValidation(error, setValidation);
         }
 
-        return toast.error(error.message, { containerId: "CreateCategory" });
+        toast.error(error.message, { containerId: "CreateCategory" });
       }, 700);
     }
   };
@@ -70,7 +69,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
   return (
     <>
       <button
-        className="btn btn-primary btn-sm"
+        className="btn btn-primary btn-sm w-fit"
         onClick={() => modalHandler("addCat", true, initialData, setState)}
       >
         Add Category
@@ -84,9 +83,8 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
         <div className="modal-box absolute text-white">
           <h3 className="modal-title mb-5">Add Category</h3>
           <TextInput
-            data={data}
+            dataState={{ data, setData }}
             label={["Category Name", "name", "Enter category name"]}
-            onChange={(e) => textInputHandler(e, "name", data, setData)}
             validations={validation}
           />
           <div className="modal-action flex">

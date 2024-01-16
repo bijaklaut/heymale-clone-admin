@@ -27,22 +27,17 @@ const DeleteCategoryModal = (props: thisProps) => {
       const result = await deleteCategory(id, token!);
 
       setTimeout(() => {
-        toast.success(result.message, {
-          containerId: "Main",
-        });
+        toast.success(result.message, { containerId: "Main" });
 
         simpleModalHandler(`delCat${index}`, false);
         setLoading(false);
         router.refresh();
-
-        return stateChanges();
+        stateChanges();
       }, 700);
     } catch (error: any) {
       setTimeout(() => {
         setLoading(false);
-        toast.error(error.message, {
-          containerId: "Main",
-        });
+        toast.error(error.message, { containerId: "Main" });
         simpleModalHandler(`delCat${index}`, false);
       }, 700);
     }
@@ -59,8 +54,9 @@ const DeleteCategoryModal = (props: thisProps) => {
       </button>
       <dialog data-theme={"skies"} id={`delCat${index}`} className="modal">
         <div className="modal-box flex flex-col items-center px-5 py-8">
-          <h3 className="mb-3 text-base text-white">
-            Are you sure to delete {category.name}?
+          <h3 className="mb-3 text-center text-base font-semibold text-white">
+            Are you sure to delete{" "}
+            <span className="text-error">{` ${category.name} `}</span>?
           </h3>
           <div className="modal-action flex">
             {!loading ? (
