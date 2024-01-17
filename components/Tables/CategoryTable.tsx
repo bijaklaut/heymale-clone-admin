@@ -1,5 +1,5 @@
 "use client";
-import { Fragment } from "react";
+import { Fragment, MouseEventHandler } from "react";
 import { CategoryTypes, PaginationTypes } from "../../services/types";
 import NoDisplay from "../Misc/NoDisplay";
 import DeleteCategoryModal from "../Modals/Category/DeleteCategory";
@@ -12,11 +12,15 @@ interface CategoryPagination extends PaginationTypes {
 
 interface ThisProps {
   paginate: CategoryPagination;
-  pageHandler(page: number | null): void;
+  paginateAction: MouseEventHandler<HTMLButtonElement>;
   stateChanges(): void;
 }
 
-const CategoryTable = ({ paginate, pageHandler, stateChanges }: ThisProps) => {
+const CategoryTable = ({
+  paginate,
+  paginateAction,
+  stateChanges,
+}: ThisProps) => {
   const { docs: categories } = paginate;
 
   return (
@@ -57,7 +61,7 @@ const CategoryTable = ({ paginate, pageHandler, stateChanges }: ThisProps) => {
               })}
             </tbody>
           </table>
-          <Pagination paginate={paginate} pageHandler={pageHandler} />
+          <Pagination paginate={paginate} onClick={paginateAction} />
         </Fragment>
       ) : (
         <NoDisplay text="There's no category to display" />

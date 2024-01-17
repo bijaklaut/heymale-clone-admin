@@ -6,38 +6,23 @@ import SearchFilter from "../Misc/SearchFilter";
 import CategoryTable from "../Tables/CategoryTable";
 import SimpleTableLoading from "../Loading/SimpleTableLoading";
 import CreateCategoryModal from "../Modals/Category/CreateCategory";
-
-const initialPagination = (payload?: any) => {
-  return {
-    docs: payload?.docs || [],
-    page: payload?.page || 1,
-    totalPages: payload?.totalPages || 1,
-    pagingCounter: payload?.pagingCounter || 1,
-    hasPrevPage: payload?.hasPrevPage || false,
-    hasNextPage: payload?.hasNextPage || false,
-    prevPage: payload?.prevPage || null,
-    nextPage: payload?.nextPage || null,
-  };
-};
+import { initPagination } from "../../services/helper";
 
 const CategoryWrapper = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState(initialPagination());
+  const [pagination, setPagination] = useState(initPagination());
   const [changes, setChanges] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const stateChanges = () => setChanges((prev) => !prev);
-  const pageHandler = (pageNumber: number) => {
-    setPage(pageNumber);
-  };
-
+  const pageHandler = (pageNumber: number) => setPage(pageNumber);
   const getFilteredCategory = useCallback(
     async (search: string, page: number) => {
       setLoading(true);
       const { payload } = await getCategories(search, page);
 
-      setPagination(initialPagination(payload));
+      setPagination(initPagination(payload));
       return setTimeout(() => setLoading(false), 500);
     },
     [search, page, changes],
@@ -67,9 +52,11 @@ const CategoryWrapper = () => {
         />
         {!loading ? (
           <CategoryTable
-            pageHandler={pageHandler}
             stateChanges={stateChanges}
             paginate={pagination}
+            paginateAction={(e) =>
+              pageHandler(Number(e.currentTarget.dataset.page))
+            }
           />
         ) : (
           <SimpleTableLoading />

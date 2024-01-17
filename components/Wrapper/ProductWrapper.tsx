@@ -29,11 +29,7 @@ const ProductWrapper = (props: ThisProps) => {
   const [loading, setLoading] = useState(true);
 
   const stateChanges = () => setChanges((prev) => !prev);
-
-  const pageHandler = (pageNumber: number) => {
-    setPage(pageNumber);
-  };
-
+  const pageHandler = (pageNumber: number) => setPage(pageNumber);
   const getFilteredProduct = useCallback(
     async (page: number, data: { query: string; search: string }) => {
       setLoading(true);

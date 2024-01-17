@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import {
@@ -17,7 +17,6 @@ import {
   buttonCheck,
   modalHandler,
   populateValidation,
-  textInputHandler,
 } from "../../../services/helper";
 
 interface thisProps {

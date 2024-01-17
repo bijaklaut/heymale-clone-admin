@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createCategory } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,6 @@ import {
   buttonCheck,
   modalHandler,
   populateValidation,
-  textInputHandler,
 } from "../../../services/helper";
 import { PostCategoryTypes, ValidationTypes } from "../../../services/types";
 
