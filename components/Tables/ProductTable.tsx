@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, MouseEventHandler } from "react";
 import {
   CategoryTypes,
   FilterTypes,
@@ -15,16 +15,15 @@ import Pagination from "../Misc/Pagination";
 
 interface ProductTableProps {
   stateChanges(): void;
-  pageHandler(page: number | null): void;
+  paginateAction: MouseEventHandler<HTMLButtonElement>;
   categories: CategoryTypes[];
   filters: FilterTypes[];
   paginate: PaginationTypes;
 }
 
 const ProductTable = (props: ProductTableProps) => {
-  const { categories, filters, stateChanges, paginate, pageHandler } = props;
+  const { categories, filters, stateChanges, paginate, paginateAction } = props;
   const { docs: products } = paginate;
-
   const IMG_API = process.env.NEXT_PUBLIC_IMG;
 
   return (
@@ -181,7 +180,7 @@ const ProductTable = (props: ProductTableProps) => {
               })}
             </tbody>
           </table>
-          <Pagination paginate={paginate} pageHandler={pageHandler} />
+          <Pagination paginate={paginate} onClick={paginateAction} />
         </Fragment>
       ) : (
         <NoDisplay text={"There's no products to display"} />

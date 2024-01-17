@@ -1,101 +1,75 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
-import { FilterTypes, CategoryTypes } from "../../services/types";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+import {
+  FilterTypes,
+  CategoryTypes,
+  PaginationTypes,
+} from "../../services/types";
 import { getProducts } from "../../services/admin";
 import ProductTable from "../Tables/ProductTable";
 import CreateProductModal from "../Modals/Product/CreateProduct";
 import SearchFilter from "../Misc/SearchFilter";
 import ComplexTableLoading from "../Loading/ComplexTableLoading";
+import {
+  initCriteria,
+  initPagination,
+  queryGenerator,
+} from "../../services/helper";
 
 interface ThisProps {
   categories: CategoryTypes[];
 }
-const initialCriteria = (categories: CategoryTypes[]) => {
-  let returnValue: FilterTypes[] = [];
-
-  categories.map((category) => {
-    return returnValue.push({ name: category.name, include: true });
-  });
-
-  return returnValue;
-};
-const initialPagination = (payload?: any) => {
-  return {
-    docs: payload?.docs || [],
-    page: payload?.page || 1,
-    totalPages: payload?.totalPages || 1,
-    pagingCounter: payload?.pagingCounter || 1,
-    hasPrevPage: payload?.hasPrevPage || false,
-    hasNextPage: payload?.hasNextPage || false,
-    prevPage: payload?.prevPage || null,
-    nextPage: payload?.nextPage || null,
-  };
-};
-const queryGenerator = (filters: FilterTypes[]) => {
-  let joinArray: string[] = [];
-  filters
-    .filter((crit) => crit.include)
-    .map((crit) => joinArray.push(crit.name));
-
-  return `((^)(${joinArray.join("|")}))+$` || "";
-};
 
 const ProductWrapper = (props: ThisProps) => {
   const { categories } = props;
-  const [filters, setFilters] = useState(initialCriteria(categories || []));
+  const [filters, setFilters] = useState(
+    initCriteria(categories || [], "name"),
+  );
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState(initialPagination());
+  const [pagination, setPagination] = useState(initPagination());
   const [changes, setChanges] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const stateChanges = () => setChanges((prev) => !prev);
-  const changeSearch = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
-    setLoading(true);
-  };
-  const changeFilter = (filters: FilterTypes[], filter: FilterTypes) => {
-    let copyFilter = [...filters];
-    copyFilter.map((copy) => {
-      if (copy.name == filter.name) return (copy.include = !copy.include);
-    });
 
-    setFilters(copyFilter);
-    setLoading(true);
-  };
   const pageHandler = (pageNumber: number) => {
     setPage(pageNumber);
   };
 
-  useEffect(() => {
-    const getFiltered = async (
-      page: number,
-      data: { query: string; search: string },
-    ) => {
+  const getFilteredProduct = useCallback(
+    async (page: number, data: { query: string; search: string }) => {
+      setLoading(true);
       const { payload } = await getProducts(page, data);
 
-      setPagination(initialPagination(payload));
-      return setTimeout(() => setLoading(false), 500);
-    };
+      return setTimeout(() => {
+        setLoading(false);
+        setPagination(initPagination(payload));
+      }, 500);
+    },
+    [search, filters, page, changes],
+  );
+
+  // Search filter then reset pagination
+  useEffect(() => {
     const pageParams = 1;
     const query = queryGenerator(filters);
 
-    getFiltered(pageParams, { query, search });
+    getFilteredProduct(pageParams, { query, search });
   }, [filters, search, changes]);
 
+  // Pagination
   useEffect(() => {
-    const getFiltered = async (
-      page: number,
-      data: { query: string; search: string },
-    ) => {
-      const { payload } = await getProducts(page, data);
-
-      setPagination(initialPagination(payload));
-    };
     const query = queryGenerator(filters);
 
-    getFiltered(page, { query, search });
+    getFilteredProduct(page, { query, search });
   }, [page]);
 
   return (
@@ -107,10 +81,9 @@ const ProductWrapper = (props: ThisProps) => {
           stateChanges={stateChanges}
         />
         <SearchFilter
-          data={{ filters, search }}
-          changeSearch={changeSearch}
-          changeFilter={changeFilter}
-          withFilter={true}
+          search={search}
+          filterData={{ filters, setFilters }}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search product by name"
         />
         {!loading ? (
@@ -119,7 +92,9 @@ const ProductWrapper = (props: ThisProps) => {
             filters={filters}
             stateChanges={stateChanges}
             paginate={pagination}
-            pageHandler={pageHandler}
+            paginateAction={(e) =>
+              pageHandler(Number(e.currentTarget.dataset.page))
+            }
           />
         ) : (
           <ComplexTableLoading />

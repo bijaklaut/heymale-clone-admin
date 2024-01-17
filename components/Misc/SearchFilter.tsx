@@ -1,26 +1,22 @@
-import { ChangeEvent } from "react";
+import { Dispatch, InputHTMLAttributes, SetStateAction } from "react";
 import { FilterTypes } from "../../services/types";
+import { changeFilter } from "../../services/helper";
 
-interface ThisProps {
-  data: {
-    search: string;
+interface ThisProps extends InputHTMLAttributes<HTMLInputElement> {
+  search: string;
+  filterData?: {
     filters?: FilterTypes[];
+    setFilters?: Dispatch<SetStateAction<FilterTypes[]>>;
   };
-  changeSearch(search: string): void;
-  withFilter?: boolean;
-  changeFilter?: (filters: FilterTypes[], filter: FilterTypes) => void;
   placeholder?: string;
 }
 
 const SearchFilter = ({
-  data,
-  changeSearch,
-  changeFilter,
-  withFilter = false,
+  filterData,
+  onChange,
   placeholder,
+  search,
 }: ThisProps) => {
-  const { filters, search } = data;
-
   return (
     <div className="flex items-center gap-x-3">
       <input
@@ -28,9 +24,9 @@ const SearchFilter = ({
         placeholder={placeholder || "Search table"}
         value={search}
         className="input input-bordered h-9 w-full max-w-xs transition-all focus:border-white focus:outline-none focus:ring-0"
-        onChange={(e) => changeSearch(e.target.value)}
+        onChange={onChange}
       />
-      {withFilter ? (
+      {filterData ? (
         <div
           data-theme={"nord"}
           className="dropdown dropdown-right bg-transparent"
@@ -46,16 +42,18 @@ const SearchFilter = ({
             tabIndex={0}
             className="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow"
           >
-            {filters?.map((fil, i) => {
+            {filterData.filters?.map((fil, i) => {
+              const { filters, setFilters } = filterData;
+
               return (
                 <div key={i} className="form-control">
-                  <label className="label cursor-pointer justify-normal">
+                  <label className="label cursor-pointer justify-normal gap-x-3">
                     <input
                       type="checkbox"
-                      className="checkbox checkbox-sm me-4"
+                      className="checkbox checkbox-sm"
                       checked={fil.include}
                       onChange={() => {
-                        changeFilter!(filters, fil);
+                        changeFilter(filters!, fil, setFilters!);
                       }}
                     />
                     <span className="label-text">{fil.name}</span>

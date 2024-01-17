@@ -2,24 +2,29 @@ import { PaginationTypes, UserTypes } from "../../services/types";
 import DeleteUserModal from "../Modals/User/DeleteUser";
 import UpdateUserModal from "../Modals/User/UpdateUser";
 import ChangePasswordModal from "../Modals/User/ChangePassword";
-import { Dispatch, Fragment, SetStateAction } from "react";
+import { Dispatch, Fragment, MouseEventHandler, SetStateAction } from "react";
 import NoDisplay from "../Misc/NoDisplay";
 import Pagination from "../Misc/Pagination";
 import AddressListModal from "../Modals/User/AddressList";
 
 interface ProductTableProps {
-  setChanges: Dispatch<SetStateAction<boolean>>;
+  stateChanges(): void;
+  setChanges?: Dispatch<SetStateAction<boolean>>;
   paginate: PaginationTypes;
-  setPage: Dispatch<SetStateAction<number>>;
+  paginateAction: MouseEventHandler<HTMLButtonElement>;
 }
 
-const UserTable = ({ paginate, setChanges, setPage }: ProductTableProps) => {
+const UserTable = ({
+  paginate,
+  stateChanges,
+  paginateAction,
+}: ProductTableProps) => {
   const { docs: users } = paginate;
   return (
     <div className="max-w-5xl">
       {users.length ? (
         <Fragment>
-          <table data-theme={"nord"} className="table w-fit rounded-md">
+          <table data-theme={"nord"} className="table w-full rounded-md">
             <thead>
               <tr>
                 <th className="text-center text-base font-semibold">#</th>
@@ -38,13 +43,15 @@ const UserTable = ({ paginate, setChanges, setPage }: ProductTableProps) => {
               {(users as UserTypes[]).map((user, i: any) => {
                 return (
                   <tr key={i}>
-                    <th className="text-center">{i + 1}</th>
-                    <td>
+                    <th className="text-center">
+                      {i + paginate.pagingCounter}
+                    </th>
+                    <td className="text-center">
                       <span className="font-semibold">{user.name}</span>
                     </td>
-                    <td>{user.email}</td>
-                    <td>{user.phoneNumber}</td>
-                    <td>
+                    <td className="text-center">{user.email}</td>
+                    <td className="text-center">{user.phoneNumber}</td>
+                    <td className="text-center">
                       <AddressListModal user={user} index={i} />
                     </td>
                     <td>
@@ -52,17 +59,17 @@ const UserTable = ({ paginate, setChanges, setPage }: ProductTableProps) => {
                         <UpdateUserModal
                           user={user}
                           index={i}
-                          setChanges={setChanges}
+                          stateChanges={stateChanges}
                         />
                         <DeleteUserModal
                           user={user}
                           index={i}
-                          setChanges={setChanges}
+                          stateChanges={stateChanges}
                         />
                         <ChangePasswordModal
                           user={user}
                           index={i}
-                          setChanges={setChanges}
+                          stateChanges={stateChanges}
                         />
                       </div>
                     </td>
@@ -71,7 +78,7 @@ const UserTable = ({ paginate, setChanges, setPage }: ProductTableProps) => {
               })}
             </tbody>
           </table>
-          <Pagination paginate={paginate} setPage={setPage} />
+          <Pagination paginate={paginate} onClick={paginateAction} />
         </Fragment>
       ) : (
         <NoDisplay text="There's no users to display" />

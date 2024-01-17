@@ -1,23 +1,19 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { changePassword } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { UserTypes, ValidationTypes } from "../../../services/types";
 import Cookies from "js-cookie";
-import {
-  buttonCheck,
-  populateValidation,
-  stateChanges,
-} from "../../../services/helper";
+import { buttonCheck, populateValidation } from "../../../services/helper";
 import TextInput from "../../Form/TextInput";
 import { KeySvg } from "../../Misc/SvgGroup";
 
 interface thisProps {
   user: UserTypes;
   index: number;
-  setChanges: Dispatch<SetStateAction<boolean>>;
+  stateChanges(): void;
 }
 
 const initialData = () => {
@@ -30,7 +26,7 @@ const initialData = () => {
 
 const ChangePasswordModal = (props: thisProps) => {
   const router = useRouter();
-  const { user, index, setChanges } = props;
+  const { user, index, stateChanges } = props;
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
@@ -82,7 +78,7 @@ const ChangePasswordModal = (props: thisProps) => {
         toast.success(result.message, { containerId: "Main" });
         modalHandler(`cxPass${index}`, false);
         router.refresh();
-        stateChanges(setChanges);
+        stateChanges();
       }, 700);
     } catch (error: any) {
       setTimeout(() => {

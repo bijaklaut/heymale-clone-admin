@@ -1,16 +1,12 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createUser } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { PostUserTypes, ValidationTypes } from "../../../services/types";
 import Cookies from "js-cookie";
-import {
-  buttonCheck,
-  populateValidation,
-  stateChanges,
-} from "../../../services/helper";
+import { buttonCheck, populateValidation } from "../../../services/helper";
 import TextInput from "../../Form/TextInput";
 
 const initialData = () => {
@@ -18,10 +14,10 @@ const initialData = () => {
 };
 
 interface ThisProps {
-  setChanges: Dispatch<SetStateAction<boolean>>;
+  stateChanges(): void;
 }
 
-const CreateUserModal = ({ setChanges }: ThisProps) => {
+const CreateUserModal = ({ stateChanges }: ThisProps) => {
   const router = useRouter();
   const [disable, setDisable] = useState(true);
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
@@ -74,7 +70,7 @@ const CreateUserModal = ({ setChanges }: ThisProps) => {
         toast.success(result.message, { containerId: "Main" });
         modalHandler("addUser", false);
         router.refresh();
-        stateChanges(setChanges);
+        stateChanges();
       }, 700);
     } catch (error: any) {
       setLoading(false);

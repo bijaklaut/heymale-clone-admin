@@ -1,21 +1,15 @@
-import { Dispatch, Fragment, SetStateAction } from "react";
-import { pageHandler } from "../../services/helper";
+import { Fragment, InputHTMLAttributes } from "react";
 import { PaginationTypes } from "../../services/types";
 
-interface ThisProps {
+interface ThisProps extends InputHTMLAttributes<HTMLButtonElement> {
   paginate: PaginationTypes;
-  setPage: Dispatch<SetStateAction<number>>;
-  // pageHandler?: (page: number | null)=> void;
 }
 
-const firstPage = ({ paginate, setPage }: ThisProps) => {
+const firstPage = ({ paginate, onClick }: ThisProps) => {
   // 1 2(now) 3
   if (paginate.hasPrevPage && paginate.prevPage! - 1 == 1)
     return (
-      <button
-        className="btn join-item btn-sm"
-        onClick={() => pageHandler(1, setPage)}
-      >
+      <button className="btn join-item btn-sm" data-page={1} onClick={onClick}>
         1
       </button>
     );
@@ -26,13 +20,15 @@ const firstPage = ({ paginate, setPage }: ThisProps) => {
       <>
         <button
           className="btn join-item btn-sm"
-          onClick={() => pageHandler(1, setPage)}
+          data-page={1}
+          onClick={onClick}
         >
           1
         </button>
         <button
           className="btn join-item btn-sm"
-          onClick={() => pageHandler(2, setPage)}
+          data-page={2}
+          onClick={onClick}
         >
           2
         </button>
@@ -45,7 +41,8 @@ const firstPage = ({ paginate, setPage }: ThisProps) => {
       <>
         <button
           className="btn join-item btn-sm"
-          onClick={() => pageHandler(1, setPage)}
+          data-page={1}
+          onClick={onClick}
         >
           1
         </button>
@@ -55,12 +52,14 @@ const firstPage = ({ paginate, setPage }: ThisProps) => {
       </>
     );
 };
-const lastPage = ({ paginate, setPage }: ThisProps) => {
+
+const lastPage = ({ paginate, onClick }: ThisProps) => {
   if (paginate.hasNextPage && paginate.nextPage! + 1 == paginate.totalPages)
     return (
       <button
         className="btn join-item btn-sm"
-        onClick={() => pageHandler(paginate.totalPages, setPage)}
+        data-page={paginate.totalPages}
+        onClick={onClick}
       >
         {paginate.totalPages}
       </button>
@@ -71,13 +70,15 @@ const lastPage = ({ paginate, setPage }: ThisProps) => {
       <>
         <button
           className="btn join-item btn-sm"
-          onClick={() => pageHandler(paginate.totalPages - 1, setPage)}
+          data-page={paginate.totalPages - 1}
+          onClick={onClick}
         >
           {paginate.totalPages - 1}
         </button>
         <button
           className="btn join-item btn-sm"
-          onClick={() => pageHandler(paginate.totalPages, setPage)}
+          data-page={paginate.totalPages}
+          onClick={onClick}
         >
           {paginate.totalPages}
         </button>
@@ -92,37 +93,40 @@ const lastPage = ({ paginate, setPage }: ThisProps) => {
         </button>
         <button
           className="btn join-item btn-sm"
-          onClick={() => pageHandler(paginate.totalPages, setPage)}
+          data-page={paginate.totalPages}
+          onClick={onClick}
         >
           {paginate.totalPages}
         </button>
       </>
     );
 };
-const prevPage = ({ paginate, setPage }: ThisProps) => {
+const prevPage = ({ paginate, onClick }: ThisProps) => {
   if (paginate.hasPrevPage)
     return (
       <button
         className="btn join-item btn-sm"
-        onClick={() => pageHandler(paginate.prevPage!, setPage)}
+        data-page={paginate.prevPage}
+        onClick={onClick}
       >
         {paginate.prevPage}
       </button>
     );
 };
-const nextPage = ({ paginate, setPage }: ThisProps) => {
+const nextPage = ({ paginate, onClick }: ThisProps) => {
   if (paginate.hasNextPage)
     return (
       <button
         className="btn join-item btn-sm"
-        onClick={() => pageHandler(paginate.nextPage!, setPage)}
+        data-page={paginate.nextPage}
+        onClick={onClick}
       >
         {paginate.nextPage}
       </button>
     );
 };
 
-const Pagination = ({ paginate, setPage }: ThisProps) => {
+const Pagination = ({ paginate, onClick }: ThisProps) => {
   return (
     <Fragment>
       {paginate.totalPages > 1 ? (
@@ -131,13 +135,13 @@ const Pagination = ({ paginate, setPage }: ThisProps) => {
             data-theme={"nord"}
             className="join items-center justify-center gap-x-2 bg-transparent first:rounded-l-lg last:rounded-r-lg"
           >
-            {firstPage({ paginate, setPage })}
-            {prevPage({ paginate, setPage })}
+            {firstPage({ paginate, onClick })}
+            {prevPage({ paginate, onClick })}
             <button className="btn btn-primary join-item btn-sm pointer-events-none text-white">
               {paginate.page}
             </button>
-            {nextPage({ paginate, setPage })}
-            {lastPage({ paginate, setPage })}
+            {nextPage({ paginate, onClick })}
+            {lastPage({ paginate, onClick })}
           </div>
         </div>
       ) : (

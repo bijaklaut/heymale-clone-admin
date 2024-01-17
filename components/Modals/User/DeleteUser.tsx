@@ -5,18 +5,18 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { UserTypes } from "../../../services/types";
 import Cookies from "js-cookie";
-import { Dispatch, SetStateAction, useState } from "react";
-import { simpleModalHandler, stateChanges } from "../../../services/helper";
+import { useState } from "react";
+import { simpleModalHandler } from "../../../services/helper";
 import { TrashSvg } from "../../Misc/SvgGroup";
 
 interface thisProps {
   user: UserTypes;
   index: number;
-  setChanges: Dispatch<SetStateAction<boolean>>;
+  stateChanges(): void;
 }
 
 const DeleteUserModal = (props: thisProps) => {
-  const { user, index, setChanges } = props;
+  const { user, index, stateChanges } = props;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +32,7 @@ const DeleteUserModal = (props: thisProps) => {
         simpleModalHandler(`delUser${index}`, false);
         toast.success(result.message, { containerId: "Main" });
         router.refresh();
-        stateChanges(setChanges);
+        stateChanges();
       }, 700);
     } catch (error: any) {
       setTimeout(() => {
