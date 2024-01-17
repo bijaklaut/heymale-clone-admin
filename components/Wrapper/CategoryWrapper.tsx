@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { getCategories } from "../../services/admin";
 import SearchFilter from "../Misc/SearchFilter";
 import CategoryTable from "../Tables/CategoryTable";
@@ -28,34 +28,31 @@ const CategoryWrapper = () => {
   const [loading, setLoading] = useState(true);
 
   const stateChanges = () => setChanges((prev) => !prev);
-  const changeSearch = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
-    setLoading(true);
-  };
   const pageHandler = (pageNumber: number) => {
     setPage(pageNumber);
   };
 
-  useEffect(() => {
-    const getFiltered = async (search: string, page: number) => {
+  const getFilteredCategory = useCallback(
+    async (search: string, page: number) => {
+      setLoading(true);
       const { payload } = await getCategories(search, page);
 
       setPagination(initialPagination(payload));
       return setTimeout(() => setLoading(false), 500);
-    };
+    },
+    [search, page, changes],
+  );
+
+  // Search filter then reset pagination
+  useEffect(() => {
     const pageParams = 1;
 
-    getFiltered(search, pageParams);
+    getFilteredCategory(search, pageParams);
   }, [search, changes]);
 
+  // Pagination
   useEffect(() => {
-    const getFiltered = async (search: string, page: number) => {
-      const { payload } = await getCategories(search, page);
-
-      setPagination(initialPagination(payload));
-    };
-
-    getFiltered(search, page);
+    getFilteredCategory(search, page);
   }, [page]);
 
   return (
@@ -64,9 +61,8 @@ const CategoryWrapper = () => {
       <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
         <CreateCategoryModal stateChanges={stateChanges} />
         <SearchFilter
-          data={{ search }}
-          changeSearch={changeSearch}
-          withFilter={false}
+          search={search}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search category by name"
         />
         {!loading ? (

@@ -1,17 +1,7 @@
 "use client";
 
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-import {
-  FilterTypes,
-  CategoryTypes,
-  PaginationTypes,
-} from "../../services/types";
+import { useCallback, useEffect, useState } from "react";
+import { CategoryTypes } from "../../services/types";
 import { getProducts } from "../../services/admin";
 import ProductTable from "../Tables/ProductTable";
 import CreateProductModal from "../Modals/Product/CreateProduct";
