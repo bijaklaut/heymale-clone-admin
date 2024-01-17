@@ -3,7 +3,7 @@ import Image from "next/image";
 import { PaginationTypes, PaymentTypes } from "../../services/types";
 import DeletePaymentModal from "../Modals/Payment/DeletePayment";
 import UpdatePaymentModal from "../Modals/Payment/UpdatePayment";
-import { Fragment } from "react";
+import { Fragment, MouseEventHandler } from "react";
 import NoDisplay from "../Misc/NoDisplay";
 import Pagination from "../Misc/Pagination";
 
@@ -13,11 +13,15 @@ interface PaymentPagination extends PaginationTypes {
 
 interface ThisProps {
   paginate: PaymentPagination;
-  pageHandler(page: number | null): void;
+  paginateAction: MouseEventHandler<HTMLButtonElement>;
   stateChanges(): void;
 }
 
-const PaymentTable = ({ paginate, pageHandler, stateChanges }: ThisProps) => {
+const PaymentTable = ({
+  paginate,
+  paginateAction,
+  stateChanges,
+}: ThisProps) => {
   const { docs: payments } = paginate;
 
   return (
@@ -79,7 +83,7 @@ const PaymentTable = ({ paginate, pageHandler, stateChanges }: ThisProps) => {
               })}
             </tbody>
           </table>
-          <Pagination paginate={paginate} pageHandler={pageHandler} />
+          <Pagination paginate={paginate} onClick={paginateAction} />
         </Fragment>
       ) : (
         <NoDisplay text="There's no payment to display" />

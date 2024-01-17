@@ -27,9 +27,8 @@ const ProductWrapper = (props: ThisProps) => {
   const [pagination, setPagination] = useState(initPagination());
   const [changes, setChanges] = useState(false);
   const [loading, setLoading] = useState(true);
-
   const stateChanges = () => setChanges((prev) => !prev);
-  const pageHandler = (pageNumber: number) => setPage(pageNumber);
+
   const getFilteredProduct = useCallback(
     async (page: number, data: { query: string; search: string }) => {
       setLoading(true);
@@ -79,7 +78,7 @@ const ProductWrapper = (props: ThisProps) => {
             stateChanges={stateChanges}
             paginate={pagination}
             paginateAction={(e) =>
-              pageHandler(Number(e.currentTarget.dataset.page))
+              setPage(Number(e.currentTarget.dataset.page))
             }
           />
         ) : (

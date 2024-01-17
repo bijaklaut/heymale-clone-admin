@@ -1,59 +1,42 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState, Fragment } from "react";
+import { ChangeEvent, useEffect, useState, Fragment, useCallback } from "react";
 import { getPayments } from "../../services/admin";
 import SearchFilter from "../Misc/SearchFilter";
 import SimpleTableLoading from "../Loading/SimpleTableLoading";
 import PaymentTable from "../Tables/PaymentTable";
 import CreatePaymentModal from "../Modals/Payment/CreatePayment";
-
-const initialPagination = (payload?: any) => {
-  return {
-    docs: payload?.docs || [],
-    page: payload?.page || 1,
-    totalPages: payload?.totalPages || 1,
-    pagingCounter: payload?.pagingCounter || 1,
-    hasPrevPage: payload?.hasPrevPage || false,
-    hasNextPage: payload?.hasNextPage || false,
-    prevPage: payload?.prevPage || null,
-    nextPage: payload?.nextPage || null,
-  };
-};
+import { initPagination } from "../../services/helper";
 
 const PaymentWrapper = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState(initialPagination());
+  const [pagination, setPagination] = useState(initPagination());
   const [changes, setChanges] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const stateChanges = () => setChanges((prev) => !prev);
   const pageHandler = (pageNumber: number) => setPage(pageNumber);
-  const changeSearch = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
-    setLoading(true);
-  };
 
-  useEffect(() => {
-    const getFiltered = async (search: string, page: number) => {
+  const getFilteredPayment = useCallback(
+    async (search: string, page: number) => {
+      setLoading(true);
       const { payload } = await getPayments(search, page);
 
-      setPagination(initialPagination(payload));
+      setPagination(initPagination(payload));
       return setTimeout(() => setLoading(false), 500);
-    };
+    },
+    [search, changes, page],
+  );
+
+  useEffect(() => {
     const pageParams = 1;
 
-    getFiltered(search, pageParams);
+    getFilteredPayment(search, pageParams);
   }, [search, changes]);
 
   useEffect(() => {
-    const getFiltered = async (search: string, page: number) => {
-      const { payload } = await getPayments(search, page);
-
-      setPagination(initialPagination(payload));
-    };
-
-    getFiltered(search, page);
+    getFilteredPayment(search, page);
   }, [page]);
 
   return (
@@ -63,16 +46,17 @@ const PaymentWrapper = () => {
       <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
         <CreatePaymentModal stateChanges={stateChanges} />
         <SearchFilter
-          data={{ search }}
-          changeSearch={changeSearch}
-          withFilter={false}
+          search={search}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by account number"
         />
         {!loading ? (
           <PaymentTable
-            pageHandler={pageHandler}
             stateChanges={stateChanges}
             paginate={pagination}
+            paginateAction={(e) =>
+              setPage(Number(e.currentTarget.dataset.page))
+            }
           />
         ) : (
           <SimpleTableLoading />
