@@ -51,7 +51,7 @@ const SearchFilter = ({
                     <input
                       type="checkbox"
                       className="checkbox checkbox-sm"
-                      checked={fil.include}
+                      checked={fil.include ? fil.include : false}
                       onChange={() => {
                         changeFilter(filters!, fil, setFilters!);
                       }}
