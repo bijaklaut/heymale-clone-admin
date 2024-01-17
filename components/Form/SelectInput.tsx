@@ -1,11 +1,11 @@
 import { Dispatch, InputHTMLAttributes, SetStateAction } from "react";
-import { CategoryTypes, ValidationTypes } from "../../services/types";
+import { ValidationTypes } from "../../services/types";
 import { textInputHandler } from "../../services/helper";
 
-interface SelectCategoryProps extends InputHTMLAttributes<HTMLSelectElement> {
+interface SelectInputProps extends InputHTMLAttributes<HTMLSelectElement> {
   dataState: { data: any; setData: Dispatch<SetStateAction<any>> };
   label: [textLabel: string, fieldLabel: string, placeholder?: string];
-  categories: CategoryTypes[];
+  selectionData: any[];
   validations: ValidationTypes[];
 }
 
@@ -13,8 +13,8 @@ const SelectInput = ({
   validations,
   dataState: { data, setData },
   label: [textLabel, fieldLabel, placeholder],
-  categories,
-}: SelectCategoryProps) => {
+  selectionData,
+}: SelectInputProps) => {
   const validation = validations.find((val) => val.field == fieldLabel);
   return (
     <label data-theme={"skies"} className="form-control w-full">
@@ -31,10 +31,10 @@ const SelectInput = ({
         <option disabled value={""}>
           {placeholder || "Select one option"}
         </option>
-        {categories.map((category: CategoryTypes, i: number) => {
+        {selectionData.map((item: any, i: number) => {
           return (
-            <option key={i} value={category._id}>
-              {category.name}
+            <option key={i} value={item._id}>
+              {item.name}
             </option>
           );
         })}

@@ -143,7 +143,7 @@ const CreateProductModal = (props: CreateProductProps) => {
               validations={validation}
             />
             <SelectInput
-              categories={categories}
+              selectionData={categories}
               dataState={{ data, setData }}
               label={[
                 "Product Category",
