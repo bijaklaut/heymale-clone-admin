@@ -92,7 +92,7 @@ const AddressListModal = (props: thisProps) => {
         <div
           id={`AddressList${index}`}
           ref={modalRef}
-          className="no-scrollbar modal-box max-w-2xl py-8"
+          className="no-scrollbar modal-box max-w-2xl py-8 text-start"
         >
           <button
             className="btn btn-circle btn-ghost absolute right-4 top-4 text-lg"
@@ -102,7 +102,7 @@ const AddressListModal = (props: thisProps) => {
           </button>
           <h3 className="text-xl font-bold text-primary">Address List</h3>
 
-          {/* {addresses.length < 5 ? (
+          {addresses.length < 5 ? (
             <PostAddressCollapse
               id={_id}
               modalShow={modalShow}
@@ -112,14 +112,14 @@ const AddressListModal = (props: thisProps) => {
             />
           ) : (
             <div className="mt-10"></div>
-          )} */}
+          )}
 
-          <div className="flex flex-wrap justify-evenly gap-y-5">
+          <div className="z-10 flex flex-wrap justify-evenly gap-y-5">
             {addresses.map((address, i) => {
               return (
                 <div
                   key={i}
-                  className="card relative w-full overflow-hidden border-2 border-neutral shadow-md"
+                  className="card relative z-10 w-full overflow-hidden border-2 border-neutral shadow-md"
                 >
                   <div className="card-body px-7 py-5">
                     <div className="flex items-center">
