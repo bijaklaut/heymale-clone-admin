@@ -218,3 +218,25 @@ export const pageHandler = (
 
 export const stateChanges = (setChanges: Dispatch<SetStateAction<boolean>>) =>
   setChanges((prev) => !prev);
+
+export const changeSearch = (
+  search: string,
+  setSearch: Dispatch<SetStateAction<string>>,
+  setLoading: Dispatch<SetStateAction<boolean>>,
+) => {
+  setSearch(search);
+  setLoading(true);
+};
+
+export const changeFilter = (
+  filters: FilterTypes[],
+  filter: FilterTypes,
+  setFilters: Dispatch<SetStateAction<FilterTypes[]>>,
+) => {
+  let copyFilter = [...filters];
+  copyFilter.map((copy) => {
+    if (copy.name == filter.name) return (copy.include = !copy.include);
+  });
+
+  setFilters(copyFilter);
+};
