@@ -107,6 +107,7 @@ const AddressListModal = (props: thisProps) => {
               id={_id}
               modalShow={modalShow}
               address={data!}
+              centered={addresses.length == 0}
               showUpdate={showUpdate}
               reset={reset}
             />
@@ -184,14 +185,21 @@ const AddressListModal = (props: thisProps) => {
                 </div>
               );
             })}
+            {!addresses.length && (
+              <div className="mt-5 flex h-fit w-full items-center justify-center text-base italic">
+                {`There is no address to display`}
+              </div>
+            )}
           </div>
           <div className="modal-action">
-            <label
-              className="btn btn-outline btn-sm"
-              onClick={() => modalHandler(`addressList${index}`, false)}
-            >
-              Close
-            </label>
+            {addresses.length != 0 && (
+              <label
+                className="btn btn-outline btn-sm"
+                onClick={() => modalHandler(`addressList${index}`, false)}
+              >
+                Close
+              </label>
+            )}
           </div>
         </div>
       </div>

@@ -25,6 +25,7 @@ interface thisProps {
   showUpdate: boolean;
   address: AddressTypes;
   reset(): void;
+  centered?: boolean;
 }
 
 const initData = (id: string, address?: AddressTypes) => {
@@ -45,7 +46,7 @@ const initData = (id: string, address?: AddressTypes) => {
 };
 
 const PostAddressCollapse = (props: thisProps) => {
-  const { id: userid, modalShow, showUpdate, address, reset } = props;
+  const { id: userid, modalShow, showUpdate, address, reset, centered } = props;
   const router = useRouter();
   const [data, setData] = useState<PostAddressTypes>(initData(userid));
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
@@ -64,6 +65,11 @@ const PostAddressCollapse = (props: thisProps) => {
       true,
     "scale-y-0 -mb-5 opacity-0 absolute": !showCollapse,
     "scale-y-100 mb-5 opacity-100": showCollapse,
+  });
+
+  const centeredButton = cx({
+    "w-full flex": true,
+    "justify-center": centered,
   });
 
   const collapseHandler = useCallback(
@@ -235,15 +241,17 @@ const PostAddressCollapse = (props: thisProps) => {
   return (
     <>
       <div className="relative mt-5 bg-transparent transition-all">
-        <button
-          className="btn btn-sm mb-3 rounded-md"
-          data-theme={"skies"}
-          onClick={() => {
-            collapseHandler(!showCollapse, userid);
-          }}
-        >
-          {showCollapse ? "Close" : "Add Address"}
-        </button>
+        <div className={centeredButton}>
+          <button
+            className={"btn btn-sm my-3 rounded-md"}
+            data-theme={"skies"}
+            onClick={() => {
+              collapseHandler(!showCollapse, userid);
+            }}
+          >
+            {showCollapse ? "Close" : "Add Address"}
+          </button>
+        </div>
         <div data-theme={"skies"} className={classItem}>
           {/* Address Label */}
           <TextInput
