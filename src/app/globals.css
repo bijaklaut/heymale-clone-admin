@@ -118,3 +118,13 @@
     scrollbar-width: none; /* Firefox */
   }
 }
+
+@layer components {
+  .sidebar-svg {
+    @apply h-7 w-7 lg:h-6 lg:w-6;
+  }
+
+  .sidebar-menu-text {
+    @apply ms-2 text-lg sm:ms-1 sm:text-sm sm:font-semibold;
+  }
+}
