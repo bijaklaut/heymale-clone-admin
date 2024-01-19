@@ -404,35 +404,6 @@ export const NoDisplaySvg = (props: { className?: string }) => {
   );
 };
 
-export const ArrowRightSvg = (props: { className?: string }) => {
-  const { className } = props;
-  return (
-    <svg
-      className={className}
-      width={24}
-      height={24}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-      <g
-        id="SVGRepo_tracerCarrier"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      ></g>
-      <g id="SVGRepo_iconCarrier">
-        <path
-          d="M4 12H20M20 12L14 6M20 12L14 18"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        ></path>
-      </g>
-    </svg>
-  );
-};
-
 export const ImageSvg = (props: { className?: string }) => {
   const { className } = props;
   return (
@@ -492,6 +463,57 @@ export const KeySvg = (props: { className?: string }) => {
           d="M17.8853 8.29353C17.8853 9.50601 16.8984 10.4889 15.681 10.4889C14.4635 10.4889 13.4766 9.50601 13.4766 8.29353C13.4766 7.08105 14.4635 6.09814 15.681 6.09814C16.8984 6.09814 17.8853 7.08105 17.8853 8.29353Z"
           strokeWidth="1.5"
         ></path>
+      </g>
+    </svg>
+  );
+};
+
+export const ArrowDownSvg = (props: { className?: string }) => {
+  const { className } = props;
+  return (
+    <svg
+      className={className}
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        <path
+          d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z"
+          fill="#0F0F0F"
+        ></path>
+      </g>
+    </svg>
+  );
+};
+
+export const ArrowRightSvg = (props: { className?: string }) => {
+  const { className } = props;
+  return (
+    <svg
+      className={className}
+      width={24}
+      height={24}
+      viewBox="0 0 1024 1024"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        <path d="M338.752 104.704a64 64 0 0 0 0 90.496l316.8 316.8-316.8 316.8a64 64 0 0 0 90.496 90.496l362.048-362.048a64 64 0 0 0 0-90.496L429.248 104.704a64 64 0 0 0-90.496 0z"></path>
       </g>
     </svg>
   );
