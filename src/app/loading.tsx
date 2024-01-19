@@ -1,4 +1,4 @@
-import LoadingSpin from "../../../components/Loading/LoadingSpin";
+import LoadingSpin from "../../components/Loading/LoadingSpin";
 
 const Loading = () => {
   return <LoadingSpin />;
