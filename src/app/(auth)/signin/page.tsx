@@ -14,7 +14,6 @@ import Cookies from "js-cookie";
 import heymaleLogo from "@/../public/images/logo/heymale-logo.png";
 import { SignInTypes, ValidationTypes } from "../../../../services/types";
 import {
-  btnCheckExp,
   buttonCheck,
   populateErrorFloating,
   populateValidation,

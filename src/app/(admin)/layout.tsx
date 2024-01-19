@@ -3,8 +3,6 @@ import "../globals.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Sidebar } from "../../../components/Sidebar/Sidebar";
-import { Suspense } from "react";
-import Loading from "./loading";
 
 export const metadata: Metadata = {
   title: "Heymale Clone",
@@ -20,14 +18,12 @@ export default function AdminLayout({
     <section className="flex flex-row">
       <Sidebar />
 
-      <Suspense fallback={<Loading />}>
-        <main
-          data-theme={"skies"}
-          className="ms-[17rem] min-h-screen w-full px-16 py-10"
-        >
-          {children}
-        </main>
-      </Suspense>
+      <main
+        data-theme={"skies"}
+        className="mt-[50px] min-h-screen w-full px-3 py-8 pb-5 sm:ms-[4.5rem] sm:mt-0 lg:ms-0 lg:px-10 lg:py-10"
+      >
+        {children}
+      </main>
       <ToastContainer enableMultiContainer containerId={"Main"} theme="dark" />
     </section>
   );
