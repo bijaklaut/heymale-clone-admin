@@ -107,7 +107,7 @@ const UpdateUserModal = (props: thisProps) => {
         />
         <div className="no-scrollbar modal-box absolute max-w-xl text-white">
           <h3 className="modal-title mb-5">Update User</h3>
-          <div className="flex gap-x-3">
+          <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
             <TextInput
               dataState={{ data, setData }}
               label={["Full Name", "name", "Enter full name"]}

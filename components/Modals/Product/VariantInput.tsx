@@ -18,7 +18,7 @@ const VariantInput = (props: VariantInputProps) => {
   const validation = validations.find((val) => val.field == joinLabel);
 
   return (
-    <div className="join relative w-36 md:w-1/5">
+    <div className="join relative w-full">
       <div className="label join-item bg-neutral">
         <span className="label-text w-7 text-center font-bold text-white">
           {label.toUpperCase()}

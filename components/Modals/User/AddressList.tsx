@@ -92,7 +92,7 @@ const AddressListModal = (props: thisProps) => {
         <div
           id={`AddressList${index}`}
           ref={modalRef}
-          className="no-scrollbar modal-box max-w-2xl py-8 text-start"
+          className="no-scrollbar modal-box absolute right-1/2 max-w-2xl translate-x-1/2 px-4 py-8 text-start sm:px-8"
         >
           <button
             className="btn btn-circle btn-ghost absolute right-4 top-4 text-lg"
@@ -122,40 +122,47 @@ const AddressListModal = (props: thisProps) => {
                   key={i}
                   className="card relative z-10 w-full overflow-hidden border-2 border-neutral shadow-md"
                 >
-                  <div className="card-body px-7 py-5">
-                    <div className="flex items-center">
-                      <p className="card-title">{address.addressLabel}</p>
+                  <div className="card-body px-3 py-4 sm:px-7 sm:py-5">
+                    <div className="mb-3 flex items-center">
+                      <p className="card-title text-base">
+                        {address.addressLabel}
+                      </p>
                       {address.asDefault ? (
-                        <div className="badge badge-primary text-white">
+                        <div
+                          data-theme={"skies"}
+                          className="badge badge-accent badge-sm text-white"
+                        >
                           Default
                         </div>
                       ) : (
                         ""
                       )}
                     </div>
-                    <div className="">
-                      <span className="mr-2 font-semibold">Recipient:</span>
-                      <p>{`${address.recipientName} - ${address.phone}`}</p>
+                    <div>
+                      <span className="text-sm font-semibold">Recipient:</span>
+                      <p className="text-sm">{`${address.recipientName} - ${address.phone}`}</p>
                     </div>
-                    <p>{address.address}</p>
-                    <div className="flex flex-col">
+                    <p className="mt-3 text-sm">{address.address}</p>
+                    <div className="mb-7 flex flex-col">
                       <p className="mb-0 font-semibold">{address.city.name}</p>
                       <p className="font-semibold">{`${address.province.name} ${address.postcode}`}</p>
-                      <p className="font-semibold"></p>
                     </div>
                     {deleteShow == i ? (
                       <div className="card-actions mt-7">
-                        <div className="absolute bottom-0 left-0 flex w-full justify-between bg-error px-5 py-2 text-white">
+                        <div
+                          data-theme={"skies"}
+                          className="absolute bottom-0 left-0 flex w-full flex-col justify-between gap-y-2 px-5 py-2 text-center text-white sm:flex-row sm:items-center sm:text-start"
+                        >
                           <span>Are you sure to delete this address?</span>
-                          <div>
+                          <div className="flex w-full justify-center gap-x-1 sm:w-fit">
                             <button
-                              className="btn btn-outline btn-xs rounded-md border-2 text-white hover:border-white hover:bg-white hover:text-error"
+                              className="btn btn-error btn-xs"
                               onClick={() => deleteHandler(address._id)}
                             >
                               Delete
                             </button>
                             <button
-                              className="btn btn-xs ms-2 rounded-md text-error"
+                              className="btn btn-ghost btn-xs z-10"
                               onClick={() => setDeleteShow(-1)}
                             >
                               Cancel
@@ -164,9 +171,12 @@ const AddressListModal = (props: thisProps) => {
                         </div>
                       </div>
                     ) : (
-                      <div className="card-actions justify-end">
+                      <div
+                        data-theme={"skies"}
+                        className="card-actions justify-center bg-transparent sm:justify-end"
+                      >
                         <button
-                          className="btn btn-neutral btn-xs"
+                          className="btn btn-xs text-white"
                           onClick={() => {
                             updateMisc(address);
                           }}
