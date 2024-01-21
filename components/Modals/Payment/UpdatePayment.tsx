@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { updatePayment } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -16,8 +16,8 @@ import {
   buttonCheck,
   modalHandler,
   populateValidation,
-  textInputHandler,
 } from "../../../services/helper";
+import SelectInput from "../../Form/SelectInput";
 
 interface thisProps {
   payment: PaymentTypes;
@@ -32,6 +32,16 @@ const initialData = (data?: DataTypes | undefined) => {
     accountNo: (data as PaymentTypes)?.accountNo || "",
   };
 };
+
+const banks = [
+  { _id: "BCA", name: "BCA" },
+  { _id: "BNI", name: "BNI" },
+  { _id: "BRI", name: "BRI" },
+  {
+    _id: "Mandiri",
+    name: "Mandiri",
+  },
+];
 
 const UpdatePaymentModal = (props: thisProps) => {
   const router = useRouter();
@@ -110,23 +120,26 @@ const UpdatePaymentModal = (props: thisProps) => {
           containerId={"UpdatePay"}
           theme="dark"
         />
-        <div className="modal-box absolute text-white">
+        <div className="no-scrollbar modal-box absolute max-w-xl text-white">
           <h3 className="modal-title mb-5">Update Payment</h3>
           <TextInput
             dataState={{ data, setData }}
             label={["Owner Name", "ownerName", "Enter account owner name"]}
             validations={validation}
           />
-          <TextInput
-            dataState={{ data, setData }}
-            label={["Bank Name", "bankName", "Enter bank name"]}
-            validations={validation}
-          />
-          <TextInput
-            dataState={{ data, setData }}
-            label={["Account Number", "accountNo", "Enter account number"]}
-            validations={validation}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-3">
+            <SelectInput
+              dataState={{ data, setData }}
+              label={["Bank Name", "bankName", "Enter bank name"]}
+              selectionData={banks}
+              validations={validation}
+            />
+            <TextInput
+              dataState={{ data, setData }}
+              label={["Account Number", "accountNo", "Enter account number"]}
+              validations={validation}
+            />
+          </div>
           <div className="modal-action flex">
             {!loading ? (
               <button

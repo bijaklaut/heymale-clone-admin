@@ -25,8 +25,8 @@ const SelectInput = ({
       </div>
       <select
         className="select select-bordered rounded-md"
-        onChange={(e) => textInputHandler(e.target.value, "category", setData)}
-        value={data.category ? data.category : ""}
+        onChange={(e) => textInputHandler(e.target.value, fieldLabel, setData)}
+        value={(data as any)[fieldLabel] ? (data as any)[fieldLabel] : ""}
       >
         <option disabled value={""}>
           {placeholder || "Select one option"}

@@ -139,9 +139,9 @@ const UpdateProductModal = (props: ThisProps) => {
           theme="dark"
         />
         <div className="no-scrollbar modal-box absolute max-w-3xl text-white">
-          <h3 className="modal-title mb-5">Update Product</h3>
+          <h3 className="modal-title mb-5">Add New Product</h3>
           {/* Product Name & Category */}
-          <div className="flex w-full gap-x-3">
+          <div className="flex w-full flex-col gap-x-3 sm:flex-row">
             <TextInput
               dataState={{ data, setData }}
               label={["Product Name", "name", "Enter product name"]}
@@ -158,12 +158,14 @@ const UpdateProductModal = (props: ThisProps) => {
               validations={validation}
             />
           </div>
-          {/* Variant */}
+          {/* Variants */}
           <div>
             <label className="label">
-              <span className="label-text -ms-1 block text-white">Variant</span>
+              <span className="label-text -ms-1 block text-base text-white">
+                Product Variant
+              </span>
             </label>
-            <div className="mb-3 flex flex-wrap justify-between">
+            <div className="mb-3 grid grid-cols-2 gap-x-5 gap-y-2 md:grid-cols-4 ">
               {["s", "m", "l", "xl"].map((v, i) => {
                 return (
                   <VariantInput
@@ -182,25 +184,24 @@ const UpdateProductModal = (props: ThisProps) => {
             dataState={{ data, setData }}
             validations={validation}
           />
-
-          {/* Thumbnail & Price */}
-          <div className="flex items-center justify-between">
-            <div className="flex w-1/2 flex-col">
+          {/* Price, Thumbnail, Status */}
+          <div className="grid grid-cols-1 place-content-between content-between justify-between sm:grid-cols-2">
+            <div className="flex flex-col">
               <NumericInput
                 isCurrency
                 label={["Price", "price", "Enter product price"]}
                 validations={validation}
                 dataState={{ data, setData }}
               />
-              <FileInput
-                ref={fileInput}
-                label={["Thumbnail", "thumbnail"]}
-                validations={validation}
-                fileSetState={{ setData, setPreview }}
-              />
               <StatusInput dataState={{ data, setData }} label="status" />
+              <FileInput
+                fileSetState={{ setData, setPreview }}
+                label={["Thumbnail", "thumbnail"]}
+                ref={fileInput}
+                validations={validation}
+              />
             </div>
-            <div className="flex h-[250px] w-[250px] items-center justify-center rounded-md bg-neutral">
+            <div className="flex h-[300px] w-[300px] items-center justify-center place-self-center self-center rounded-md bg-neutral sm:h-[250px] sm:w-[250px] sm:place-self-end md:h-[300px] md:w-[300px]">
               {preview ? (
                 <Image
                   src={preview}

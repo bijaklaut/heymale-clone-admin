@@ -61,7 +61,7 @@ const PostAddressCollapse = (props: thisProps) => {
   const [citiesData, setCitiesData] = useState([{}]);
 
   const classItem = cx({
-    "origin-top ease-linear rounded-md w-full px-10 py-5 overflow-hidden duration-300 transition-all":
+    "origin-top ease-linear rounded-md w-full px-4 sm:px-10 py-5 overflow-hidden duration-300 transition-all":
       true,
     "scale-y-0 -mb-5 opacity-0 absolute": !showCollapse,
     "scale-y-100 mb-5 opacity-100": showCollapse,
@@ -274,7 +274,7 @@ const PostAddressCollapse = (props: thisProps) => {
           />
 
           {/* Province & City */}
-          <div className="grid w-full grid-cols-2 items-center justify-between gap-x-5">
+          <div className="grid w-full grid-cols-1 items-center justify-between gap-x-5 sm:grid-cols-2">
             {/* Province */}
             <SelectProvince
               data={data}
@@ -320,7 +320,7 @@ const PostAddressCollapse = (props: thisProps) => {
           </div>
 
           {/* Postal Code & Phone Number*/}
-          <div className="grid grid-cols-2 gap-x-5">
+          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
             {/* Postal Code */}
             <TextInput
               dataState={{ data, setData }}

@@ -19,7 +19,7 @@ const TextAreaInput = (props: TextAreaProps) => {
   const [textLabel, fieldLabel, placeholder] = label;
   const validation = validations.find((val) => val.field == fieldLabel);
   const inputClass = cx({
-    "textarea textarea-bordered min-h-[96px] p-2 transition-color": true,
+    "textarea textarea-bordered min-h-[12rem] p-2 transition-color": true,
     "textarea-error": validation,
   });
   return (

@@ -104,7 +104,7 @@ const CreateUserModal = ({ stateChanges }: ThisProps) => {
         />
         <div className="no-scrollbar modal-box absolute max-w-xl text-white">
           <h3 className="modal-title mb-5">Add New User</h3>
-          <div className="flex gap-x-3">
+          <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
             <TextInput
               dataState={{ data, setData }}
               label={["Full Name", "name", "Enter full name"]}
@@ -121,7 +121,7 @@ const CreateUserModal = ({ stateChanges }: ThisProps) => {
             label={["Phone Number", "phoneNumber", "Enter phone number"]}
             validations={validation}
           />
-          <div className="flex gap-x-3">
+          <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
             <TextInput
               dataState={{ data, setData }}
               label={["Password", "password", "Enter password"]}
