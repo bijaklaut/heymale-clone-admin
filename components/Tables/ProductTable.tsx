@@ -1,4 +1,10 @@
-import { Fragment, MouseEventHandler } from "react";
+import {
+  ChangeEvent,
+  Fragment,
+  MouseEventHandler,
+  useCallback,
+  useState,
+} from "react";
 import {
   CategoryTypes,
   FilterTypes,
@@ -12,6 +18,9 @@ import cx from "classnames";
 import NumFormatWrapper from "../Wrapper/NumFormatWrapper";
 import NoDisplay from "../Misc/NoDisplay";
 import Pagination from "../Misc/Pagination";
+import { ProductExpand } from "../Misc/ProductExpand";
+import { ProductThumbnail } from "../Misc/ProductThumbnail";
+import { ProductVariant } from "../Misc/ProductVariant";
 
 interface ProductTableProps {
   stateChanges(): void;
@@ -24,162 +33,268 @@ interface ProductTableProps {
 const ProductTable = (props: ProductTableProps) => {
   const { categories, filters, stateChanges, paginate, paginateAction } = props;
   const { docs: products } = paginate;
-  const IMG_API = process.env.NEXT_PUBLIC_IMG;
+  const [active, setActive] = useState(0);
+
+  const parentRowClass = cx({
+    "grid h-fit w-full grid-cols-5 items-center justify-items-stretch rounded-md bg-white px-3 py-3 text-neutral shadow-md md:grid-cols-8 lg:grid-cols-10 3xl:grid-cols-12":
+      true,
+  });
+  const mainContentClass = cx({
+    "col-span-3 grid w-full items-center gap-x-3 justify-self-center md:col-span-6 md:grid md:grid-cols-3 lg:col-span-8 lg:grid-cols-4 lg:gap-x-0 3xl:col-span-10 3xl:grid-cols-6":
+      true,
+  });
+  const priceVariantClass = cx({
+    "hidden flex-col items-start gap-y-2 justify-self-center md:flex lg:col-span-2 lg:grid lg:grid-cols-2 lg:justify-self-auto":
+      true,
+  });
+  const collapseClass = useCallback((active: number, index: number) => {
+    return cx({
+      "group flex h-fit w-full origin-top flex-col justify-between gap-x-3 overflow-hidden rounded-md bg-white p-3 text-neutral shadow-md sm:px-5 md:h-full md:pt-8 lg:mx-auto lg:w-[80%] lg:px-16 lg:pt-3 2xl:w-[65%] 3xl:hidden":
+        true,
+      "relative scale-100 opacity-100": active == index,
+      "absolute scale-0 opacity-0": active != index,
+    });
+  }, []);
+  const statusClass = useCallback((status: string) => {
+    return cx({
+      "badge badge-outline px-5 font-semibold lg:justify-self-center": true,
+      "badge-primary": status == "Active",
+      "badge-error": status == "Inactive",
+    });
+  }, []);
+  const expandHandler = useCallback(
+    (event: ChangeEvent<HTMLInputElement>, index: number) => {
+      const parent = event.target.parentElement;
+
+      if (active == index) {
+        setActive(-1);
+      } else {
+        setActive(index);
+        setTimeout(() => {
+          window.scrollTo({
+            top: parent!.offsetTop - 85,
+            behavior: "smooth",
+          });
+        }, 50);
+      }
+    },
+    [active],
+  );
 
   return (
-    <div className="max-w-5xl">
+    <div className="max-w-[1920px]">
       {products.length ? (
         <Fragment>
-          <table data-theme={"nord"} className="table w-full rounded-md">
-            <thead>
-              <tr>
-                <th className="text-center text-base font-semibold">#</th>
-                <th className="text-center text-base font-semibold">Product</th>
-                <th className="text-center text-base font-semibold">Stock</th>
-                <th className="text-center text-base font-semibold">Price</th>
-                <th className="text-center text-base font-semibold">Status</th>
-                <th className="w-[300px] text-center text-base font-semibold">
-                  Description
-                </th>
-                <th className="text-center text-base font-semibold">Action</th>
-              </tr>
-            </thead>
+          {filters.map((fil, i) => {
+            let isExist = (products as ProductTypes[]).filter(
+              (product) => product.category.name == fil.name,
+            ).length;
 
-            <tbody>
-              {filters?.map((fil, index) => {
-                let isExist = (products as ProductTypes[]).filter(
-                  (product) => product.category.name == fil.name,
-                ).length;
-                if (fil.include && isExist) {
-                  return (
-                    <Fragment key={index}>
-                      <tr className="bg-gray-300">
-                        <td colSpan={7} className="text-center font-semibold">
-                          {fil.name}
-                        </td>
-                      </tr>
-                      {(products as ProductTypes[]).map(
-                        (product: ProductTypes, i) => {
-                          let statusClass = cx({
-                            "inline-block h-2 w-2 rounded-full": true,
-                            "bg-green-400": product.status == "Active",
-                            "bg-red-400": product.status == "Inactive",
-                          });
+            if (fil.include && isExist) {
+              return (
+                <div key={i} className="mb-8">
+                  <div
+                    data-theme="skies"
+                    className="mb-2 h-fit w-full rounded-md bg-base-300 py-1 text-center text-white"
+                  >
+                    {fil.name}
+                  </div>
+                  <div className="grid grid-cols-1 gap-1">
+                    {(products as ProductTypes[]).map((product, index) => {
+                      if (product.category.name == fil.name)
+                        return (
+                          <Fragment key={index}>
+                            <div className={parentRowClass}>
+                              {/* Number */}
+                              <span className="me-1 justify-self-start font-semibold text-base-100/60 3xl:justify-self-center">
+                                {paginate.pagingCounter + index}
+                              </span>
 
-                          if (product.category.name == fil.name)
-                            return (
-                              <tr
-                                key={`${product._id}-${
-                                  paginate.pagingCounter + i
-                                }`}
-                              >
-                                <th className="text-center">
-                                  {paginate.pagingCounter + i}
-                                </th>
-                                <td>
-                                  <div className="mb-3 flex min-h-[150px] w-full flex-col items-center justify-center gap-2">
-                                    <span className="font-semibold">
-                                      {product.name}
+                              {/* Main content */}
+                              <div className={mainContentClass}>
+                                {/* Thumbnail 3XL */}
+                                <div className="hidden w-full justify-self-center 3xl:block">
+                                  <ProductThumbnail
+                                    thumbnail={product.thumbnail}
+                                    width={500}
+                                    height={500}
+                                    alt={`thumbnail-${product.name}`}
+                                  />
+                                </div>
+
+                                {/* Product Name */}
+                                <div className="justify-self-center text-center font-semibold md:justify-self-start md:text-start">
+                                  {product.name}
+                                </div>
+
+                                {/* Price & Variant MD */}
+                                <div className={priceVariantClass}>
+                                  <div className="flex flex-col items-start justify-self-center">
+                                    <span className="font-semibold lg:hidden">
+                                      Price
                                     </span>
-                                    <Image
-                                      src={
-                                        product.thumbnail != ""
-                                          ? `${IMG_API}/product/${product.thumbnail}`
-                                          : "icon/image.svg"
-                                      }
-                                      width={90}
-                                      height={90}
-                                      alt={`thumbnail-${product.name}`}
-                                      className={
-                                        product.thumbnail != ""
-                                          ? "h-auto w-auto rounded-md border-2 border-neutral bg-cover"
-                                          : "h-[90px] w-auto rounded-md bg-neutral p-2"
-                                      }
+                                    <NumFormatWrapper
+                                      value={product.price}
+                                      displayType="text"
+                                      prefix="Rp. "
+                                      thousandSeparator="."
+                                      decimalSeparator=","
                                     />
                                   </div>
-                                </td>
-                                <td>
-                                  <div className="flex gap-x-2">
-                                    {Object.entries(product.variant).map(
-                                      ([k], id) => {
-                                        let variantClass = cx({
-                                          "tooltip relative flex h-[25px] font-semibold w-[30px] items-center justify-center rounded-md border px-2 cursor-default":
-                                            true,
-                                          "text-green-500 border-green-500":
-                                            (product.variant as any)[k] >= 100,
-                                          "text-yellow-500 border-yellow-500":
-                                            (product.variant as any)[k] < 100 &&
-                                            (product.variant as any)[k] >= 50,
-                                          "text-red-500 border-red-500":
-                                            (product.variant as any)[k] < 50 &&
-                                            (product.variant as any)[k] > 0,
-                                          "text-gray-500 border-gray-400":
-                                            (product.variant as any)[k] == 0,
-                                        });
+                                  <div className="flex flex-col items-start gap-y-2 justify-self-center">
+                                    <span className="font-semibold lg:hidden">
+                                      Variant
+                                    </span>
+                                    <ProductVariant
+                                      variants={product.variant}
+                                    />
+                                  </div>
+                                </div>
 
-                                        return (
-                                          <div
-                                            key={id}
-                                            className={variantClass}
-                                            data-tip={`${
-                                              (product.variant as any)[k]
-                                            } pcs`}
-                                          >
-                                            <p>{k.toUpperCase()}</p>
-                                          </div>
-                                        );
-                                      },
-                                    )}
+                                {/* Status MD */}
+                                <div className="hidden md:block md:justify-self-center">
+                                  <div
+                                    data-theme="skies"
+                                    className={statusClass(product.status)}
+                                  >
+                                    {product.status}
                                   </div>
-                                </td>
-                                <td className="w-[150px] text-center">
-                                  <NumFormatWrapper
-                                    value={product.price}
-                                    displayType="text"
-                                    prefix="Rp. "
-                                    thousandSeparator="."
-                                    decimalSeparator=","
-                                  />
-                                </td>
-                                <td className="text-center">
-                                  <div className="flex items-center gap-x-2">
-                                    <span className={statusClass}></span>
-                                    <p>{product.status}</p>
-                                  </div>
-                                </td>
-                                <td className="text-justify">
-                                  {product.description} Lorem ipsum dolor sit
-                                  amet consectetur adipisicing elit. Tempora
-                                  itaque aspernatur, explicabo ipsum soluta
-                                  iusto fuga iste omnis dignissimos nihil
-                                  officiis commodi magni, architecto voluptate
-                                  nulla fugit in impedit nemo?
-                                </td>
-                                <td>
-                                  <div className="flex min-h-full items-center justify-center gap-x-2 px-5">
+                                </div>
+
+                                {/* Description 3XL */}
+                                <div className="hidden justify-self-center 3xl:block">
+                                  <button className="btn btn-accent btn-sm text-white">
+                                    Description
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Expand or Action */}
+                              <div className="justify-self-end 3xl:justify-self-center">
+                                <div className="flex items-center justify-center gap-x-2 p-3">
+                                  <div className="hidden gap-x-2 lg:flex">
                                     <UpdateProductModal
                                       product={product}
                                       categories={categories!}
-                                      index={i}
+                                      index={index}
                                       stateChanges={stateChanges}
                                     />
                                     <DeleteProductModal
                                       product={product}
-                                      index={i}
+                                      index={index}
                                       stateChanges={stateChanges}
                                     />
                                   </div>
-                                </td>
-                              </tr>
-                            );
-                        },
-                      )}
-                    </Fragment>
-                  );
-                }
-              })}
-            </tbody>
-          </table>
+                                  <ProductExpand
+                                    checked={active == index}
+                                    onChange={(e) => expandHandler(e, index)}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className={collapseClass(active, index)}>
+                              <div className="flex items-center gap-x-3 md:mt-5 lg:mt-0 lg:gap-x-10">
+                                <div className="flex w-[45%] md:justify-center">
+                                  <ProductThumbnail
+                                    thumbnail={product.thumbnail}
+                                    width={500}
+                                    height={500}
+                                    alt={`thumbnail-${product.name}`}
+                                  />
+                                </div>
+                                <div className="grid w-[55%] grid-cols-1 gap-y-2 md:hidden">
+                                  <div
+                                    data-theme="skies"
+                                    className={statusClass(product.status)}
+                                  >
+                                    {product.status}
+                                  </div>
+                                  <div className="flex gap-x-3">
+                                    <span className="font-semibold">
+                                      Price:
+                                    </span>
+                                    <NumFormatWrapper
+                                      value={249000}
+                                      displayType="text"
+                                      prefix="Rp. "
+                                      thousandSeparator="."
+                                      decimalSeparator=","
+                                    />
+                                  </div>
+                                  <div className="flex flex-col gap-y-2">
+                                    <span className="font-semibold">
+                                      Variant:
+                                    </span>
+                                    <ProductVariant
+                                      variants={product.variant}
+                                    />
+                                  </div>
+                                </div>
+                                <div
+                                  data-theme="skies"
+                                  className="hidden w-[55%] rounded-md p-3 md:block md:bg-transparent md:text-black lg:h-full lg:w-[500px]"
+                                >
+                                  <div className="mb-3 text-center font-semibold md:text-left">
+                                    Description
+                                  </div>
+                                  <p>
+                                    {product.description} Lorem ipsum dolor sit,
+                                    amet consectetur adipisicing elit. Nulla
+                                    cumque voluptatem libero nisi quod dolorem
+                                    autem, ipsa deleniti eveniet eos velit totam
+                                    veritatis. Necessitatibus distinctio
+                                    cupiditate, magni dicta nihil sequi cumque
+                                    quod? Reiciendis laborum commodi libero
+                                    placeat ipsa cupiditate dolorum veritatis
+                                    ratione. Voluptas autem vero dolores, vitae
+                                    quidem laudantium quae.
+                                  </p>
+                                </div>
+                              </div>
+                              <div
+                                data-theme="skies"
+                                className="mt-5 rounded-md bg-base-100 p-3 md:hidden"
+                              >
+                                <div className="mb-2 text-center font-semibold">
+                                  Description
+                                </div>
+                                <p>
+                                  {product.description} Lorem ipsum dolor sit,
+                                  amet consectetur adipisicing elit. Nulla
+                                  cumque voluptatem libero nisi quod dolorem
+                                  autem, ipsa deleniti eveniet eos velit totam
+                                  veritatis. Necessitatibus distinctio
+                                  cupiditate, magni dicta nihil sequi cumque
+                                  quod? Reiciendis laborum commodi libero
+                                  placeat ipsa cupiditate dolorum veritatis
+                                  ratione. Voluptas autem vero dolores, vitae
+                                  quidem laudantium quae.
+                                </p>
+                              </div>
+                              <div className="absolute right-1 top-1 flex items-center justify-center gap-x-2 rounded-md p-3 sm:right-2 sm:top-2 lg:hidden">
+                                <UpdateProductModal
+                                  product={product}
+                                  categories={categories!}
+                                  index={index + 100}
+                                  stateChanges={stateChanges}
+                                />
+                                <DeleteProductModal
+                                  product={product}
+                                  index={index + 100}
+                                  stateChanges={stateChanges}
+                                />
+                              </div>
+                            </div>
+                          </Fragment>
+                        );
+                    })}
+                  </div>
+                </div>
+              );
+            }
+          })}
+
           <Pagination paginate={paginate} onClick={paginateAction} />
         </Fragment>
       ) : (

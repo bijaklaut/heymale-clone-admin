@@ -59,8 +59,8 @@ const ProductWrapper = (props: ThisProps) => {
 
   return (
     <>
-      <h2 className="text-2xl font-semibold">Product Dashboard</h2>
-      <div className="mt-3 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
+      <h2 className="text-3xl font-semibold">Product Dashboard</h2>
+      <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
         <CreateProductModal
           categories={categories}
           stateChanges={stateChanges}
