@@ -27,15 +27,14 @@ const CategoryTable = ({
     <div className="max-w-3xl">
       {categories.length ? (
         <Fragment>
-          <table
-            data-theme="nord"
-            className="table w-full min-w-[500px] rounded-md"
-          >
+          <table data-theme="nord" className="table w-full rounded-md">
             <thead>
               <tr>
-                <th className="w-[75px] text-base font-semibold">#</th>
+                <th className="text-base font-semibold sm:w-[75px]">#</th>
                 <th className="text-base font-semibold">Category Name</th>
-                <th className="text-base font-semibold">Action</th>
+                <th className="w-[100px] text-center text-base font-semibold sm:w-[150px]">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -44,7 +43,7 @@ const CategoryTable = ({
                   <tr key={i}>
                     <th className="">{i + paginate.pagingCounter}</th>
                     <td>{category.name}</td>
-                    <td className="flex gap-x-2">
+                    <td className="flex w-full justify-center gap-x-2">
                       <UpdateCategoryModal
                         category={category}
                         index={i}
