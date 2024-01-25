@@ -29,7 +29,7 @@ const SearchFilter = ({
       {filterData ? (
         <div
           data-theme={"nord"}
-          className="dropdown dropdown-right bg-transparent"
+          className="dropdown bg-transparent max-[640px]:dropdown-end md:dropdown-right"
         >
           <div
             tabIndex={0}
