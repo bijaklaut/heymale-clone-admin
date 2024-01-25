@@ -35,7 +35,7 @@ export const Sidebar = () => {
     "fixed left-0 top-0 right-0 z-20 flex w-full h-screen origin-top flex-col justify-between px-2 sm:pt-4 shadow-lg sm:origin-left sm:right-auto lg:pt-7 lg:sticky":
       true,
     "opacity-0 scale-y-0 sm:opacity-100 sm:scale-y-100 sm:w-[4rem]": !checked,
-    "opacity-100 w-full scale-y-100 sm:w-[50%] lg:w-[20rem] xl:w[25rem]":
+    "opacity-100 w-full scale-y-100 sm:w-[50%] lg:w-[20rem] xl:w[25rem] overflow-y-auto":
       checked,
   });
   const arrowClass = cx({

@@ -22,7 +22,7 @@ export const ProductThumbnail = ({
 
   const imageClass = useCallback(() => {
     return cx({
-      "h-auto w-full max-w-[200px] rounded-md border-2 border-neutral bg-cover":
+      "xl:max-w-[100px] h-auto w-full max-w-[200px] rounded-md border-2 border-neutral bg-cover":
         thumbnail,
       "h-auto w-full max-w-[200px] rounded-md bg-neutral p-5 sm:p-8":
         !thumbnail,

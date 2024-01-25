@@ -7,7 +7,7 @@ interface ThisProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const ProductExpand = ({ checked, onChange }: ThisProps) => {
   return (
-    <div className="form-control 3xl:hidden">
+    <div className="form-control xl:hidden">
       <label className="label cursor-pointer p-0">
         <input
           type="checkbox"

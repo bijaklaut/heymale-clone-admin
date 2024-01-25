@@ -33,23 +33,23 @@ interface ProductTableProps {
 const ProductTable = (props: ProductTableProps) => {
   const { categories, filters, stateChanges, paginate, paginateAction } = props;
   const { docs: products } = paginate;
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(-1);
 
   const parentRowClass = cx({
-    "grid h-fit w-full grid-cols-5 items-center justify-items-stretch rounded-md bg-white px-3 py-3 text-neutral shadow-md md:grid-cols-8 lg:grid-cols-10 3xl:grid-cols-12":
+    "grid h-fit w-full grid-cols-5 items-center justify-items-stretch rounded-md bg-white px-3 py-3 text-neutral shadow-md md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12":
       true,
   });
   const mainContentClass = cx({
-    "col-span-3 grid w-full items-center gap-x-3 justify-self-center md:col-span-6 md:grid md:grid-cols-3 lg:col-span-8 lg:grid-cols-4 lg:gap-x-0 3xl:col-span-10 3xl:grid-cols-6":
+    "col-span-3 grid w-full items-center gap-x-3 justify-self-center md:col-span-6 md:grid md:grid-cols-3 lg:col-span-8 lg:grid-cols-4 lg:gap-x-0 xl:col-span-10 xl:grid-cols-5 2xl:grid-cols-6":
       true,
   });
   const priceVariantClass = cx({
-    "hidden flex-col items-start gap-y-2 justify-self-center md:flex lg:col-span-2 lg:grid lg:grid-cols-2 lg:justify-self-auto":
+    "hidden grid-cols-1 gap-y-2 items-center justify-self-end md:grid lg:col-span-2 lg:grid-cols-2 lg:justify-self-center xl:col-span-1 xl:justify-self-end xl:grid-cols-1 2xl:col-span-2 2xl:grid-cols-2 2xl:justify-self-center":
       true,
   });
   const collapseClass = useCallback((active: number, index: number) => {
     return cx({
-      "group flex h-fit w-full origin-top flex-col justify-between gap-x-3 overflow-hidden rounded-md bg-white p-3 text-neutral shadow-md sm:px-5 md:h-full md:pt-8 lg:mx-auto lg:w-[80%] lg:px-16 lg:pt-3 2xl:w-[65%] 3xl:hidden":
+      "group flex h-fit w-full origin-top flex-col justify-between gap-x-3 overflow-hidden rounded-md bg-white p-3 text-neutral shadow-md sm:px-5 md:h-full md:pt-8 lg:mx-auto lg:w-[80%] lg:px-16 lg:pt-3 xl:hidden":
         true,
       "relative scale-100 opacity-100": active == index,
       "absolute scale-0 opacity-0": active != index,
@@ -99,21 +99,21 @@ const ProductTable = (props: ProductTableProps) => {
                   >
                     {fil.name}
                   </div>
-                  <div className="grid grid-cols-1 gap-1">
+                  <div className="grid grid-cols-1 gap-2">
                     {(products as ProductTypes[]).map((product, index) => {
                       if (product.category.name == fil.name)
                         return (
                           <Fragment key={index}>
                             <div className={parentRowClass}>
                               {/* Number */}
-                              <span className="me-1 justify-self-start font-semibold text-base-100/60 3xl:justify-self-center">
+                              <span className="me-1 justify-self-start font-semibold text-base-100/60 2xl:justify-self-center">
                                 {paginate.pagingCounter + index}
                               </span>
 
                               {/* Main content */}
                               <div className={mainContentClass}>
                                 {/* Thumbnail 3XL */}
-                                <div className="hidden w-full justify-self-center 3xl:block">
+                                <div className="hidden w-full justify-self-center xl:block">
                                   <ProductThumbnail
                                     thumbnail={product.thumbnail}
                                     width={500}
@@ -129,8 +129,8 @@ const ProductTable = (props: ProductTableProps) => {
 
                                 {/* Price & Variant MD */}
                                 <div className={priceVariantClass}>
-                                  <div className="flex flex-col items-start justify-self-center">
-                                    <span className="font-semibold lg:hidden">
+                                  <div className="flex flex-col">
+                                    <span className="font-semibold lg:hidden xl:inline 2xl:hidden">
                                       Price
                                     </span>
                                     <NumFormatWrapper
@@ -141,8 +141,8 @@ const ProductTable = (props: ProductTableProps) => {
                                       decimalSeparator=","
                                     />
                                   </div>
-                                  <div className="flex flex-col items-start gap-y-2 justify-self-center">
-                                    <span className="font-semibold lg:hidden">
+                                  <div className="flex flex-col gap-y-2 ">
+                                    <span className="font-semibold lg:hidden xl:inline 2xl:hidden">
                                       Variant
                                     </span>
                                     <ProductVariant
@@ -162,15 +162,15 @@ const ProductTable = (props: ProductTableProps) => {
                                 </div>
 
                                 {/* Description 3XL */}
-                                <div className="hidden justify-self-center 3xl:block">
-                                  <button className="btn btn-accent btn-sm text-white">
+                                <div className="hidden justify-self-center xl:block">
+                                  <button className="btn btn-outline btn-accent btn-sm text-white">
                                     Description
                                   </button>
                                 </div>
                               </div>
 
                               {/* Expand or Action */}
-                              <div className="justify-self-end 3xl:justify-self-center">
+                              <div className="justify-self-end 2xl:justify-self-center">
                                 <div className="flex items-center justify-center gap-x-2 p-3">
                                   <div className="hidden gap-x-2 lg:flex">
                                     <UpdateProductModal
