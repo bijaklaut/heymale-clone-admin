@@ -18,7 +18,7 @@ import {
   PaymentSvg,
   ProductSvg,
   TransactionSvg,
-  UserSvg,
+  UsersSvg,
   VoucherSvg,
 } from "../Misc/SvgGroup";
 import cx from "classnames";
@@ -159,7 +159,7 @@ export const Sidebar = () => {
                     <p className={"sidebar-menu-text"}>Payments</p>
                   </MenuItem>
                   <MenuItem onClick={resetNavbar} href="/user">
-                    <UserSvg className="sidebar-svg stroke-current" />
+                    <UsersSvg className="sidebar-svg stroke-current" />
                     <p className={"sidebar-menu-text"}>User Management</p>
                   </MenuItem>
                 </div>
@@ -212,7 +212,7 @@ export const Sidebar = () => {
                     <PaymentSvg className="sidebar-svg stroke-current" />
                   </MenuItem>
                   <MenuItem centered datatip={"User Management"} href="/user">
-                    <UserSvg className="sidebar-svg stroke-current" />
+                    <UsersSvg className="sidebar-svg stroke-current" />
                   </MenuItem>
                 </div>
               </div>

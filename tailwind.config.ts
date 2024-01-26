@@ -27,6 +27,10 @@ const config: Config = {
       animation: {
         "spin-slow": "spin .3s linear forwards",
       },
+      gridTemplateColumns: {
+        "number-5": "75px repeat(4, minmax(0, 1fr))",
+        "number-6": "75px repeat(5, minmax(0, 1fr))",
+      },
     },
   },
   plugins: [require("daisyui")],

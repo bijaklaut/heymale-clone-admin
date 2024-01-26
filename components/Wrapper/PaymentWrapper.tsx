@@ -16,27 +16,26 @@ const PaymentWrapper = () => {
   const [loading, setLoading] = useState(true);
 
   const stateChanges = () => setChanges((prev) => !prev);
-  const pageHandler = (pageNumber: number) => setPage(pageNumber);
 
   const getFilteredPayment = useCallback(
-    async (search: string, page: number) => {
+    async (page: number) => {
       setLoading(true);
       const { payload } = await getPayments(search, page);
 
       setPagination(initPagination(payload));
       return setTimeout(() => setLoading(false), 500);
     },
-    [search, changes, page],
+    [search, changes],
   );
 
   useEffect(() => {
     const pageParams = 1;
 
-    getFilteredPayment(search, pageParams);
+    getFilteredPayment(pageParams);
   }, [search, changes]);
 
   useEffect(() => {
-    getFilteredPayment(search, page);
+    getFilteredPayment(page);
   }, [page]);
 
   return (

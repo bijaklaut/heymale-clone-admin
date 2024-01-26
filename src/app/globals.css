@@ -82,20 +82,25 @@
 }
 
 .btn-icon-primary {
-  @apply hover:text-primary;
+  @apply hover:text-primary max-sm:focus:text-primary;
 }
 
 .btn-icon-error {
-  @apply hover:text-error;
+  @apply hover:text-error max-sm:focus:text-error;
 }
 
 .btn-icon-accent {
-  @apply hover:text-accent;
+  @apply hover:text-accent max-sm:focus:text-accent;
+}
+
+.btn-icon-success {
+  @apply hover:text-success max-sm:focus:text-success;
 }
 
 .btn-icon-primary,
 .btn-icon-error,
-.btn-icon-accent {
+.btn-icon-accent,
+.btn-icon-success {
   @apply bg-transparent text-gray-600 transition-all;
 }
 /* End of Buttons */

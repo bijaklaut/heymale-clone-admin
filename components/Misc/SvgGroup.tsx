@@ -80,13 +80,12 @@ export const RefreshSvg = (props: { className?: string }) => {
         strokeLinejoin="round"
       ></g>
       <g id="SVGRepo_iconCarrier">
-        {" "}
         <path
           d="M21 3V8M21 8H16M21 8L18 5.29168C16.4077 3.86656 14.3051 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.2832 21 19.8675 18.008 20.777 14"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-        ></path>{" "}
+        ></path>
       </g>
     </svg>
   );
@@ -110,30 +109,29 @@ export const TransactionSvg = (props: { className?: string }) => {
         strokeLinejoin="round"
       ></g>
       <g id="SVGRepo_iconCarrier">
-        {" "}
         <path
           d="M7.5 18C8.32843 18 9 18.6716 9 19.5C9 20.3284 8.32843 21 7.5 21C6.67157 21 6 20.3284 6 19.5C6 18.6716 6.67157 18 7.5 18Z"
           strokeWidth="2"
-        ></path>{" "}
+        ></path>
         <path
           d="M16.5 18.0001C17.3284 18.0001 18 18.6716 18 19.5001C18 20.3285 17.3284 21.0001 16.5 21.0001C15.6716 21.0001 15 20.3285 15 19.5001C15 18.6716 15.6716 18.0001 16.5 18.0001Z"
           strokeWidth="2"
-        ></path>{" "}
+        ></path>
         <path
           d="M9.5 9L10.0282 12.1179"
           strokeWidth="2"
           strokeLinecap="round"
-        ></path>{" "}
+        ></path>
         <path
           d="M15.5283 9L15.0001 12.1179"
           strokeWidth="2"
           strokeLinecap="round"
-        ></path>{" "}
+        ></path>
         <path
           d="M2 3L2.26121 3.09184C3.5628 3.54945 4.2136 3.77826 4.58584 4.32298C4.95808 4.86771 4.95808 5.59126 4.95808 7.03836V9.76C4.95808 12.7016 5.02132 13.6723 5.88772 14.5862C6.75412 15.5 8.14857 15.5 10.9375 15.5H12M16.2404 15.5C17.8014 15.5 18.5819 15.5 19.1336 15.0504C19.6853 14.6008 19.8429 13.8364 20.158 12.3075L20.6578 9.88275C21.0049 8.14369 21.1784 7.27417 20.7345 6.69708C20.2906 6.12 18.7738 6.12 17.0888 6.12H11.0235M4.95808 6.12H7"
           strokeWidth="2"
           strokeLinecap="round"
-        ></path>{" "}
+        ></path>
       </g>
     </svg>
   );
@@ -187,13 +185,12 @@ export const VoucherSvg = (props: { className?: string }) => {
         strokeLinejoin="round"
       ></g>
       <g id="SVGRepo_iconCarrier">
-        {" "}
         <path
           d="M3 3C3.39922 3.5978 4.14539 4 5 4C5.85461 4 6.60078 3.5978 7 3C7.29941 2.4022 7.85904 2 8.5 2C9.14096 2 9.70059 2.4022 10 3C10.3992 3.5978 11.1454 4 12 4C12.8546 4 13.6008 3.5978 14 3C14.2994 2.4022 14.859 2 15.5 2C16.141 2 16.7006 2.4022 17 3C17.3992 3.5978 18.1454 4 19 4C19.8546 4 20.6008 3.5978 21 3V21C20.6008 20.4022 19.8546 20 19 20C18.1454 20 17.3992 20.4022 17 21C16.7006 21.5978 16.141 22 15.5 22C14.859 22 14.2994 21.5978 14 21C13.6008 20.4022 12.8546 20 12 20C11.1454 20 10.3992 20.4022 10 21C9.70059 21.5978 9.14096 22 8.5 22C7.85904 22 7.29941 21.5978 7 21C6.60078 20.4022 5.85461 20 5 20C4.14539 20 3.39922 20.4022 3 21V3Z"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-        ></path>{" "}
+        ></path>
         <circle
           cx="8.5"
           cy="9.5"
@@ -201,7 +198,7 @@ export const VoucherSvg = (props: { className?: string }) => {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-        ></circle>{" "}
+        ></circle>
         <circle
           cx="15.5"
           cy="15.5"
@@ -209,13 +206,13 @@ export const VoucherSvg = (props: { className?: string }) => {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-        ></circle>{" "}
+        ></circle>
         <path
           d="M17 8.00001L8.00003 16"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-        ></path>{" "}
+        ></path>
       </g>
     </svg>
   );
@@ -318,7 +315,6 @@ export const PaymentSvg = (props: { className?: string }) => {
         strokeLinejoin="round"
       ></g>
       <g id="SVGRepo_iconCarrier">
-        {" "}
         <rect
           x="3"
           y="6"
@@ -328,25 +324,25 @@ export const PaymentSvg = (props: { className?: string }) => {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-        ></rect>{" "}
+        ></rect>
         <path
           d="M3 10H20.5"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-        ></path>{" "}
+        ></path>
         <path
           d="M7 15H9"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-        ></path>{" "}
+        ></path>
       </g>
     </svg>
   );
 };
 
-export const UserSvg = (props: { className?: string }) => {
+export const UsersSvg = (props: { className?: string }) => {
   const { className } = props;
   return (
     <svg
@@ -511,6 +507,137 @@ export const ArrowRightSvg = (props: { className?: string }) => {
       ></g>
       <g id="SVGRepo_iconCarrier">
         <path d="M338.752 104.704a64 64 0 0 0 0 90.496l316.8 316.8-316.8 316.8a64 64 0 0 0 90.496 90.496l362.048-362.048a64 64 0 0 0 0-90.496L429.248 104.704a64 64 0 0 0-90.496 0z"></path>
+      </g>
+    </svg>
+  );
+};
+
+export const MailSvg = (props: { className?: string }) => {
+  const { className } = props;
+  return (
+    <svg
+      className={className}
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        <path
+          d="M4 7.00005L10.2 11.65C11.2667 12.45 12.7333 12.45 13.8 11.65L20 7"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        ></path>
+        <rect
+          x="3"
+          y="5"
+          width="18"
+          height="14"
+          rx="2"
+          strokeWidth="2"
+          strokeLinecap="round"
+        ></rect>
+      </g>
+    </svg>
+  );
+};
+
+export const UserSvg = (props: { className?: string }) => {
+  const { className } = props;
+  return (
+    <svg
+      className={className}
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        <path
+          d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        ></path>
+        <path
+          d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        ></path>
+      </g>
+    </svg>
+  );
+};
+
+export const PhoneSvg = (props: { className?: string }) => {
+  const { className } = props;
+  return (
+    <svg
+      className={className}
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        <path
+          d="M3 5.5C3 14.0604 9.93959 21 18.5 21C18.8862 21 19.2691 20.9859 19.6483 20.9581C20.0834 20.9262 20.3009 20.9103 20.499 20.7963C20.663 20.7019 20.8185 20.5345 20.9007 20.364C21 20.1582 21 19.9181 21 19.438V16.6207C21 16.2169 21 16.015 20.9335 15.842C20.8749 15.6891 20.7795 15.553 20.6559 15.4456C20.516 15.324 20.3262 15.255 19.9468 15.117L16.74 13.9509C16.2985 13.7904 16.0777 13.7101 15.8683 13.7237C15.6836 13.7357 15.5059 13.7988 15.3549 13.9058C15.1837 14.0271 15.0629 14.2285 14.8212 14.6314L14 16C11.3501 14.7999 9.2019 12.6489 8 10L9.36863 9.17882C9.77145 8.93713 9.97286 8.81628 10.0942 8.64506C10.2012 8.49408 10.2643 8.31637 10.2763 8.1317C10.2899 7.92227 10.2096 7.70153 10.0491 7.26005L8.88299 4.05321C8.745 3.67376 8.67601 3.48403 8.55442 3.3441C8.44701 3.22049 8.31089 3.12515 8.15802 3.06645C7.98496 3 7.78308 3 7.37932 3H4.56201C4.08188 3 3.84181 3 3.63598 3.09925C3.4655 3.18146 3.29814 3.33701 3.2037 3.50103C3.08968 3.69907 3.07375 3.91662 3.04189 4.35173C3.01413 4.73086 3 5.11378 3 5.5Z"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        ></path>
+      </g>
+    </svg>
+  );
+};
+
+export const HomeSvg = (props: { className?: string }) => {
+  const { className } = props;
+  return (
+    <svg
+      className={className}
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        <path
+          d="M3.99999 10L12 3L20 10L20 20H15V16C15 15.2044 14.6839 14.4413 14.1213 13.8787C13.5587 13.3161 12.7956 13 12 13C11.2043 13 10.4413 13.3161 9.87868 13.8787C9.31607 14.4413 9 15.2043 9 16V20H4L3.99999 10Z"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        ></path>
       </g>
     </svg>
   );
