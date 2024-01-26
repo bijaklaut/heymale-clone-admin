@@ -7,14 +7,16 @@ import { deleteAddress } from "../../../services/admin";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import PostAddressCollapse from "../../Collapse/Address/PostAddress";
+import { HomeSvg } from "../../Misc/SvgGroup";
 
 interface thisProps {
   user: UserTypes;
   index: number;
+  stateChanges(): void;
 }
 
 const AddressListModal = (props: thisProps) => {
-  const { user, index } = props;
+  const { user, index, stateChanges } = props;
   const { _id, addresses } = user;
   const router = useRouter();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -24,16 +26,23 @@ const AddressListModal = (props: thisProps) => {
   const [showUpdate, setShowUpdate] = useState(false);
 
   const modalHandler = (id: string, show: boolean) => {
-    const checkbox = document.getElementById(id) as HTMLInputElement;
+    const modal = document.getElementById(id) as HTMLDialogElement;
 
-    if (checkbox && show) {
-      checkbox.checked = true;
+    // Prevent modal closed via escape button
+    modal.addEventListener("cancel", (e) => {
+      e.preventDefault();
+    });
+
+    if (show) {
+      modal.showModal();
       return setModalShow(true);
     }
 
-    checkbox.checked = false;
+    setDeleteShow(-1);
+    modal.close();
     return setModalShow(false);
   };
+
   const deleteHandler = async (id: string) => {
     const loading = toast.loading("Processing", { containerId: "AddressList" });
     try {
@@ -42,11 +51,12 @@ const AddressListModal = (props: thisProps) => {
 
       toast.dismiss(loading);
       toast.success(result.message, {
-        containerId: "AddressList",
+        containerId: "Main",
       });
 
       setDeleteShow(-1);
       router.refresh();
+      stateChanges();
     } catch (error: any) {
       toast.dismiss(loading);
       toast.error(error.message, {
@@ -71,26 +81,26 @@ const AddressListModal = (props: thisProps) => {
   };
   return (
     <>
-      <label
-        className="btn-xs min-w-[75px] rounded-md border-2 border-primary bg-transparent py-1 text-primary transition-all hover:bg-primary hover:text-white"
+      <button
+        data-theme="skies"
+        className="btn-icon-success bg-transparent md:btn md:btn-success md:btn-xs xl:btn-sm md:bg-inherit md:p-0 md:px-2 md:text-success md:hover:text-white"
         onClick={() => modalHandler(`addressList${index}`, true)}
       >
-        Address List
-      </label>
-
-      <input
-        type="checkbox"
+        <HomeSvg className="w-6 stroke-current md:hidden" />
+        <span className="hidden md:inline ">Address List</span>
+      </button>
+      <dialog
+        data-theme={"nord"}
         id={`addressList${index}`}
-        className="modal-toggle hidden"
-      />
-      <div data-theme={"nord"} className="modal" role="dialog">
+        className="modal overflow-hidden"
+      >
         <ToastContainer
           enableMultiContainer
           containerId={"AddressList"}
           theme="dark"
         />
         <div
-          id={`AddressList${index}`}
+          // id={`AddressList${index}`}
           ref={modalRef}
           className="no-scrollbar modal-box absolute right-1/2 max-w-2xl translate-x-1/2 px-4 py-8 text-start sm:px-8"
         >
@@ -110,6 +120,7 @@ const AddressListModal = (props: thisProps) => {
               centered={addresses.length == 0}
               showUpdate={showUpdate}
               reset={reset}
+              stateChanges={stateChanges}
             />
           ) : (
             <div className="mt-10"></div>
@@ -203,16 +214,18 @@ const AddressListModal = (props: thisProps) => {
           </div>
           <div className="modal-action">
             {addresses.length != 0 && (
-              <label
-                className="btn btn-outline btn-sm"
-                onClick={() => modalHandler(`addressList${index}`, false)}
-              >
-                Close
-              </label>
+              <form method="dialog">
+                <button
+                  className="btn btn-outline btn-sm"
+                  onClick={() => modalHandler(`addressList${index}`, false)}
+                >
+                  Close
+                </button>
+              </form>
             )}
           </div>
         </div>
-      </div>
+      </dialog>
     </>
   );
 };

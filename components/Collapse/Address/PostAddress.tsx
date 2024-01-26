@@ -26,6 +26,7 @@ interface thisProps {
   address: AddressTypes;
   reset(): void;
   centered?: boolean;
+  stateChanges(): void;
 }
 
 const initData = (id: string, address?: AddressTypes) => {
@@ -46,7 +47,15 @@ const initData = (id: string, address?: AddressTypes) => {
 };
 
 const PostAddressCollapse = (props: thisProps) => {
-  const { id: userid, modalShow, showUpdate, address, reset, centered } = props;
+  const {
+    id: userid,
+    modalShow,
+    showUpdate,
+    address,
+    reset,
+    centered,
+    stateChanges,
+  } = props;
   const router = useRouter();
   const [data, setData] = useState<PostAddressTypes>(initData(userid));
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
@@ -128,9 +137,10 @@ const PostAddressCollapse = (props: thisProps) => {
 
       setTimeout(() => {
         setLoading(false);
-        toast.success(result.message, { containerId: "AddressList" });
+        toast.success(result.message, { containerId: "Main" });
         collapseHandler(false, userid);
         router.refresh();
+        stateChanges();
       }, 700);
     } catch (error: any) {
       setTimeout(() => {
@@ -156,9 +166,10 @@ const PostAddressCollapse = (props: thisProps) => {
 
       setTimeout(() => {
         setLoading(false);
-        toast.success(result.message, { containerId: "AddressList" });
+        toast.success(result.message, { containerId: "Main" });
         collapseHandler(false, userid);
         router.refresh();
+        stateChanges();
       }, 700);
     } catch (error: any) {
       setTimeout(() => {
