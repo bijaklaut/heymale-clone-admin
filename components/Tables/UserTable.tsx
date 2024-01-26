@@ -6,6 +6,7 @@ import { Dispatch, Fragment, MouseEventHandler, SetStateAction } from "react";
 import NoDisplay from "../Misc/NoDisplay";
 import Pagination from "../Misc/Pagination";
 import AddressListModal from "../Modals/User/AddressList";
+import { MailSvg, PhoneSvg, UserSvg } from "../Misc/SvgGroup";
 
 interface ProductTableProps {
   stateChanges(): void;
@@ -21,41 +22,66 @@ const UserTable = ({
 }: ProductTableProps) => {
   const { docs: users } = paginate;
   return (
-    <div className="max-w-5xl">
+    <div className="max-w-[1536px]">
       {users.length ? (
         <Fragment>
-          <table data-theme={"nord"} className="table w-full rounded-md">
-            <thead>
-              <tr>
-                <th className="text-center text-base font-semibold">#</th>
-                <th className="text-center text-base font-semibold">Name</th>
-                <th className="text-center text-base font-semibold">Email</th>
-                <th className="text-center text-base font-semibold">
-                  Phone Number
-                </th>
-                <th className="text-center text-base font-semibold">
-                  Addresses
-                </th>
-                <th className="text-center text-base font-semibold">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(users as UserTypes[]).map((user, i: any) => {
+          <div
+            data-theme="nord"
+            className="rounded-md bg-transparent md:bg-base-100 md:p-3"
+          >
+            <div className="col-span-5 hidden font-semibold md:grid md:grid-cols-number-5 md:justify-items-center lg:col-span-6 lg:grid-cols-number-6">
+              <div className="">#</div>
+              <div className="lg:hidden">User</div>
+              <div className="max-lg:hidden">Name</div>
+              <div className="max-lg:hidden">Email</div>
+              <div>Phone Number</div>
+              <div>Addresses</div>
+              <div></div>
+            </div>
+            <div className="grid grid-cols-1 gap-x-2 gap-y-2 sm:grid-cols-2 md:col-span-5 md:grid-cols-1 lg:col-span-6">
+              {(users as UserTypes[]).map((user, i) => {
                 return (
-                  <tr key={i}>
-                    <th className="text-center">
-                      {i + paginate.pagingCounter}
-                    </th>
-                    <td className="text-center">
-                      <span className="font-semibold">{user.name}</span>
-                    </td>
-                    <td className="text-center">{user.email}</td>
-                    <td className="text-center">{user.phoneNumber}</td>
-                    <td className="text-center">
-                      <AddressListModal user={user} index={i} />
-                    </td>
-                    <td>
-                      <div className="flex min-h-full items-center justify-center gap-x-3">
+                  <div
+                    key={i}
+                    tabIndex={i}
+                    data-theme="nord"
+                    className="group grid w-full grid-cols-1 items-center justify-items-center overflow-hidden rounded-md px-2 py-3 md:col-span-5 md:grid-cols-number-5 md:px-0 lg:col-span-6 lg:grid-cols-number-6"
+                  >
+                    <div className="mb-3 font-semibold text-black/50 md:mb-0">
+                      <span className="md:hidden">#</span>
+                      <span className="xl:text-base">
+                        {paginate.pagingCounter + i}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 items-center gap-y-2 md:col-span-2 md:grid-cols-2 md:justify-items-center md:justify-self-stretch lg:col-span-3 lg:grid-cols-3">
+                      <div className="grid grid-cols-1 gap-y-2 md:justify-items-center md:gap-y-0 lg:col-span-2 lg:grid-cols-2 lg:justify-items-center lg:justify-self-stretch">
+                        <div className="flex items-center gap-x-3">
+                          <UserSvg className="stroke-current md:hidden" />
+                          <span className="text-sm md:font-semibold lg:font-normal xl:text-base">
+                            {user.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-x-3">
+                          <MailSvg className="stroke-current md:hidden" />
+                          <span className="text-sm xl:text-base">
+                            {user.email}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-x-3">
+                        <PhoneSvg className="stroke-current md:hidden" />
+                        <span className="text-sm xl:text-base">
+                          {user.phoneNumber}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-5 flex w-full items-center justify-center gap-x-8 max-md:translate-y-20 max-md:opacity-0 max-md:transition-all max-md:duration-500 max-md:group-hover:translate-y-0 max-md:group-hover:opacity-100 max-md:group-focus:translate-y-0 max-md:group-focus:opacity-100 md:col-span-2 md:mt-0 md:grid md:grid-cols-2 md:justify-items-center md:gap-x-0 ">
+                      <AddressListModal
+                        user={user}
+                        index={i}
+                        stateChanges={stateChanges}
+                      />
+                      <div className="flex items-center gap-x-8 md:gap-x-3">
                         <UpdateUserModal
                           user={user}
                           index={i}
@@ -72,12 +98,13 @@ const UserTable = ({
                           stateChanges={stateChanges}
                         />
                       </div>
-                    </td>
-                  </tr>
+                    </div>
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
+            </div>
+          </div>
+
           <Pagination paginate={paginate} onClick={paginateAction} />
         </Fragment>
       ) : (

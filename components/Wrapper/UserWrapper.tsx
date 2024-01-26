@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PaginationTypes } from "../../services/types";
 import { getUsers } from "../../services/admin";
 import SearchFilter from "../Misc/SearchFilter";
@@ -25,7 +19,8 @@ const UserWrapper = () => {
   const stateChanges = () => setChanges((prev) => !prev);
 
   const getFilteredUser = useCallback(
-    async (page: number, search: string) => {
+    async (page: number) => {
+      setLoading(true);
       const { payload } = await getUsers(page, search);
 
       return setTimeout(() => {
@@ -38,13 +33,12 @@ const UserWrapper = () => {
 
   useEffect(() => {
     const newPage = 1;
-    setLoading(true);
-    getFilteredUser(newPage, search);
+    getFilteredUser(newPage);
   }, [search, changes]);
 
   useEffect(() => {
     setLoading(true);
-    getFilteredUser(page, search);
+    getFilteredUser(page);
   }, [page]);
 
   return (
