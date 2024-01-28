@@ -79,14 +79,14 @@ const Signin = () => {
   }, [data]);
 
   return (
-    <section className="flex h-screen items-center justify-center">
+    <section className="flex h-screen items-center justify-center px-5">
       <div
         data-theme="skies"
-        className="mx-auto mb-8 flex w-full max-w-[700px] flex-col items-center rounded-xl bg-white px-5 py-8 transition-all duration-300 sm:px-10"
+        className="mx-auto mb-8 flex w-full max-w-[400px] flex-col items-center rounded-xl bg-white px-5 py-8 shadow-md transition-all duration-300 sm:px-10 md:max-w-[550px]"
       >
         <Image
-          className="mx-auto my-3 w-16 sm:w-32 lg:w-48"
-          width={150}
+          className="mx-auto my-3 w-[150px] xl:w-[180px]"
+          width={500}
           src={heymaleLogo}
           alt="heymale-logo"
         />
@@ -94,7 +94,7 @@ const Signin = () => {
           Administrator Sign-in
         </h2>
 
-        <div className="relative my-4 w-[300px]">
+        <div className="relative my-4 w-full max-w-[275px] sm:max-w-[300px]">
           <input
             id="email"
             autoComplete="off"
@@ -108,7 +108,7 @@ const Signin = () => {
           </label>
           <span className="invalid-feedback"></span>
         </div>
-        <div className="relative my-4 w-[300px]">
+        <div className="relative my-4 w-full max-w-[275px] sm:max-w-[300px]">
           <input
             id="password"
             placeholder="password"
