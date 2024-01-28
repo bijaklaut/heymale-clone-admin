@@ -25,7 +25,7 @@ interface thisProps {
   showUpdate: boolean;
   address: AddressTypes;
   reset(): void;
-  centered?: boolean;
+  isFirst: boolean;
   stateChanges(): void;
 }
 
@@ -53,7 +53,7 @@ const PostAddressCollapse = (props: thisProps) => {
     showUpdate,
     address,
     reset,
-    centered,
+    isFirst,
     stateChanges,
   } = props;
   const router = useRouter();
@@ -65,7 +65,7 @@ const PostAddressCollapse = (props: thisProps) => {
   const [showCollapse, setShowCollapse] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
 
-  const [isDefault, setIsDefault] = useState(false);
+  const [isDefault, setIsDefault] = useState<boolean>(false);
   const [provincesData, setProvincesData] = useState([{}]);
   const [citiesData, setCitiesData] = useState([{}]);
 
@@ -78,7 +78,7 @@ const PostAddressCollapse = (props: thisProps) => {
 
   const centeredButton = cx({
     "w-full flex": true,
-    "justify-center": centered,
+    "justify-center": isFirst,
   });
 
   const collapseHandler = useCallback(
@@ -97,7 +97,7 @@ const PostAddressCollapse = (props: thisProps) => {
       if (isShow) {
         setDisable(true);
         setData(initData(userid));
-        setIsDefault(false);
+        setIsDefault(isFirst);
 
         return setShowCollapse(true);
       }
@@ -231,12 +231,18 @@ const PostAddressCollapse = (props: thisProps) => {
       for (let i = 0; i < reqField.length; i++) {
         const field = reqField[i];
 
-        if (field == "province" || field == "city") {
+        if (field == "province") {
           if (!(data as any)[field]["id"]) {
             setDisable(true);
             break;
           }
-          return setDisable(false);
+        }
+
+        if (field == "city") {
+          if (!(data as any)[field]["id"]) {
+            setDisable(true);
+            break;
+          }
         }
 
         if (!(data as any)[field]) {
@@ -315,13 +321,13 @@ const PostAddressCollapse = (props: thisProps) => {
               onChange={(e) =>
                 citiesData.map((cit: any) => {
                   if (cit.city_id == e.target.value) {
-                    return setData({
-                      ...data,
+                    return setData((prev) => ({
+                      ...prev,
                       city: {
                         id: cit.city_id,
                         name: cit.city_name,
                       },
-                    });
+                    }));
                   }
                 })
               }

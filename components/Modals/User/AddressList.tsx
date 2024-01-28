@@ -116,7 +116,7 @@ const AddressListModal = (props: thisProps) => {
               id={_id}
               modalShow={modalShow}
               address={data!}
-              centered={addresses.length == 0}
+              isFirst={addresses.length == 0}
               showUpdate={showUpdate}
               reset={reset}
               stateChanges={stateChanges}
