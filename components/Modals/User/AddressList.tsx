@@ -100,7 +100,6 @@ const AddressListModal = (props: thisProps) => {
           theme="dark"
         />
         <div
-          // id={`AddressList${index}`}
           ref={modalRef}
           className="no-scrollbar modal-box absolute right-1/2 max-w-2xl translate-x-1/2 px-4 py-8 text-start sm:px-8"
         >

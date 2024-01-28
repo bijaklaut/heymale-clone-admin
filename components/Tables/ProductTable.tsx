@@ -11,7 +11,6 @@ import {
   PaginationTypes,
   ProductTypes,
 } from "../../services/types";
-import Image from "next/image";
 import DeleteProductModal from "../Modals/Product/DeleteProduct";
 import UpdateProductModal from "../Modals/Product/UpdateProduct";
 import cx from "classnames";
@@ -19,8 +18,9 @@ import NumFormatWrapper from "../Wrapper/NumFormatWrapper";
 import NoDisplay from "../Misc/NoDisplay";
 import Pagination from "../Misc/Pagination";
 import { ProductExpand } from "../Misc/ProductExpand";
-import { ProductThumbnail } from "../Misc/ProductThumbnail";
 import { ProductVariant } from "../Misc/ProductVariant";
+import DescriptionModal from "../Modals/Product/DescriptionModal";
+import { ImageLightbox } from "../Misc/ImageLightbox";
 
 interface ProductTableProps {
   stateChanges(): void;
@@ -35,26 +35,17 @@ const ProductTable = (props: ProductTableProps) => {
   const { docs: products } = paginate;
   const [active, setActive] = useState(-1);
 
-  const parentRowClass = cx({
-    "grid h-fit w-full grid-cols-5 items-center justify-items-stretch rounded-md bg-white px-3 py-3 text-neutral shadow-md md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12":
-      true,
-  });
-  const mainContentClass = cx({
-    "col-span-3 grid w-full items-center gap-x-3 justify-self-center md:col-span-6 md:grid md:grid-cols-3 lg:col-span-8 lg:grid-cols-4 lg:gap-x-0 xl:col-span-10 xl:grid-cols-5 2xl:grid-cols-6":
-      true,
-  });
-  const priceVariantClass = cx({
-    "hidden grid-cols-1 gap-y-2 items-center justify-self-end md:grid lg:col-span-2 lg:grid-cols-2 lg:justify-self-center xl:col-span-1 xl:justify-self-end xl:grid-cols-1 2xl:col-span-2 2xl:grid-cols-2 2xl:justify-self-center":
-      true,
-  });
-  const collapseClass = useCallback((active: number, index: number) => {
-    return cx({
-      "group flex h-fit w-full origin-top flex-col justify-between gap-x-3 overflow-hidden rounded-md bg-white p-3 text-neutral shadow-md sm:px-5 md:h-full md:pt-8 lg:mx-auto lg:w-[80%] lg:px-16 lg:pt-3 xl:hidden":
-        true,
-      "relative scale-100 opacity-100": active == index,
-      "absolute scale-0 opacity-0": active != index,
-    });
-  }, []);
+  const collapseClass = useCallback(
+    (index: number) => {
+      return cx({
+        "flex h-fit w-full origin-top flex-col justify-between gap-x-3 rounded-md bg-white p-3 text-neutral shadow-md sm:px-5 md:h-full md:pt-8 lg:mx-auto lg:w-[80%] lg:px-16 lg:pt-3 xl:hidden":
+          true,
+        "static scale-100 opacity-100": active == index,
+        "absolute scale-0 opacity-0": active != index,
+      });
+    },
+    [active],
+  );
   const statusClass = useCallback((status: string) => {
     return cx({
       "badge badge-outline px-5 font-semibold lg:justify-self-center": true,
@@ -62,6 +53,7 @@ const ProductTable = (props: ProductTableProps) => {
       "badge-error": status == "Inactive",
     });
   }, []);
+
   const expandHandler = useCallback(
     (event: ChangeEvent<HTMLInputElement>, index: number) => {
       const parent = event.target.parentElement;
@@ -104,21 +96,22 @@ const ProductTable = (props: ProductTableProps) => {
                       if (product.category.name == fil.name)
                         return (
                           <Fragment key={index}>
-                            <div className={parentRowClass}>
+                            <div className="product-parent-row">
                               {/* Number */}
                               <span className="me-1 justify-self-start font-semibold text-base-100/60 2xl:justify-self-center">
                                 {paginate.pagingCounter + index}
                               </span>
 
                               {/* Main content */}
-                              <div className={mainContentClass}>
+                              <div className="product-collapse-content">
                                 {/* Thumbnail 3XL */}
                                 <div className="hidden w-full justify-self-center xl:block">
-                                  <ProductThumbnail
-                                    thumbnail={product.thumbnail}
-                                    width={500}
-                                    height={500}
+                                  <ImageLightbox
                                     alt={`thumbnail-${product.name}`}
+                                    index={index}
+                                    height={500}
+                                    width={500}
+                                    thumbnail={product.thumbnail}
                                   />
                                 </div>
 
@@ -128,7 +121,7 @@ const ProductTable = (props: ProductTableProps) => {
                                 </div>
 
                                 {/* Price & Variant MD */}
-                                <div className={priceVariantClass}>
+                                <div className="product-price-variant">
                                   <div className="flex flex-col">
                                     <span className="font-semibold lg:hidden xl:inline 2xl:hidden">
                                       Price
@@ -163,9 +156,10 @@ const ProductTable = (props: ProductTableProps) => {
 
                                 {/* Description 3XL */}
                                 <div className="hidden justify-self-center xl:block">
-                                  <button className="btn btn-outline btn-accent btn-sm text-white">
-                                    Description
-                                  </button>
+                                  <DescriptionModal
+                                    product={product}
+                                    index={index}
+                                  />
                                 </div>
                               </div>
 
@@ -193,14 +187,18 @@ const ProductTable = (props: ProductTableProps) => {
                               </div>
                             </div>
 
-                            <div className={collapseClass(active, index)}>
+                            <div
+                              id={`collapse${index}`}
+                              className={collapseClass(index)}
+                            >
                               <div className="flex items-center gap-x-3 md:mt-5 lg:mt-0 lg:gap-x-10">
                                 <div className="flex w-[45%] md:justify-center">
-                                  <ProductThumbnail
-                                    thumbnail={product.thumbnail}
-                                    width={500}
-                                    height={500}
+                                  <ImageLightbox
                                     alt={`thumbnail-${product.name}`}
+                                    index={index}
+                                    height={1000}
+                                    width={1000}
+                                    thumbnail={product.thumbnail}
                                   />
                                 </div>
                                 <div className="grid w-[55%] grid-cols-1 gap-y-2 md:hidden">
