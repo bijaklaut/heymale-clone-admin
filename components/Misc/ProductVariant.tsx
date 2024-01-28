@@ -10,7 +10,7 @@ export const ProductVariant = ({ variants }: ThisProps) => {
   const variantClass = useCallback(
     (k: string) => {
       return cx({
-        "bg-transparent tooltip relative flex h-[25px] font-semibold w-[30px] items-center justify-center rounded-md border px-2 max-lg:focus:tooltip-open":
+        "bg-transparent tooltip relative flex h-[25px] font-semibold w-[30px] items-center justify-center rounded-md border px-2 max-2xl:focus:tooltip-open":
           true,
         "text-green-500 border-green-500": (variants as any)[k] >= 100,
         "text-yellow-500 border-yellow-500":
