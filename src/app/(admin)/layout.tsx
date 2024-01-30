@@ -24,7 +24,12 @@ export default function AdminLayout({
       >
         {children}
       </main>
-      <ToastContainer enableMultiContainer containerId={"Main"} theme="dark" />
+      <ToastContainer
+        hideProgressBar
+        enableMultiContainer
+        containerId={"Main"}
+        theme="dark"
+      />
     </section>
   );
 }

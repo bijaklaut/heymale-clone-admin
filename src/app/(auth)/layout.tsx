@@ -16,7 +16,12 @@ export default function RootLayout({
   return (
     <section data-theme={"dracula"} className="h-screen">
       <main>{children}</main>
-      <ToastContainer enableMultiContainer containerId={"Main"} theme="dark" />
+      <ToastContainer
+        hideProgressBar
+        enableMultiContainer
+        containerId={"Signin"}
+        theme="dark"
+      />
     </section>
   );
 }

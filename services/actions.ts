@@ -9,7 +9,7 @@ import axios from "axios";
 const KING_API = process.env.KING;
 const API_KEY = process.env.API_KEY;
 
-export async function authLogout() {
+export async function authSignout() {
   cookies().delete("token");
   redirect("/signin");
 }

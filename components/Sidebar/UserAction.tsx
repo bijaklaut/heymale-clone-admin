@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { authLogout } from "../../services/actions";
 import { ArrowDownSvg, ArrowRightSvg } from "../Misc/SvgGroup";
 import { Fragment, useState } from "react";
 import cx from "classnames";
+import { SignoutModal } from "./SignoutModal";
 
 interface ThisProps {
   user: {
@@ -39,7 +39,10 @@ const UserAction = (props: ThisProps) => {
     <Fragment>
       {compact ? (
         <div className="flex items-center justify-center gap-x-3 py-5 sm:py-2">
-          <div className="form-control">
+          <div
+            data-tip={!checked ? user.name : null}
+            className="form-control tooltip tooltip-right"
+          >
             <label className="label cursor-pointer">
               <input
                 type="checkbox"
@@ -70,14 +73,17 @@ const UserAction = (props: ThisProps) => {
             </label>
           </div>
           <div data-theme={"nord"} className={menuCompact}>
-            <ul tabIndex={0} className="menu">
+            <ul
+              tabIndex={0}
+              className="flex flex-col gap-y-1 p-1 [&>li:hover]:bg-black/10 [&>li]:rounded-md [&>li]:px-3 [&>li]:py-2"
+            >
               <li className="text-base lg:text-sm">
-                <Link href={"/profile"}>Profile</Link>
+                <Link href={"/profile"}>
+                  <div className="w-full">Profile</div>
+                </Link>
               </li>
               <li className="text-base lg:text-sm">
-                <button type="button" onClick={async () => await authLogout()}>
-                  Log out
-                </button>
+                <SignoutModal />
               </li>
             </ul>
           </div>
@@ -122,26 +128,28 @@ const UserAction = (props: ThisProps) => {
             </label>
           </div>
           <div data-theme={"nord"} className={menuExpand}>
-            <ul tabIndex={0} className="menu">
+            <ul
+              tabIndex={0}
+              className="flex flex-col gap-y-1 p-1 [&>li:hover]:bg-black/10 [&>li]:rounded-md [&>li]:px-3 [&>li]:py-2"
+            >
               <li className="text-base lg:text-sm">
                 <Link href={"/profile"}>Profile</Link>
               </li>
               <li className="text-base lg:text-sm">
-                <button type="button" onClick={async () => await authLogout()}>
-                  Log out
-                </button>
+                <SignoutModal />
               </li>
             </ul>
           </div>
           <div data-theme={"skies"} className={menuMobile}>
-            <ul tabIndex={0} className="menu">
+            <ul
+              tabIndex={0}
+              className="flex flex-col gap-y-1 p-1 [&>li:hover]:bg-black/10 [&>li]:rounded-md [&>li]:px-3 [&>li]:py-2"
+            >
               <li className="text-base">
                 <Link href={"/profile"}>Profile</Link>
               </li>
               <li className="text-base">
-                <button type="button" onClick={async () => await authLogout()}>
-                  Log out
-                </button>
+                <SignoutModal />
               </li>
             </ul>
           </div>
