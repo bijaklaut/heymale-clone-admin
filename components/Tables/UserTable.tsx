@@ -8,18 +8,14 @@ import Pagination from "../Misc/Pagination";
 import AddressListModal from "../Modals/User/AddressList";
 import { MailSvg, PhoneSvg, UserSvg } from "../Misc/SvgGroup";
 
-interface ProductTableProps {
+interface ThisProps {
   stateChanges(): void;
   setChanges?: Dispatch<SetStateAction<boolean>>;
   paginate: PaginationTypes;
   paginateAction: MouseEventHandler<HTMLButtonElement>;
 }
 
-const UserTable = ({
-  paginate,
-  stateChanges,
-  paginateAction,
-}: ProductTableProps) => {
+const UserTable = ({ paginate, stateChanges, paginateAction }: ThisProps) => {
   const { docs: users } = paginate;
   return (
     <div className="max-w-[1536px]">
@@ -29,7 +25,7 @@ const UserTable = ({
             data-theme="nord"
             className="rounded-md bg-transparent md:bg-base-100 md:p-3"
           >
-            <div className="col-span-5 hidden font-semibold md:grid md:grid-cols-number-5 md:justify-items-center lg:col-span-6 lg:grid-cols-number-6">
+            <div className="hidden font-semibold md:grid md:grid-cols-number-5 md:justify-items-center lg:grid-cols-number-6">
               <div className="">#</div>
               <div className="lg:hidden">User</div>
               <div className="max-lg:hidden">Name</div>
