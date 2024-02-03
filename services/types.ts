@@ -131,6 +131,24 @@ export interface UserTypes extends Omit<PostUserTypes, "avatar"> {
   addresses: AddressTypes[];
 }
 
+export interface PostVoucherTypes {
+  voucherName: string;
+  conditions: string;
+  minTransaction: number;
+  validProducts: ProductTypes[];
+  validCategories: string[];
+  voucherCode: string;
+  value: number;
+  validUntil: Date;
+  status: string;
+  voucherQuota: number;
+}
+
+export interface VoucherTypes extends Omit<PostVoucherTypes, "validUntil"> {
+  _id: string;
+  validUntil: string;
+}
+
 export interface SignInTypes {
   email: string;
   password: string;
