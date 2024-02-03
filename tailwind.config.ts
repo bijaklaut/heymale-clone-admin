@@ -29,7 +29,9 @@ const config: Config = {
       },
       gridTemplateColumns: {
         "number-5": "75px repeat(4, minmax(0, 1fr))",
+        "number-3-action": "50px repeat(3, minmax(0, 1fr)) 75px",
         "number-6": "75px repeat(5, minmax(0, 1fr))",
+        "number-8": "50px repeat(5, minmax(0, 1fr)) 125px",
       },
     },
   },
