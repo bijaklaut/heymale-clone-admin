@@ -247,6 +247,17 @@ export const deleteAddress = async (id: string, token: string) => {
 };
 // End of Address
 
+// Voucher
+export const getVouchers = async () => {
+  const url = `${ROOT_API}/${API_VER}/voucher/`;
+
+  return callApi({
+    url,
+    method: "POST",
+  });
+};
+// End of Voucher
+
 // Auth
 export const signIn = async (data: SignInTypes) => {
   const url = `${ROOT_API}/${API_VER}/user/signin`;
