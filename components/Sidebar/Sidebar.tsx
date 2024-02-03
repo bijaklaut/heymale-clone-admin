@@ -29,7 +29,7 @@ export const Sidebar = () => {
     name: "",
     avatar: "",
   });
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [checked, setChecked] = useState(false);
   const sidebarClass = cx({
     "fixed left-0 top-0 right-0 z-20 flex w-full h-screen origin-top flex-col justify-between px-2 sm:pt-4 shadow-lg sm:origin-left sm:right-auto lg:pt-7 lg:sticky":
@@ -65,6 +65,7 @@ export const Sidebar = () => {
     if (token) {
       const reverse = atob(token);
       const { id } = jwtDecode<UserToken>(reverse);
+      setIsLoading(true);
       getUserAPI(id);
     }
   }, []);
