@@ -58,7 +58,7 @@ const VoucherWrapper = (props: ThisProps) => {
   return (
     <>
       <h2 className="text-3xl font-semibold">Voucher Dashboard</h2>
-      <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
+      <div className="mt-7 flex w-full flex-col gap-3 overflow-hidden py-3">
         <VoucherTable
           stateChanges={stateChanges}
           paginate={pagination}
