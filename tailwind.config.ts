@@ -31,7 +31,10 @@ const config: Config = {
         "number-5": "75px repeat(4, minmax(0, 1fr))",
         "number-3-action": "50px repeat(3, minmax(0, 1fr)) 75px",
         "number-6": "75px repeat(5, minmax(0, 1fr))",
-        "number-8": "50px repeat(5, minmax(0, 1fr)) 125px",
+        "voucher-xl":
+          "50px minmax(150px,1fr) minmax(150px,300px) minmax(75px,125px) 150px 75px 100px 100px",
+        "voucher-3xl":
+          "75px minmax(150px,1fr) minmax(150px,350px) minmax(75px,150px) 175px 100px 125px 125px",
       },
     },
   },
