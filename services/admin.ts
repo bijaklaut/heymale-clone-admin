@@ -267,6 +267,17 @@ export const createVoucher = async (data: FormData, token: string) => {
     token,
   });
 };
+
+export const updateVoucher = async (data: FormData, token: string) => {
+  const url = `${ROOT_API}/${API_VER}/voucher/update`;
+
+  return callApi({
+    url,
+    method: "PUT",
+    data,
+    token,
+  });
+};
 // End of Voucher
 
 // Auth
