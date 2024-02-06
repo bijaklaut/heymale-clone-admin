@@ -13,7 +13,7 @@ import {
   queryGenerator,
 } from "../../services/helper";
 import VoucherTable from "../Tables/VoucherTable";
-import CreateVoucherModal from "../Modals/Voucher/CreateVoucher";
+import PostVoucherModal from "../Modals/Voucher/PostVoucher";
 
 interface ThisProps {
   // categories: CategoryTypes[];
@@ -60,7 +60,7 @@ const VoucherWrapper = (props: ThisProps) => {
     <>
       <h2 className="text-3xl font-semibold">Voucher Dashboard</h2>
       <div className="mt-7 flex w-full flex-col gap-3 overflow-hidden py-3">
-        <CreateVoucherModal stateChanges={stateChanges} />
+        <PostVoucherModal stateChanges={stateChanges} />
         <VoucherTable
           stateChanges={stateChanges}
           paginate={pagination}
