@@ -132,6 +132,7 @@ export interface UserTypes extends Omit<PostUserTypes, "avatar"> {
 }
 
 export interface PostVoucherTypes {
+  _id?: string;
   voucherName: string;
   conditions: string;
   minTransaction: number;
