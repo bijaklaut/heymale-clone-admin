@@ -3,6 +3,7 @@
 import { ChangeEvent, Fragment, useCallback, useEffect, useState } from "react";
 import {
   createUser,
+  createVoucher,
   getCategories,
   getProducts,
 } from "../../../services/admin";
@@ -74,11 +75,6 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
   );
 
   const [proSearch, setProSearch] = useState("");
-
-  const btnCheckProps = {
-    data,
-    setDisable,
-  };
 
   const modalHandler = useCallback(
     (id: string, show: boolean, voucher?: VoucherTypes) => {
@@ -265,34 +261,42 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
   const formAppend = useCallback(() => {
     const form = new FormData();
     for (const [key, value] of Object.entries(data)) {
-      form.append(key, value);
+      if (key == "validProducts" || key == "validCategories") {
+        for (const [k, v] of Object.entries((data as any)[key])) {
+          form.append(`${key}[${k}]`, v as string);
+        }
+      } else {
+        form.append(key, value);
+      }
     }
     return form;
   }, [data]);
 
   const submitHandler = async () => {
-    // const form = formAppend();
-    // setLoading(true);
-    // setValidation([]);
-    // try {
-    //   const token = Cookies.get("token");
-    //   const result = await createUser(form, token!);
-    //   setTimeout(() => {
-    //     setLoading(false);
-    //     toast.success(result.message, { containerId: "Main" });
-    //     modalHandler("create_voucher", false);
-    //     router.refresh();
-    //     stateChanges();
-    //   }, 700);
-    // } catch (error: any) {
-    //   setLoading(false);
-    //   setTimeout(() => {
-    //     if (error.message == "Validation Error" || error.code == 11000) {
-    //       return populateValidation(error, setValidation);
-    //     }
-    //     toast.error(error.message, { containerId: "CreateUser" });
-    //   }, 700);
-    // }
+    const form = formAppend();
+    setLoading(true);
+    setValidation([]);
+    try {
+      const token = Cookies.get("token");
+      const result = await createVoucher(form, token!);
+
+      setTimeout(() => {
+        setLoading(false);
+        toast.success(result.message, { containerId: "Main" });
+        modalHandler("create_voucher", false);
+
+        router.refresh();
+        stateChanges();
+      }, 700);
+    } catch (error: any) {
+      setTimeout(() => {
+        setLoading(false);
+        if (error.message == "ValidationError" || error.code == 11000) {
+          return populateValidation(error, setValidation);
+        }
+        toast.error(error.message, { containerId: "CreateUser" });
+      }, 700);
+    }
   };
 
   useEffect(() => {

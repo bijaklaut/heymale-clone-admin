@@ -41,13 +41,13 @@ const VoucherWrapper = (props: ThisProps) => {
     }, 500);
   }, []);
 
-  // // Search filter then reset pagination
-  // useEffect(() => {
-  //   const pageParams = 1;
-  //   const query = queryGenerator(filters);
+  // Search filter then reset pagination
+  useEffect(() => {
+    // const pageParams = 1;
+    // const query = queryGenerator(filters);
 
-  //   getFilteredProduct(pageParams, { query, search });
-  // }, [filters, search, changes]);
+    getFilteredVoucher();
+  }, [changes]);
 
   // Pagination
   useEffect(() => {
@@ -61,22 +61,8 @@ const VoucherWrapper = (props: ThisProps) => {
       <h2 className="text-3xl font-semibold">Voucher Dashboard</h2>
       <div className="mt-7 flex w-full flex-col gap-3 overflow-hidden py-3">
         <PostVoucherModal stateChanges={stateChanges} />
-        <VoucherTable
-          stateChanges={stateChanges}
-          paginate={pagination}
-          paginateAction={(e) => setPage(Number(e.currentTarget.dataset.page))}
-        />
-        {/*
-        <SearchFilter
-          search={search}
-          filterData={{ filters, setFilters }}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search product by name"
-        />
         {!loading ? (
-          <ProductTable
-            categories={categories}
-            filters={filters}
+          <VoucherTable
             stateChanges={stateChanges}
             paginate={pagination}
             paginateAction={(e) =>
@@ -85,7 +71,16 @@ const VoucherWrapper = (props: ThisProps) => {
           />
         ) : (
           <ComplexTableLoading />
-        )} */}
+        )}
+
+        {/*
+        <SearchFilter
+          search={search}
+          filterData={{ filters, setFilters }}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search product by name"
+        />
+        */}
       </div>
     </>
   );
