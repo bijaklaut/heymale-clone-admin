@@ -17,26 +17,31 @@ import {
 } from "../../../services/types";
 import ProductOption from "./ProductOption";
 import ProductDisplay from "./ProductDisplay";
+import CategoryDisplay from "./CategoryDisplay";
+import CategoryOption from "./CategoryOption";
 
 interface ThisProps extends InputHTMLAttributes<HTMLInputElement> {
   data: PostVoucherTypes;
   filteredEntity: ProductTypes[] | CategoryTypes[];
+  entities: ProductTypes[] | CategoryTypes[];
   searchLabel: string[];
   selectAll: MouseEventHandler<HTMLButtonElement>;
   deselectAll: MouseEventHandler<HTMLButtonElement>;
-  deselect(productId: string): void;
+  deselect(productId: string, fieldLabel: string): void;
   selectHandler: ChangeEventHandler<HTMLInputElement>;
   searchHandler: ChangeEventHandler<HTMLInputElement>;
   validations: ValidationTypes[];
 }
 
 const interfaceCheck = (entity: any): entity is ProductTypes[] => {
+  if (entity[0] === undefined) return false;
   return "thumbnail" in entity[0];
 };
 
 const EntitySelect = ({
   data,
   filteredEntity,
+  entities,
   searchLabel,
   selectAll,
   deselectAll,
@@ -49,20 +54,20 @@ const EntitySelect = ({
   // const validation = validations.filter((val) => val.field == fieldLabel);
 
   const deselectAllCond = useCallback(() => {
-    if (interfaceCheck(filteredEntity)) {
+    if (interfaceCheck(entities)) {
       return data.validProducts.length == 0;
     }
 
     return data.validCategories.length == 0;
-  }, [data, filteredEntity]);
+  }, [data, entities]);
 
   const selectAllCond = useCallback(() => {
-    if (interfaceCheck(filteredEntity)) {
-      return data.validProducts.length == filteredEntity.length;
+    if (interfaceCheck(entities)) {
+      return data.validProducts.length == entities.length;
     }
 
-    return data.validCategories.length == filteredEntity.length;
-  }, [data, filteredEntity]);
+    return data.validCategories.length == entities.length;
+  }, [data, entities]);
 
   return (
     <Fragment>
@@ -99,7 +104,15 @@ const EntitySelect = ({
                   />
                 );
               })
-            : ""}
+            : filteredEntity.map((entity, index) => {
+                return (
+                  <CategoryOption
+                    key={index}
+                    category={entity}
+                    selectHandler={selectHandler}
+                  />
+                );
+              })}
         </ul>
       </div>
       {/* Button */}
@@ -119,24 +132,47 @@ const EntitySelect = ({
           Deselect All
         </button>
       </div>
-      {data.validProducts.length > 0 && (
-        <div className="flex flex-col">
-          <span className="mb-3">{`Selected Product (${data.validProducts.length})`}</span>
-          <div className="grid grid-cols-2 items-center gap-2">
-            {(filteredEntity as ProductTypes[])
-              .filter((product) => data.validProducts.includes(product._id))
-              .map((product, i) => {
-                return (
-                  <ProductDisplay
-                    key={i}
-                    product={product}
-                    deselect={() => deselect(product._id)}
-                  />
-                );
-              })}
-          </div>
-        </div>
-      )}
+      {interfaceCheck(entities)
+        ? data.validProducts.length > 0 && (
+            <div className="flex flex-col">
+              <span className="mb-3">{`Selected Product (${data.validProducts.length})`}</span>
+              <div className="grid grid-cols-2 items-center gap-2">
+                {(entities as ProductTypes[])
+                  .filter((product) => data.validProducts.includes(product._id))
+                  .map((product, i) => {
+                    return (
+                      <ProductDisplay
+                        key={i}
+                        product={product}
+                        deselect={() => deselect(product._id, "validProducts")}
+                      />
+                    );
+                  })}
+              </div>
+            </div>
+          )
+        : data.validCategories.length > 0 && (
+            <div className="flex flex-col">
+              <span className="mb-3">{`Selected Product (${data.validCategories.length})`}</span>
+              <div className="grid grid-cols-2 items-center gap-2">
+                {(entities as CategoryTypes[])
+                  .filter((category) =>
+                    data.validCategories.includes(category._id),
+                  )
+                  .map((category, i) => {
+                    return (
+                      <CategoryDisplay
+                        key={i}
+                        category={category}
+                        deselect={() =>
+                          deselect(category._id, "validCategories")
+                        }
+                      />
+                    );
+                  })}
+              </div>
+            </div>
+          )}
     </Fragment>
   );
 };

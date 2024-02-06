@@ -1,10 +1,15 @@
 "use client";
 
 import { ChangeEvent, Fragment, useCallback, useEffect, useState } from "react";
-import { createUser, getProducts } from "../../../services/admin";
+import {
+  createUser,
+  getCategories,
+  getProducts,
+} from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import {
+  CategoryTypes,
   PostUserTypes,
   PostVoucherTypes,
   ProductTypes,
@@ -58,10 +63,18 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
   const [disable, setDisable] = useState(true);
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
   const [data, setData] = useState<PostVoucherTypes>(initData());
+  const [loading, setLoading] = useState(false);
+
   const [products, setProducts] = useState<ProductTypes[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<ProductTypes[]>([]);
+
+  const [categories, setCategories] = useState<CategoryTypes[]>([]);
+  const [filteredCategories, setFilteredCategories] = useState<CategoryTypes[]>(
+    [],
+  );
+
   const [proSearch, setProSearch] = useState("");
-  const [loading, setLoading] = useState(false);
+
   const btnCheckProps = {
     data,
     setDisable,
@@ -85,103 +98,129 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
     setFilteredProducts(payload.docs);
   }, []);
 
+  const getCategoriesAPI = useCallback(async () => {
+    const { payload } = await getCategories();
+    setCategories(payload.docs);
+    setFilteredCategories(payload.docs);
+  }, []);
+
   const getFilterProducts = useCallback(() => {
     return products.filter((product) =>
       product.name.toLowerCase().includes(proSearch.toLowerCase()),
     );
   }, [products, proSearch]);
 
-  const selectProduct = useCallback(
-    (element: HTMLInputElement) => {
+  const getFilterCategories = useCallback(() => {
+    return categories.filter((category) =>
+      category.name.toLowerCase().includes(proSearch.toLowerCase()),
+    );
+  }, [categories, proSearch]);
+
+  const selectHandler = useCallback(
+    (element: HTMLInputElement, fieldLabel: string) => {
       const parent = element.parentElement;
-      const newProducts: Array<string> = JSON.parse(
-        JSON.stringify(data.validProducts),
+      const newArray: Array<string> = JSON.parse(
+        JSON.stringify((data as any)[fieldLabel]),
       );
 
       if (element.checked) {
         parent?.classList.add("bg-primary/80");
-        newProducts.push(element.value);
+        newArray.push(element.value);
         setData((prev) => ({
           ...prev,
-          validProducts: newProducts,
+          [fieldLabel]: newArray,
         }));
       } else {
-        const arrayIndex = newProducts.indexOf(element.value);
+        const arrayIndex = newArray.indexOf(element.value);
         if (arrayIndex > -1) {
-          newProducts.splice(arrayIndex, 1);
+          newArray.splice(arrayIndex, 1);
         }
         parent?.classList.remove("bg-primary/80");
         setData((prev) => ({
           ...prev,
-          validProducts: newProducts,
+          [fieldLabel]: newArray,
         }));
       }
     },
     [data],
   );
 
-  const deselectProduct = useCallback(
-    (productId: string) => {
-      const newProducts: Array<string> = JSON.parse(
-        JSON.stringify(data.validProducts),
+  const deselectHandler = useCallback(
+    (productId: string, fieldLabel: string) => {
+      const newArray: Array<string> = JSON.parse(
+        JSON.stringify((data as any)[fieldLabel]),
       );
       const label = document.getElementById(productId)?.children[0];
       const input = label?.children[0] as HTMLInputElement;
-      const arrayIndex = newProducts.indexOf(productId);
+      const arrayIndex = newArray.indexOf(productId);
 
       input.checked = false;
       label?.classList.remove("bg-primary/80");
       if (arrayIndex > -1) {
-        newProducts.splice(arrayIndex, 1);
+        newArray.splice(arrayIndex, 1);
       }
       setData((prev) => ({
         ...prev,
-        validProducts: newProducts,
+        [fieldLabel]: newArray,
       }));
     },
     [data],
   );
 
-  const selectAllProducts = useCallback(() => {
-    const newProducts: Array<string> = JSON.parse(
-      JSON.stringify(data.validProducts),
-    );
-    products.map((product) => {
-      const label = document.getElementById(product._id)?.children[0];
-      const input = label?.children[0] as HTMLInputElement;
+  const selectAll = useCallback(
+    (fieldLabel: string) => {
+      const newArray: Array<string> = JSON.parse(
+        JSON.stringify((data as any)[fieldLabel]),
+      );
+      const action = (entity: ProductTypes | CategoryTypes) => {
+        const label = document.getElementById(entity._id)?.children[0];
+        const input = label?.children[0] as HTMLInputElement;
 
-      if (!newProducts.includes(input.value)) {
-        input.checked = true;
-        label?.classList.add("bg-primary/80");
-        newProducts.push(input.value);
+        if (!newArray.includes(input.value)) {
+          input.checked = true;
+          label?.classList.add("bg-primary/80");
+          newArray.push(input.value);
+          setData((prev) => ({
+            ...prev,
+            [fieldLabel]: newArray,
+          }));
+        }
+      };
+
+      fieldLabel == "validProducts"
+        ? products.map((product) => action(product))
+        : categories.map((category) => action(category));
+    },
+    [products, categories, data],
+  );
+
+  const deselectAll = useCallback(
+    (fieldLabel: string) => {
+      const newArray: Array<string> = JSON.parse(
+        JSON.stringify((data as any)[fieldLabel]),
+      );
+      const action = (entity: ProductTypes | CategoryTypes) => {
+        const label = document.getElementById(entity._id)?.children[0];
+        const input = label?.children[0] as HTMLInputElement;
+        const arrayIndex = newArray.indexOf(input.value);
+
+        input.checked = false;
+        label?.classList.remove("bg-primary/80");
+        if (arrayIndex > -1) {
+          newArray.splice(arrayIndex, 1);
+        }
         setData((prev) => ({
           ...prev,
-          validProducts: newProducts,
+          [fieldLabel]: newArray,
         }));
-      }
-    });
-  }, [products, data]);
+      };
 
-  const deselectAllProducts = useCallback(() => {
-    const newProducts: Array<string> = JSON.parse(
-      JSON.stringify(data.validProducts),
-    );
-    products.map((product) => {
-      const label = document.getElementById(product._id)?.children[0];
-      const input = label?.children[0] as HTMLInputElement;
-      const arrayIndex = newProducts.indexOf(input.value);
-
-      input.checked = false;
-      label?.classList.remove("bg-primary/80");
-      if (arrayIndex > -1) {
-        newProducts.splice(arrayIndex, 1);
-      }
-      setData((prev) => ({
-        ...prev,
-        validProducts: newProducts,
-      }));
-    });
-  }, [products, data]);
+      fieldLabel == "validProducts"
+        ? products.map((product) => action(product))
+        : categories.map((category) => action(category));
+    },
+    [products, data],
+  );
 
   const formCheck = useCallback(() => {
     for (let i = 0; i < Object.entries(data).length; i++) {
@@ -232,12 +271,49 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
   }, [data.validProducts]);
 
   useEffect(() => {
-    setFilteredProducts(getFilterProducts());
+    if (data.conditions == "Particular Product") {
+      setFilteredProducts(getFilterProducts());
+    } else {
+      setFilteredCategories(getFilterCategories());
+    }
   }, [proSearch]);
 
   useEffect(() => {
     if (data.conditions == "Particular Product") {
       getProductsAPI();
+      setData((prev) => ({
+        ...prev,
+        validCategories: [],
+        minTransaction: 0,
+      }));
+    }
+
+    if (data.conditions == "Particular Category") {
+      getCategoriesAPI();
+      setData((prev) => ({
+        ...prev,
+        minTransaction: 0,
+        validProducts: [],
+      }));
+    }
+
+    if (data.conditions == "Minimal Transaction") {
+      getCategoriesAPI();
+      setData((prev) => ({
+        ...prev,
+        validProducts: [],
+        validCategories: [],
+      }));
+    }
+
+    if (data.conditions == "None") {
+      getCategoriesAPI();
+      setData((prev) => ({
+        ...prev,
+        validProducts: [],
+        validCategories: [],
+        minTransaction: 0,
+      }));
     }
   }, [data.conditions]);
 
@@ -370,120 +446,36 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
             </div>
           )}
           {data.conditions == "Particular Product" && (
-            // <Fragment>
-            //   <div className="dropdown dropdown-top form-control mx-auto w-full">
-            //     <label data-theme={"skies"} className="w-full transition-all">
-            //       <div className="label">
-            //         <span className="label-text -ms-1 text-base text-white">
-            //           Product
-            //         </span>
-            //       </div>
-            //       <input
-            //         tabIndex={0}
-            //         type={"text"}
-            //         placeholder="Type here to search product"
-            //         className={
-            //           "input input-bordered input-sm w-full rounded-md py-5 text-lg transition-all"
-            //         }
-            //         onChange={(e) => setProSearch(e.target.value)}
-            //         value={proSearch}
-            //       />
-            //     </label>
-            //     <ul
-            //       tabIndex={0}
-            //       className="no-scrollbar dropdown-content z-[1] flex h-[300px] w-full flex-col gap-y-2 overflow-y-scroll rounded-box border bg-base-100 p-2 shadow [&>li:hover]:bg-neutral/10"
-            //     >
-            //       {filteredProducts.map((product, index) => (
-            //         <ProductOption
-            //           key={index}
-            //           product={product}
-            //           selectHandler={(e) => selectProduct(e.target)}
-            //         />
-            //       ))}
-            //     </ul>
-            //   </div>
-            //   {/* Button */}
-            //   <div className="flex justify-center gap-x-2">
-            //     <button
-            //       className="btn btn-accent btn-sm flex text-white"
-            //       disabled={data.validProducts.length == products.length}
-            //       onClick={() => selectAllProducts()}
-            //     >
-            //       Select All
-            //     </button>
-            //     <button
-            //       className="btn btn-accent btn-sm flex text-white"
-            //       disabled={data.validProducts.length == 0}
-            //       onClick={() => deselectAllProducts()}
-            //     >
-            //       Deselect All
-            //     </button>
-            //   </div>
-            //   {data.validProducts.length > 0 && (
-            //     <div className="flex flex-col">
-            //       <span className="mb-3">{`Selected Product (${data.validProducts.length})`}</span>
-            //       <div className="grid grid-cols-2 items-center gap-2">
-            //         {products
-            //           .filter((product) =>
-            //             data.validProducts.includes(product._id),
-            //           )
-            //           .map((product, i) => {
-            //             return (
-            //               <ProductDisplay
-            //                 key={i}
-            //                 product={product}
-            //                 deselect={() => deselectProduct(product._id)}
-            //               />
-            //             );
-            //           })}
-            //       </div>
-            //     </div>
-            //   )}
-            // </Fragment>
             <EntitySelect
               data={data}
+              entities={products}
               filteredEntity={filteredProducts}
               searchLabel={[
                 "Product Select",
                 "Type here to search product name",
               ]}
-              selectAll={selectAllProducts}
-              deselectAll={deselectAllProducts}
-              deselect={deselectProduct}
-              selectHandler={(e) => selectProduct(e.target)}
+              selectAll={() => selectAll("validProducts")}
+              deselectAll={() => deselectAll("validProducts")}
+              deselect={deselectHandler}
+              selectHandler={(e) => selectHandler(e.target, "validProducts")}
               searchHandler={(e) => setProSearch(e.target.value)}
               validations={validation}
             />
           )}
 
           {data.conditions == "Particular Category" && (
-            <label className="form-control mx-auto w-full max-w-xs">
-              <div className="label">
-                <span className="label-text -ms-1 text-base text-white">
-                  Category
-                </span>
-              </div>
-              <select
-                className="select select-bordered"
-                onChange={(e) =>
-                  setData((prev) => ({
-                    ...prev,
-                    conditions: e.target.value,
-                  }))
-                }
-                value={data.conditions}
-              >
-                <option disabled value={""}>
-                  Select category to include
-                </option>
-                <option value={"category1"}>Category 1</option>
-                <option value={"category2"}>Category 2</option>
-                <option value={"category3"}>Category 3</option>
-              </select>
-              <div className="label">
-                {/* <span className="label-text-alt hidden">Alt label</span> */}
-              </div>
-            </label>
+            <EntitySelect
+              data={data}
+              entities={categories}
+              filteredEntity={filteredCategories}
+              searchLabel={["Category Select", "Type here to search category"]}
+              selectAll={() => selectAll("validCategories")}
+              deselectAll={() => deselectAll("validCategories")}
+              deselect={deselectHandler}
+              selectHandler={(e) => selectHandler(e.target, "validCategories")}
+              searchHandler={(e) => setProSearch(e.target.value)}
+              validations={validation}
+            />
           )}
 
           {/* Submit */}
