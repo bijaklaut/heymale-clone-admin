@@ -106,10 +106,10 @@ export const deletePayment = async (id: string, token: string) => {
 
 // Product Dashboard
 export const getProducts = async (
-  page: number,
+  page?: number,
   data?: { query: string; search: string },
 ) => {
-  const queryString = `?p=${page}` || "";
+  const queryString = page ? `?p=${page}` : "";
   const url = `${ROOT_API}/${API_VER}/product${queryString}`;
 
   return callApi({
@@ -254,6 +254,17 @@ export const getVouchers = async () => {
   return callApi({
     url,
     method: "POST",
+  });
+};
+
+export const createVoucher = async (data: FormData, token: string) => {
+  const url = `${ROOT_API}/${API_VER}/voucher/create`;
+
+  return callApi({
+    url,
+    method: "POST",
+    data,
+    token,
   });
 };
 // End of Voucher
