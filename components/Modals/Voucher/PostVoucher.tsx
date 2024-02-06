@@ -225,7 +225,40 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
   const formCheck = useCallback(() => {
     for (let i = 0; i < Object.entries(data).length; i++) {
       const [key] = Object.entries(data)[i];
-      console.log("KEY: ", key);
+
+      if (
+        key == "minTransaction" &&
+        data.conditions !== "Minimal Transaction"
+      ) {
+        continue;
+      }
+
+      if (key == "validProducts" && data.conditions !== "Particular Product") {
+        continue;
+      }
+
+      if (
+        key == "validCategories" &&
+        data.conditions !== "Particular Category"
+      ) {
+        continue;
+      }
+
+      if (Array.isArray((data as any)[key])) {
+        const newArray: Array<string> = (data as any)[key];
+
+        if (newArray.length == 0) {
+          setDisable(true);
+          break;
+        }
+      }
+
+      if (!Array.isArray((data as any)[key]) && !(data as any)[key]) {
+        setDisable(true);
+        break;
+      }
+
+      setDisable(false);
     }
   }, [data]);
 
@@ -238,15 +271,12 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
   }, [data]);
 
   const submitHandler = async () => {
-    console.log("DATA: ", data);
     // const form = formAppend();
     // setLoading(true);
     // setValidation([]);
-
     // try {
     //   const token = Cookies.get("token");
     //   const result = await createUser(form, token!);
-
     //   setTimeout(() => {
     //     setLoading(false);
     //     toast.success(result.message, { containerId: "Main" });
@@ -260,15 +290,10 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
     //     if (error.message == "Validation Error" || error.code == 11000) {
     //       return populateValidation(error, setValidation);
     //     }
-
     //     toast.error(error.message, { containerId: "CreateUser" });
     //   }, 700);
     // }
   };
-
-  useEffect(() => {
-    console.log(data.validProducts);
-  }, [data.validProducts]);
 
   useEffect(() => {
     if (data.conditions == "Particular Product") {
@@ -316,6 +341,10 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
       }));
     }
   }, [data.conditions]);
+
+  useEffect(() => {
+    formCheck();
+  }, [data]);
 
   return (
     <>
@@ -483,7 +512,7 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
             {!loading ? (
               <button
                 className="btn btn-primary btn-sm"
-                // disabled={disable}
+                disabled={disable}
                 onClick={submitHandler}
               >
                 Create
