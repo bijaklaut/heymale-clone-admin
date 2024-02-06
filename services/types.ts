@@ -135,18 +135,24 @@ export interface PostVoucherTypes {
   voucherName: string;
   conditions: string;
   minTransaction: number;
-  validProducts: ProductTypes[];
+  validProducts: string[];
   validCategories: string[];
   voucherCode: string;
   value: number;
-  validUntil: Date;
+  validUntil: string;
   status: string;
   voucherQuota: number;
 }
 
-export interface VoucherTypes extends Omit<PostVoucherTypes, "validUntil"> {
+export interface VoucherTypes
+  extends Omit<
+    PostVoucherTypes,
+    "validUntil" | "validProducts" | "validCategories"
+  > {
   _id: string;
   validUntil: string;
+  validProducts: ProductTypes[];
+  validCategories: CategoryTypes[];
 }
 
 export interface SignInTypes {
