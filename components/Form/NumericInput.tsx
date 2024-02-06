@@ -39,7 +39,7 @@ const NumericInput = (props: NumInputProps) => {
         decimalSeparator=","
         prefix={isCurrency ? "Rp. " : ""}
         value={(data as any)[fieldLabel] || 0}
-        onValueChange={(e) => numInputHandler(e.value, "price", setData)}
+        onValueChange={(e) => numInputHandler(e.value, fieldLabel, setData)}
         className={inputClass}
         placeholder={placeholder || "Enter value"}
       />
