@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { CategoryTypes } from "../../services/types";
+import { CategoryTypes, VoucherTypes } from "../../services/types";
 import { getProducts, getVouchers } from "../../services/admin";
 import ProductTable from "../Tables/ProductTable";
 import CreateProductModal from "../Modals/Product/CreateProduct";
@@ -28,6 +28,8 @@ const VoucherWrapper = (props: ThisProps) => {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(initPagination());
   const [changes, setChanges] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [updateVoucher, setUpdateVoucher] = useState<VoucherTypes>();
   const [loading, setLoading] = useState(true);
   const stateChanges = () => setChanges((prev) => !prev);
 
@@ -39,6 +41,11 @@ const VoucherWrapper = (props: ThisProps) => {
       setLoading(false);
       setPagination(initPagination(payload));
     }, 500);
+  }, []);
+
+  const updateMisc = useCallback((voucher: VoucherTypes) => {
+    setUpdateVoucher(voucher);
+    setIsUpdate(true);
   }, []);
 
   // Search filter then reset pagination
@@ -60,7 +67,12 @@ const VoucherWrapper = (props: ThisProps) => {
     <>
       <h2 className="text-3xl font-semibold">Voucher Dashboard</h2>
       <div className="mt-7 flex w-full flex-col gap-3 overflow-hidden py-3">
-        <PostVoucherModal stateChanges={stateChanges} />
+        <PostVoucherModal
+          stateChanges={stateChanges}
+          voucher={updateVoucher}
+          isUpdate={isUpdate}
+          reset={() => setIsUpdate(false)}
+        />
         {!loading ? (
           <VoucherTable
             stateChanges={stateChanges}
@@ -68,6 +80,7 @@ const VoucherWrapper = (props: ThisProps) => {
             paginateAction={(e) =>
               setPage(Number(e.currentTarget.dataset.page))
             }
+            updateMisc={updateMisc}
           />
         ) : (
           <ComplexTableLoading />

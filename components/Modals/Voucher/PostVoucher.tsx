@@ -6,6 +6,7 @@ import {
   createVoucher,
   getCategories,
   getProducts,
+  updateVoucher,
 } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -32,39 +33,61 @@ import ProductDisplay from "./ProductDisplay";
 import EntitySelect from "./EntitySelect";
 
 const initData = (voucher?: VoucherTypes) => {
-  let productIds: Array<string> = [];
-  let categoryIds: Array<string> = [];
-
   if (voucher) {
+    let productIds: Array<string> = [];
+    let categoryIds: Array<string> = [];
+
     voucher.validProducts.map((product) => productIds.push(product._id));
     voucher.validCategories.map((category) => categoryIds.push(category._id));
+
+    return {
+      id: voucher._id,
+      voucherName: voucher.voucherName,
+      voucherCode: voucher.voucherCode,
+      conditions: voucher.conditions,
+      minTransaction: voucher.minTransaction,
+      validProducts: productIds,
+      validCategories: categoryIds,
+      value: voucher.value,
+      validUntil: voucher.validUntil,
+      status: voucher.status,
+      voucherQuota: voucher.voucherQuota,
+    };
   }
 
   return {
-    voucherName: voucher?.voucherName || "",
-    voucherCode: voucher?.voucherCode || "",
-    conditions: voucher?.conditions || "",
-    minTransaction: voucher?.minTransaction || 0,
-    validProducts: productIds || [],
-    validCategories: categoryIds || [],
-    value: voucher?.value || 0,
-    validUntil: voucher?.validUntil || "",
-    status: voucher?.status || "",
-    voucherQuota: voucher?.voucherQuota || 0,
+    voucherName: "",
+    voucherCode: "",
+    conditions: "",
+    minTransaction: 0,
+    validProducts: [],
+    validCategories: [],
+    value: 0,
+    validUntil: "",
+    status: "",
+    voucherQuota: 0,
   };
 };
 
 interface ThisProps {
   stateChanges(): void;
   voucher?: VoucherTypes;
+  isUpdate: boolean;
+  reset(): void;
 }
 
-const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
+const PostVoucherModal = ({
+  stateChanges,
+  voucher,
+  isUpdate,
+  reset,
+}: ThisProps) => {
   const router = useRouter();
   const [disable, setDisable] = useState(true);
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
   const [data, setData] = useState<PostVoucherTypes>(initData());
   const [loading, setLoading] = useState(false);
+  const [updateState, setUpdateState] = useState(false);
 
   const [products, setProducts] = useState<ProductTypes[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<ProductTypes[]>([]);
@@ -77,15 +100,24 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
   const [proSearch, setProSearch] = useState("");
 
   const modalHandler = useCallback(
-    (id: string, show: boolean, voucher?: VoucherTypes) => {
+    (id: string, show: boolean, update?: boolean) => {
       const modal = document.getElementById(id) as HTMLDialogElement;
       setDisable(true);
       setValidation([]);
 
-      voucher ? setData(initData(voucher)) : setData(initData());
-      show ? modal.showModal() : modal.close();
+      if (update) {
+        setData(initData(voucher));
+        setUpdateState(true);
+      } else {
+        setData(initData());
+        setUpdateState(false);
+      }
+      if (show) {
+        return modal.showModal();
+      }
+      return modal.close();
     },
-    [],
+    [voucher],
   );
 
   const getProductsAPI = useCallback(async () => {
@@ -272,22 +304,34 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
     return form;
   }, [data]);
 
-  const submitHandler = async () => {
-    const form = formAppend();
-    setLoading(true);
-    setValidation([]);
+  const submitHandler = useCallback(async () => {
     try {
+      const form = formAppend();
       const token = Cookies.get("token");
-      const result = await createVoucher(form, token!);
+      setLoading(true);
+      setValidation([]);
 
-      setTimeout(() => {
-        setLoading(false);
-        toast.success(result.message, { containerId: "Main" });
-        modalHandler("create_voucher", false);
+      if (!updateState) {
+        const result = await createVoucher(form, token!);
+        setTimeout(() => {
+          setLoading(false);
+          toast.success(result.message, { containerId: "Main" });
+          modalHandler("create_voucher", false);
 
-        router.refresh();
-        stateChanges();
-      }, 700);
+          router.refresh();
+          stateChanges();
+        }, 700);
+      } else {
+        const result = await updateVoucher(form, token!);
+        setTimeout(() => {
+          setLoading(false);
+          toast.success(result.message, { containerId: "Main" });
+          modalHandler("create_voucher", false);
+
+          router.refresh();
+          stateChanges();
+        }, 700);
+      }
     } catch (error: any) {
       setTimeout(() => {
         setLoading(false);
@@ -297,7 +341,12 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
         toast.error(error.message, { containerId: "CreateUser" });
       }, 700);
     }
-  };
+  }, [updateState]);
+
+  const textShift = useCallback(
+    (text: string[]) => (voucher ? text[0] : text[1]),
+    [voucher],
+  );
 
   useEffect(() => {
     if (data.conditions == "Particular Product") {
@@ -350,6 +399,13 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
     formCheck();
   }, [data]);
 
+  useEffect(() => {
+    if (isUpdate == true) {
+      modalHandler("create_voucher", true, true);
+      reset();
+    }
+  }, [isUpdate]);
+
   return (
     <>
       <button
@@ -365,7 +421,9 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
           theme="dark"
         />
         <div className="no-scrollbar modal-box absolute max-w-xl text-white">
-          <h3 className="modal-title mb-5">New Voucher</h3>
+          <h3 className="modal-title mb-5">
+            {!updateState ? "New Voucher" : "Update Voucher"}
+          </h3>
           <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
             <TextInput
               dataState={{ data, setData }}
@@ -410,9 +468,19 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
                 <option value={"Active"}>Active</option>
                 <option value={"Inactive"}>Inactive</option>
               </select>
-              {/* <div className="label">
-              <span className="label-text-alt">Alt label</span>
-            </div> */}
+              <div className="label">
+                {/* {validation.map(
+                  (val) =>
+                    val.field == "status" && (
+                      <span
+                        key={val.field}
+                        className="label-text-alt text-error"
+                      >
+                        {val.message}
+                      </span>
+                    ),
+                )} */}
+              </div>
             </label>
             <label className="form-control w-full max-w-xs">
               <div className="label">
@@ -519,12 +587,12 @@ const PostVoucherModal = ({ stateChanges, voucher }: ThisProps) => {
                 disabled={disable}
                 onClick={submitHandler}
               >
-                Create
+                {!updateState ? "Create" : "Update"}
               </button>
             ) : (
               <button className="btn btn-sm pointer-events-none">
                 <span className="loading loading-spinner loading-sm"></span>
-                Creating..
+                {!updateState ? "Creating.." : "Updating.."}
               </button>
             )}
 

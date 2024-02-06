@@ -19,6 +19,7 @@ import {
   EditSvg,
   MailSvg,
   NoteSvg,
+  OptionDotSvg,
   PhoneSvg,
   TrashSvg,
   UserSvg,
@@ -32,12 +33,14 @@ interface ThisProps {
   stateChanges(): void;
   paginate: PaginationTypes;
   paginateAction: MouseEventHandler<HTMLButtonElement>;
+  updateMisc(voucher: VoucherTypes): void;
 }
 
 const VoucherTable = ({
   paginate,
   stateChanges,
   paginateAction,
+  updateMisc,
 }: ThisProps) => {
   const { docs: vouchers } = paginate;
   const [active, setActive] = useState(-1);
@@ -85,71 +88,10 @@ const VoucherTable = ({
 
   return (
     <div className="max-w-[1920px]">
-      {/* <div data-theme="nord" className="rounded-md p-3">
-        <div className="grid-cols-voucher-xl grid justify-items-center gap-x-2">
-          <div className="">#</div>
-          <div className="">Voucher</div>
-          <div className="">Code</div>
-          <div className="">Value</div>
-          <div>Valid Period</div>
-          <div>Status</div>
-          <div>Quota</div>
-          <div></div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-y-2">
-          {(vouchers as VoucherTypes[]).map((voucher, index) => {
-            return (
-              <div
-                key={index}
-                className="grid-cols-voucher-xl grid items-center justify-items-center gap-x-2 py-2 text-center"
-              >
-                <div>{paginate.pagingCounter + index}</div>
-                <div className="text-center">{voucher.voucherName}</div>
-                <div className="w-full max-w-[250px] break-words">
-                  {voucher.voucherCode}
-                </div>
-                <div>
-                  <NumFormatWrapper
-                    value={500000}
-                    displayType="text"
-                    prefix="Rp. "
-                    thousandSeparator="."
-                    decimalSeparator=","
-                  />
-                </div>
-                <div>{voucher.validUntil.split("T")[0]}</div>
-                <div>
-                  <div
-                    data-theme="skies"
-                    className={statusClass(voucher.status)}
-                  >
-                    {voucher.status}
-                  </div>
-                </div>
-                <div>{voucher.voucherQuota}</div>
-                <div>
-                  <div className="flex items-center gap-x-2 justify-self-end">
-                    <button data-theme={"skies"} className="btn-icon-success">
-                      <NoteSvg className="w-4 fill-current" />
-                    </button>
-                    <button data-theme={"skies"} className="btn-icon-primary">
-                      <EditSvg className="w-5 stroke-current" />
-                    </button>
-                    <button data-theme={"skies"} className="btn-icon-error">
-                      <TrashSvg className="w-5 stroke-current" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div> */}
       {vouchers.length ? (
         <Fragment>
           <div className="rounded-md bg-transparent xl:bg-slate-50/90 xl:px-3 xl:py-5">
-            <div className="3xl:grid-cols-voucher-3xl mb-4 hidden grid-cols-voucher-xl justify-items-center gap-x-2 font-semibold text-black/60 xl:grid">
+            <div className="mb-4 hidden grid-cols-voucher-xl justify-items-center gap-x-2 font-semibold text-black/60 xl:grid 3xl:grid-cols-voucher-3xl">
               <div className="">#</div>
               <div className="">Voucher</div>
               <div className="">Code</div>
@@ -164,7 +106,7 @@ const VoucherTable = ({
               {(vouchers as VoucherTypes[]).map((voucher, index) => {
                 return (
                   <Fragment key={index}>
-                    <div className="3xl:grid-cols-voucher-3xl flex w-full flex-col items-center justify-items-stretch rounded-md bg-white px-3 py-3 text-neutral shadow-md md:gap-y-5 lg:py-5 xl:grid xl:grid-cols-voucher-xl xl:justify-items-center xl:gap-x-2 xl:px-0 xl:py-3 xl:text-sm">
+                    <div className="flex w-full flex-col items-center justify-items-stretch rounded-md bg-white px-3 py-3 text-neutral shadow-md md:gap-y-5 lg:py-5 xl:grid xl:grid-cols-voucher-xl xl:justify-items-center xl:gap-x-2 xl:px-0 xl:py-3 xl:text-sm 3xl:grid-cols-voucher-3xl">
                       <div className="grid w-full grid-cols-[50px_1fr_50px] items-center gap-x-3 md:grid-cols-[75px_1fr_75px] xl:col-span-2 xl:grid-cols-[50px_minmax(150px,1fr)] xl:gap-x-2 3xl:grid-cols-[75px_minmax(150px,1fr)]">
                         <span className="me-1 justify-self-start text-center font-semibold text-black/60 xl:me-auto xl:w-full xl:text-black">
                           {paginate.pagingCounter + index}
@@ -173,25 +115,30 @@ const VoucherTable = ({
                           {voucher.voucherName}
                         </div>
                         <Fragment>
-                          <div className="hidden items-center gap-x-2 md:flex xl:hidden">
-                            <button
-                              data-theme={"skies"}
-                              className="btn-icon-success"
-                            >
-                              <NoteSvg className="w-4 fill-current" />
-                            </button>
-                            <button
-                              data-theme={"skies"}
-                              className="btn-icon-primary"
-                            >
-                              <EditSvg className="w-5 stroke-current" />
-                            </button>
-                            <button
-                              data-theme={"skies"}
-                              className="btn-icon-error"
-                            >
-                              <TrashSvg className="w-5 stroke-current" />
-                            </button>
+                          <div className="hidden items-center justify-end gap-x-2 md:flex xl:hidden">
+                            <div className="dropdown dropdown-end">
+                              <div
+                                tabIndex={0}
+                                role="button"
+                                className="btn btn-ghost btn-sm"
+                              >
+                                <OptionDotSvg className="w-4 fill-neutral" />
+                              </div>
+                              <ul
+                                tabIndex={0}
+                                className="no-scrollbar dropdown-content z-[1] flex w-[200px] flex-col gap-y-2 overflow-y-scroll rounded-box border bg-base-100 p-2 text-sm text-white shadow [&>li:hover]:bg-white/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
+                              >
+                                <li>
+                                  <span>Conditions</span>
+                                </li>
+                                <li onClick={() => updateMisc(voucher)}>
+                                  <span>Edit Voucher</span>
+                                </li>
+                                <li>
+                                  <span>Delete Voucher</span>
+                                </li>
+                              </ul>
+                            </div>
                           </div>
                           <div className="justify-self-end md:hidden">
                             <div className="form-control">
@@ -230,7 +177,7 @@ const VoucherTable = ({
                         <div className="flex w-full flex-col items-center gap-y-2 min-[460px]:max-w-[200px] lg:max-w-[350px]">
                           <span className="xl:hidden">Validity Period</span>
                           <div className="w-full min-w-[150px] rounded-md border-2 border-black px-2 py-1 text-center sm:min-w-[200px] xl:border-0">
-                            {voucher.validUntil.split("T")[0]}
+                            {voucher.validUntil}
                           </div>
                         </div>
                         <div className="flex w-full flex-col items-center gap-y-2 min-[460px]:max-w-[200px] lg:max-w-[350px]">
@@ -256,6 +203,7 @@ const VoucherTable = ({
                         <button
                           data-theme={"skies"}
                           className="btn-icon-primary"
+                          onClick={() => updateMisc(voucher)}
                         >
                           <EditSvg className="w-5 stroke-current" />
                         </button>
@@ -263,33 +211,6 @@ const VoucherTable = ({
                           <TrashSvg className="w-5 stroke-current" />
                         </button>
                       </div>
-                      {/* Separate */}
-                      {/* <div className="w-full max-w-[250px] break-words max-xl:hidden">
-                        {voucher.voucherCode}
-                      </div>
-                      <div className="max-xl:hidden">
-                        <NumFormatWrapper
-                          value={500000}
-                          displayType="text"
-                          prefix="Rp. "
-                          thousandSeparator="."
-                          decimalSeparator=","
-                        />
-                      </div>
-                      <div className="max-xl:hidden">
-                        {voucher.validUntil.split("T")[0]}
-                      </div>
-                      <div className="max-xl:hidden">
-                        <div
-                          data-theme="skies"
-                          className={statusClass(voucher.status)}
-                        >
-                          {voucher.status}
-                        </div>
-                      </div>
-                      <div className="max-xl:hidden">
-                        {voucher.voucherQuota}
-                      </div> */}
                     </div>
 
                     <div className={collapseClass(index)}>
@@ -301,24 +222,29 @@ const VoucherTable = ({
                           {voucher.voucherName}
                         </div>
                         <div className="flex items-center justify-end gap-x-2">
-                          <button
-                            data-theme={"skies"}
-                            className="btn-icon-success"
-                          >
-                            <NoteSvg className="w-4 fill-current" />
-                          </button>
-                          <button
-                            data-theme={"skies"}
-                            className="btn-icon-primary"
-                          >
-                            <EditSvg className="w-5 stroke-current" />
-                          </button>
-                          <button
-                            data-theme={"skies"}
-                            className="btn-icon-error"
-                          >
-                            <TrashSvg className="w-5 stroke-current" />
-                          </button>
+                          <div className="dropdown dropdown-end">
+                            <div
+                              tabIndex={0}
+                              role="button"
+                              className="btn btn-ghost btn-sm"
+                            >
+                              <OptionDotSvg className="w-4 fill-neutral" />
+                            </div>
+                            <ul
+                              tabIndex={0}
+                              className="no-scrollbar dropdown-content z-[1] flex w-[200px] flex-col gap-y-2 overflow-y-scroll rounded-box border bg-base-100 p-2 text-sm text-white shadow [&>li:hover]:bg-white/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
+                            >
+                              <li>
+                                <span>Conditions</span>
+                              </li>
+                              <li onClick={() => updateMisc(voucher)}>
+                                <span>Edit Voucher</span>
+                              </li>
+                              <li>
+                                <span>Delete Voucher</span>
+                              </li>
+                            </ul>
+                          </div>
                         </div>
                       </div>
 
@@ -338,7 +264,7 @@ const VoucherTable = ({
                         <div className="flex w-full flex-col items-center gap-y-2 min-[460px]:max-w-[200px]">
                           <span className="font-semibold">Validity Period</span>
                           <div className="w-full min-w-[150px] rounded-md border-2 border-black px-2 py-1 text-center sm:min-w-[200px]">
-                            {voucher.validUntil.split("T")[0]}
+                            {voucher.validUntil}
                           </div>
                         </div>
                         <div className="flex w-full flex-col items-center gap-y-2 min-[460px]:max-w-[200px]">
