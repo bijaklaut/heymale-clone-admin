@@ -240,3 +240,8 @@ export const changeFilter = (
 
   setFilters(copyFilter);
 };
+
+export const productImageUrl = (imageName: string) => {
+  const IMG_API = process.env.NEXT_PUBLIC_IMG;
+  return imageName ? `${IMG_API}/product/${imageName}` : "icon/image.svg";
+};
