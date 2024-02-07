@@ -278,6 +278,16 @@ export const updateVoucher = async (data: FormData, token: string) => {
     token,
   });
 };
+
+export const deleteVoucher = async (id: string, token: string) => {
+  const url = `${ROOT_API}/${API_VER}/voucher/${id}?_method=DELETE`;
+
+  return callApi({
+    url,
+    method: "POST",
+    token,
+  });
+};
 // End of Voucher
 
 // Auth
