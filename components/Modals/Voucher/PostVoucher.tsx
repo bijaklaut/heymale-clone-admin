@@ -469,7 +469,7 @@ const PostVoucherModal = ({
                 <option value={"Inactive"}>Inactive</option>
               </select>
               <div className="label">
-                {/* {validation.map(
+                {validation.map(
                   (val) =>
                     val.field == "status" && (
                       <span
@@ -479,7 +479,7 @@ const PostVoucherModal = ({
                         {val.message}
                       </span>
                     ),
-                )} */}
+                )}
               </div>
             </label>
             <label className="form-control w-full max-w-xs">
@@ -499,6 +499,19 @@ const PostVoucherModal = ({
                 }
                 value={data.validUntil}
               />
+              <div className="label">
+                {validation.map(
+                  (val) =>
+                    val.field == "validUntil" && (
+                      <span
+                        key={val.field}
+                        className="label-text-alt text-error"
+                      >
+                        {val.message}
+                      </span>
+                    ),
+                )}
+              </div>
             </label>
           </div>
           <div className="divider"></div>
@@ -528,7 +541,14 @@ const PostVoucherModal = ({
               <option value={"Particular Category"}>Particular Category</option>
             </select>
             <div className="label">
-              <span className="label-text-alt hidden">Alt label</span>
+              {validation.map(
+                (val) =>
+                  val.field == "conditions" && (
+                    <span key={val.field} className="label-text-alt text-error">
+                      {val.message}
+                    </span>
+                  ),
+              )}
             </div>
           </label>
 
@@ -584,7 +604,7 @@ const PostVoucherModal = ({
             {!loading ? (
               <button
                 className="btn btn-primary btn-sm"
-                disabled={disable}
+                // disabled={disable}
                 onClick={submitHandler}
               >
                 {!updateState ? "Create" : "Update"}
