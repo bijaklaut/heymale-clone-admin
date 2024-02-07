@@ -28,19 +28,20 @@ import { ProductExpand } from "../Misc/ProductExpand";
 import cx from "classnames";
 import VoucherCondition from "../Modals/Voucher/VoucherCondition";
 import NumFormatWrapper from "../Wrapper/NumFormatWrapper";
+import DeleteVoucherModal from "../Modals/Voucher/DeleteVoucher";
 
 interface ThisProps {
-  stateChanges(): void;
   paginate: PaginationTypes;
   paginateAction: MouseEventHandler<HTMLButtonElement>;
   updateMisc(voucher: VoucherTypes): void;
+  deleteMisc(voucher: VoucherTypes): void;
 }
 
 const VoucherTable = ({
   paginate,
-  stateChanges,
   paginateAction,
   updateMisc,
+  deleteMisc,
 }: ThisProps) => {
   const { docs: vouchers } = paginate;
   const [active, setActive] = useState(-1);
@@ -106,7 +107,7 @@ const VoucherTable = ({
               {(vouchers as VoucherTypes[]).map((voucher, index) => {
                 return (
                   <Fragment key={index}>
-                    <div className="flex w-full flex-col items-center justify-items-stretch rounded-md bg-white px-3 py-3 text-neutral shadow-md md:gap-y-5 lg:py-5 xl:grid xl:grid-cols-voucher-xl xl:justify-items-center xl:gap-x-2 xl:px-0 xl:py-3 xl:text-sm 3xl:grid-cols-voucher-3xl">
+                    <div className="flex w-full flex-col items-center justify-items-stretch rounded-md bg-white px-3 py-3 text-neutral shadow-md transition-all md:gap-y-5 lg:py-5 xl:grid xl:grid-cols-voucher-xl xl:justify-items-center xl:gap-x-2 xl:px-0 xl:py-3 xl:text-sm 3xl:grid-cols-voucher-3xl">
                       <div className="grid w-full grid-cols-[50px_1fr_50px] items-center gap-x-3 md:grid-cols-[75px_1fr_75px] xl:col-span-2 xl:grid-cols-[50px_minmax(150px,1fr)] xl:gap-x-2 3xl:grid-cols-[75px_minmax(150px,1fr)]">
                         <span className="me-1 justify-self-start text-center font-semibold text-black/60 xl:me-auto xl:w-full xl:text-black">
                           {paginate.pagingCounter + index}
@@ -120,7 +121,7 @@ const VoucherTable = ({
                               <div
                                 tabIndex={0}
                                 role="button"
-                                className="btn btn-ghost btn-sm"
+                                className="rounded-md transition-all hover:bg-black/20 active:bg-black/20"
                               >
                                 <OptionDotSvg className="w-4 fill-neutral" />
                               </div>
@@ -134,7 +135,7 @@ const VoucherTable = ({
                                 <li onClick={() => updateMisc(voucher)}>
                                   <span>Edit Voucher</span>
                                 </li>
-                                <li>
+                                <li onClick={() => deleteMisc(voucher)}>
                                   <span>Delete Voucher</span>
                                 </li>
                               </ul>
@@ -155,7 +156,7 @@ const VoucherTable = ({
                           </div>
                         </Fragment>
                       </div>
-                      <div className="flex w-full flex-wrap items-center justify-center gap-3 max-md:hidden sm:gap-x-6 md:px-10 lg:flex-col lg:gap-x-3 lg:px-0 xl:col-span-5 xl:grid xl:grid-cols-[minmax(150px,300px)_minmax(75px,125px)_150px_75px_100px] xl:gap-x-2 3xl:grid-cols-[minmax(150px,350px)_minmax(75px,150px)_175px_100px_125px]">
+                      <div className="flex w-full flex-wrap items-center justify-center gap-3 max-md:hidden sm:gap-x-6 md:px-10 md:max-lg:items-start lg:flex-col lg:gap-x-3 lg:px-0 xl:col-span-5 xl:grid xl:grid-cols-[minmax(150px,300px)_minmax(75px,125px)_150px_75px_100px] xl:gap-x-2 3xl:grid-cols-[minmax(150px,350px)_minmax(75px,150px)_175px_100px_125px]">
                         <div className="flex w-full flex-col items-center gap-y-2 min-[460px]:max-w-[200px] lg:max-w-[350px]">
                           <span className="xl:hidden">Voucher Code</span>
                           <div className="w-full min-w-[150px] break-words rounded-md border-2 border-black px-2 py-1 text-center sm:min-w-[200px] xl:border-0">
@@ -207,45 +208,39 @@ const VoucherTable = ({
                         >
                           <EditSvg className="w-5 stroke-current" />
                         </button>
-                        <button data-theme={"skies"} className="btn-icon-error">
+                        <button
+                          onClick={() => deleteMisc(voucher)}
+                          data-theme={"skies"}
+                          className="btn-icon-error"
+                        >
                           <TrashSvg className="w-5 stroke-current" />
                         </button>
                       </div>
                     </div>
 
                     <div className={collapseClass(index)}>
-                      <div className="mb-3 sm:items-center sm:gap-x-2 md:mb-5 md:grid md:grid-cols-[75px_1fr_75px]">
-                        <div className="font-semibold text-base-100/60 max-md:hidden">
-                          {paginate.pagingCounter + index}
+                      <div className="dropdown dropdown-end mb-3 flex justify-end md:mb-5">
+                        <div
+                          tabIndex={0}
+                          role="button"
+                          className="rounded-md transition-all hover:bg-black/20 active:bg-black/20"
+                        >
+                          <OptionDotSvg className="w-4 fill-neutral" />
                         </div>
-                        <div className="text-center font-semibold max-md:hidden">
-                          {voucher.voucherName}
-                        </div>
-                        <div className="flex items-center justify-end gap-x-2">
-                          <div className="dropdown dropdown-end">
-                            <div
-                              tabIndex={0}
-                              role="button"
-                              className="btn btn-ghost btn-sm"
-                            >
-                              <OptionDotSvg className="w-4 fill-neutral" />
-                            </div>
-                            <ul
-                              tabIndex={0}
-                              className="no-scrollbar dropdown-content z-[1] flex w-[200px] flex-col gap-y-2 overflow-y-scroll rounded-box border bg-base-100 p-2 text-sm text-white shadow [&>li:hover]:bg-white/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
-                            >
-                              <li>
-                                <span>Conditions</span>
-                              </li>
-                              <li onClick={() => updateMisc(voucher)}>
-                                <span>Edit Voucher</span>
-                              </li>
-                              <li>
-                                <span>Delete Voucher</span>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
+                        <ul
+                          tabIndex={0}
+                          className="no-scrollbar dropdown-content z-[1] flex w-[200px] flex-col gap-y-2 overflow-y-scroll rounded-box border bg-base-100 p-2 text-sm text-white shadow [&>li:hover]:bg-white/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
+                        >
+                          <li>
+                            <span>Conditions</span>
+                          </li>
+                          <li onClick={() => updateMisc(voucher)}>
+                            <span>Edit Voucher</span>
+                          </li>
+                          <li onClick={() => deleteMisc(voucher)}>
+                            <span>Delete Voucher</span>
+                          </li>
+                        </ul>
                       </div>
 
                       <div className="flex flex-wrap justify-center gap-3 sm:gap-x-6 md:px-10 lg:gap-x-3 lg:px-0">
@@ -286,7 +281,6 @@ const VoucherTable = ({
               })}
             </div>
           </div>
-
           <Pagination paginate={paginate} onClick={paginateAction} />
         </Fragment>
       ) : (

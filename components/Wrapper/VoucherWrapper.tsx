@@ -14,6 +14,7 @@ import {
 } from "../../services/helper";
 import VoucherTable from "../Tables/VoucherTable";
 import PostVoucherModal from "../Modals/Voucher/PostVoucher";
+import DeleteVoucherModal from "../Modals/Voucher/DeleteVoucher";
 
 interface ThisProps {
   // categories: CategoryTypes[];
@@ -28,10 +29,12 @@ const VoucherWrapper = (props: ThisProps) => {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(initPagination());
   const [changes, setChanges] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   const [isUpdate, setIsUpdate] = useState(false);
   const [updateVoucher, setUpdateVoucher] = useState<VoucherTypes>();
-  const [loading, setLoading] = useState(true);
-  const stateChanges = () => setChanges((prev) => !prev);
+  const [isDelete, setIsDelete] = useState(false);
+  const [deleteVoucher, setDeleteVoucher] = useState<VoucherTypes>();
 
   const getFilteredVoucher = useCallback(async () => {
     setLoading(true);
@@ -46,6 +49,11 @@ const VoucherWrapper = (props: ThisProps) => {
   const updateMisc = useCallback((voucher: VoucherTypes) => {
     setUpdateVoucher(voucher);
     setIsUpdate(true);
+  }, []);
+
+  const deleteMisc = useCallback((voucher: VoucherTypes) => {
+    setIsDelete(true);
+    setDeleteVoucher(voucher);
   }, []);
 
   // Search filter then reset pagination
@@ -63,24 +71,32 @@ const VoucherWrapper = (props: ThisProps) => {
     getFilteredVoucher();
   }, []);
 
+  const resetDelete = useCallback(() => setIsDelete(false), []);
+
   return (
     <>
       <h2 className="text-3xl font-semibold">Voucher Dashboard</h2>
       <div className="mt-7 flex w-full flex-col gap-3 overflow-hidden py-3">
         <PostVoucherModal
-          stateChanges={stateChanges}
+          stateChanges={() => setChanges((prev) => !prev)}
           voucher={updateVoucher}
           isUpdate={isUpdate}
           reset={() => setIsUpdate(false)}
         />
+        <DeleteVoucherModal
+          stateChanges={() => setChanges((prev) => !prev)}
+          isDelete={isDelete}
+          deleteItem={deleteVoucher}
+          reset={resetDelete}
+        />
         {!loading ? (
           <VoucherTable
-            stateChanges={stateChanges}
             paginate={pagination}
             paginateAction={(e) =>
               setPage(Number(e.currentTarget.dataset.page))
             }
             updateMisc={updateMisc}
+            deleteMisc={deleteMisc}
           />
         ) : (
           <ComplexTableLoading />
