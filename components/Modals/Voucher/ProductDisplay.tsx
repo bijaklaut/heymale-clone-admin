@@ -28,7 +28,7 @@ const ProductDisplay = ({ key, product, deselect }: ThisProps) => {
         <span className="text-sm text-neutral/50">{product.category.name}</span>
       </div>
       <button
-        className="absolute right-1 top-1 rounded-md text-neutral/50 transition-all hover:bg-slate-300/50 hover:text-neutral/70"
+        className="absolute right-1 top-1 rounded-md text-neutral/50 transition-all hover:bg-slate-300/50 hover:text-neutral/70 focus:bg-slate-300/50 focus:text-neutral/70"
         onClick={deselect}
       >
         <CrossSvg className="w-7 fill-current" />

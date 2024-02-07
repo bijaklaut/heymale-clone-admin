@@ -12,7 +12,7 @@ const CategoryDisplay = ({ key, category, deselect }: ThisProps) => {
   return (
     <div
       key={key}
-      className="relative flex items-center gap-x-3 rounded-md bg-white px-3 py-2 shadow-lg"
+      className="relative flex w-full items-center justify-center gap-x-3 rounded-md bg-white px-3 py-2 shadow-lg"
     >
       <span className="text-sm text-neutral">{category.name}</span>
       <button

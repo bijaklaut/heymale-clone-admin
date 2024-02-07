@@ -73,9 +73,12 @@ const EntitySelect = ({
     <Fragment>
       {/* Dropdown Select & Search */}
       <div className="dropdown dropdown-top form-control mx-auto w-full">
-        <label data-theme={"skies"} className="w-full transition-all">
-          <div className="label">
-            <span className="label-text -ms-1 text-base text-white">
+        <label
+          data-theme={"skies"}
+          className="mx-auto w-full max-w-[500px] transition-all"
+        >
+          <div className="label sm:text-center">
+            <span className="label-text -ms-1 w-full text-base text-white">
               {textSearchLabel}
             </span>
           </div>
@@ -134,9 +137,9 @@ const EntitySelect = ({
       </div>
       {interfaceCheck(entities)
         ? data.validProducts.length > 0 && (
-            <div className="flex flex-col">
+            <div className="mt-5 flex flex-col">
               <span className="mb-3">{`Selected Product (${data.validProducts.length})`}</span>
-              <div className="grid grid-cols-2 items-center gap-2">
+              <div className="mx-auto grid max-h-[500px] grid-cols-2 items-center gap-2 overflow-y-auto rounded-md px-2 max-sm:max-w-[400px] max-sm:grid-cols-1">
                 {(entities as ProductTypes[])
                   .filter((product) => data.validProducts.includes(product._id))
                   .map((product, i) => {
@@ -152,9 +155,9 @@ const EntitySelect = ({
             </div>
           )
         : data.validCategories.length > 0 && (
-            <div className="flex flex-col">
-              <span className="mb-3">{`Selected Product (${data.validCategories.length})`}</span>
-              <div className="grid grid-cols-2 items-center gap-2">
+            <div className="mt-5 flex flex-col">
+              <span className="mb-3">{`Selected Category (${data.validCategories.length})`}</span>
+              <div className="mx-auto grid max-h-[500px] w-full grid-cols-2 items-center gap-2 overflow-y-auto rounded-md px-2 max-sm:max-w-[400px] max-[450px]:grid-cols-1 sm:grid-cols-3">
                 {(entities as CategoryTypes[])
                   .filter((category) =>
                     data.validCategories.includes(category._id),

@@ -343,11 +343,6 @@ const PostVoucherModal = ({
     }
   }, [updateState]);
 
-  const textShift = useCallback(
-    (text: string[]) => (voucher ? text[0] : text[1]),
-    [voucher],
-  );
-
   useEffect(() => {
     if (data.conditions == "Particular Product") {
       setFilteredProducts(getFilterProducts());
@@ -420,11 +415,11 @@ const PostVoucherModal = ({
           containerId={"CreateUser"}
           theme="dark"
         />
-        <div className="no-scrollbar modal-box absolute max-w-xl text-white">
+        <div className="no-scrollbar modal-box absolute max-w-[800px] text-white">
           <h3 className="modal-title mb-5">
             {!updateState ? "New Voucher" : "Update Voucher"}
           </h3>
-          <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
+          <div className="mx-auto grid grid-cols-1 gap-x-3 max-sm:max-w-[350px] sm:grid-cols-2">
             <TextInput
               dataState={{ data, setData }}
               label={["Voucher Name", "voucherName", "Enter voucher name"]}
@@ -446,7 +441,7 @@ const PostVoucherModal = ({
               label={["Quota", "voucherQuota", "Enter voucher quota"]}
               validations={validation}
             />
-            <label className="form-control w-full max-w-xs">
+            <label className="form-control w-full">
               <div className="label">
                 <span className="label-text -ms-1 text-base text-white">
                   Status
@@ -482,7 +477,7 @@ const PostVoucherModal = ({
                 )}
               </div>
             </label>
-            <label className="form-control w-full max-w-xs">
+            <label className="form-control w-full">
               <div className="label">
                 <span className="label-text -ms-1 text-base text-white">
                   Validity Period
@@ -604,7 +599,7 @@ const PostVoucherModal = ({
             {!loading ? (
               <button
                 className="btn btn-primary btn-sm"
-                // disabled={disable}
+                disabled={disable}
                 onClick={submitHandler}
               >
                 {!updateState ? "Create" : "Update"}
