@@ -15,6 +15,7 @@ import {
 import VoucherTable from "../Tables/VoucherTable";
 import PostVoucherModal from "../Modals/Voucher/PostVoucher";
 import DeleteVoucherModal from "../Modals/Voucher/DeleteVoucher";
+import VoucherConditionModal from "../Modals/Voucher/VoucherCondition";
 
 interface ThisProps {
   // categories: CategoryTypes[];
@@ -34,6 +35,7 @@ const VoucherWrapper = (props: ThisProps) => {
   const [isUpdate, setIsUpdate] = useState(false);
   const [updateVoucher, setUpdateVoucher] = useState<VoucherTypes>();
   const [isDelete, setIsDelete] = useState(false);
+  const [condShow, setCondShow] = useState(false);
   const [deleteVoucher, setDeleteVoucher] = useState<VoucherTypes>();
 
   const getFilteredVoucher = useCallback(async () => {
@@ -53,6 +55,11 @@ const VoucherWrapper = (props: ThisProps) => {
 
   const deleteMisc = useCallback((voucher: VoucherTypes) => {
     setIsDelete(true);
+    setDeleteVoucher(voucher);
+  }, []);
+
+  const conditionsMisc = useCallback((voucher: VoucherTypes) => {
+    setCondShow(true);
     setDeleteVoucher(voucher);
   }, []);
 
@@ -87,7 +94,12 @@ const VoucherWrapper = (props: ThisProps) => {
           stateChanges={() => setChanges((prev) => !prev)}
           isDelete={isDelete}
           deleteItem={deleteVoucher}
-          reset={resetDelete}
+          reset={() => setIsDelete(false)}
+        />
+        <VoucherConditionModal
+          condItem={deleteVoucher}
+          isShow={condShow}
+          reset={() => setCondShow(false)}
         />
         {!loading ? (
           <VoucherTable
@@ -97,6 +109,7 @@ const VoucherWrapper = (props: ThisProps) => {
             }
             updateMisc={updateMisc}
             deleteMisc={deleteMisc}
+            conditionsMisc={conditionsMisc}
           />
         ) : (
           <ComplexTableLoading />

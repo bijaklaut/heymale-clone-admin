@@ -35,6 +35,7 @@ interface ThisProps {
   paginateAction: MouseEventHandler<HTMLButtonElement>;
   updateMisc(voucher: VoucherTypes): void;
   deleteMisc(voucher: VoucherTypes): void;
+  conditionsMisc(voucher: VoucherTypes): void;
 }
 
 const VoucherTable = ({
@@ -42,6 +43,7 @@ const VoucherTable = ({
   paginateAction,
   updateMisc,
   deleteMisc,
+  conditionsMisc,
 }: ThisProps) => {
   const { docs: vouchers } = paginate;
   const [active, setActive] = useState(-1);
@@ -91,7 +93,7 @@ const VoucherTable = ({
     <div className="max-w-[1920px]">
       {vouchers.length ? (
         <Fragment>
-          <div className="rounded-md bg-transparent xl:bg-slate-50/90 xl:px-3 xl:py-5">
+          <div className="rounded-md bg-transparent xl:bg-neutral-100 xl:px-3 xl:py-5">
             <div className="mb-4 hidden grid-cols-voucher-xl justify-items-center gap-x-2 font-semibold text-black/60 xl:grid 3xl:grid-cols-voucher-3xl">
               <div className="">#</div>
               <div className="">Voucher</div>
@@ -129,7 +131,7 @@ const VoucherTable = ({
                                 tabIndex={0}
                                 className="no-scrollbar dropdown-content z-[1] flex w-[200px] flex-col gap-y-2 overflow-y-scroll rounded-box border bg-base-100 p-2 text-sm text-white shadow [&>li:hover]:bg-white/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
                               >
-                                <li>
+                                <li onClick={() => conditionsMisc(voucher)}>
                                   <span>Conditions</span>
                                 </li>
                                 <li onClick={() => updateMisc(voucher)}>
@@ -198,6 +200,7 @@ const VoucherTable = ({
                         <button
                           data-theme={"skies"}
                           className="btn-icon-success"
+                          onClick={() => conditionsMisc(voucher)}
                         >
                           <NoteSvg className="w-4 fill-current" />
                         </button>
@@ -231,7 +234,7 @@ const VoucherTable = ({
                           tabIndex={0}
                           className="no-scrollbar dropdown-content z-[1] flex w-[200px] flex-col gap-y-2 overflow-y-scroll rounded-box border bg-base-100 p-2 text-sm text-white shadow [&>li:hover]:bg-white/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
                         >
-                          <li>
+                          <li onClick={() => conditionsMisc(voucher)}>
                             <span>Conditions</span>
                           </li>
                           <li onClick={() => updateMisc(voucher)}>
