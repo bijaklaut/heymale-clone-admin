@@ -1,8 +1,7 @@
 "use client";
 
-import { ChangeEvent, Fragment, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
-  createUser,
   createVoucher,
   getCategories,
   getProducts,
@@ -12,25 +11,19 @@ import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import {
   CategoryTypes,
-  PostUserTypes,
   PostVoucherTypes,
   ProductTypes,
   ValidationTypes,
   VoucherTypes,
 } from "../../../services/types";
 import Cookies from "js-cookie";
-import {
-  buttonCheck,
-  populateValidation,
-  productImageUrl,
-} from "../../../services/helper";
+import { populateValidation } from "../../../services/helper";
 import TextInput from "../../Form/TextInput";
 import NumericInput from "../../Form/NumericInput";
-import Image from "next/image";
-import { CircleCheckSvg, CrossSvg } from "../../Misc/SvgGroup";
-import ProductOption from "./ProductOption";
-import ProductDisplay from "./ProductDisplay";
 import EntitySelect from "./EntitySelect";
+import StatusSelect from "./StatusSelect";
+import ValidityPeriod from "./ValidityPeriod";
+import ConditionsSelect from "./ConditionsSelect";
 
 const initData = (voucher?: VoucherTypes) => {
   if (voucher) {
@@ -76,17 +69,14 @@ interface ThisProps {
   reset(): void;
 }
 
-const PostVoucherModal = ({
-  stateChanges,
-  voucher,
-  isUpdate,
-  reset,
-}: ThisProps) => {
+const PostVoucherModal = (props: ThisProps) => {
+  const { stateChanges, voucher, isUpdate, reset } = props;
   const router = useRouter();
   const [disable, setDisable] = useState(true);
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
   const [data, setData] = useState<PostVoucherTypes>(initData());
   const [loading, setLoading] = useState(false);
+  const [proSearch, setProSearch] = useState("");
   const [updateState, setUpdateState] = useState(false);
 
   const [products, setProducts] = useState<ProductTypes[]>([]);
@@ -97,24 +87,24 @@ const PostVoucherModal = ({
     [],
   );
 
-  const [proSearch, setProSearch] = useState("");
-
   const modalHandler = useCallback(
-    (id: string, show: boolean, update?: boolean) => {
+    (id: string, show: boolean, updateItem?: VoucherTypes) => {
       const modal = document.getElementById(id) as HTMLDialogElement;
       setDisable(true);
       setValidation([]);
 
-      if (update) {
-        setData(initData(voucher));
+      if (updateItem && show) {
+        setData(initData(updateItem));
         setUpdateState(true);
-      } else {
-        setData(initData());
-        setUpdateState(false);
-      }
-      if (show) {
         return modal.showModal();
       }
+
+      if (show) {
+        setData(initData());
+        setUpdateState(false);
+        return modal.showModal();
+      }
+
       return modal.close();
     },
     [voucher],
@@ -132,17 +122,21 @@ const PostVoucherModal = ({
     setFilteredCategories(payload.docs);
   }, []);
 
-  const getFilterProducts = useCallback(() => {
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(proSearch.toLowerCase()),
-    );
-  }, [products, proSearch]);
+  const getFilterProducts = useCallback(
+    () =>
+      products.filter((product) =>
+        product.name.toLowerCase().includes(proSearch.toLowerCase()),
+      ),
+    [products, proSearch],
+  );
 
-  const getFilterCategories = useCallback(() => {
-    return categories.filter((category) =>
-      category.name.toLowerCase().includes(proSearch.toLowerCase()),
-    );
-  }, [categories, proSearch]);
+  const getFilterCategories = useCallback(
+    () =>
+      categories.filter((category) =>
+        category.name.toLowerCase().includes(proSearch.toLowerCase()),
+      ),
+    [categories, proSearch],
+  );
 
   const selectHandler = useCallback(
     (element: HTMLInputElement, fieldLabel: string) => {
@@ -301,18 +295,21 @@ const PostVoucherModal = ({
         form.append(key, value);
       }
     }
+
     return form;
   }, [data]);
 
   const submitHandler = useCallback(async () => {
     try {
       const form = formAppend();
+
       const token = Cookies.get("token");
       setLoading(true);
       setValidation([]);
 
       if (!updateState) {
         const result = await createVoucher(form, token!);
+
         setTimeout(() => {
           setLoading(false);
           toast.success(result.message, { containerId: "Main" });
@@ -341,7 +338,7 @@ const PostVoucherModal = ({
         toast.error(error.message, { containerId: "CreateUser" });
       }, 700);
     }
-  }, [updateState]);
+  }, [data, updateState]);
 
   useEffect(() => {
     if (data.conditions == "Particular Product") {
@@ -349,7 +346,7 @@ const PostVoucherModal = ({
     } else {
       setFilteredCategories(getFilterCategories());
     }
-  }, [proSearch]);
+  }, [proSearch, data.conditions]);
 
   useEffect(() => {
     if (data.conditions == "Particular Product") {
@@ -395,9 +392,9 @@ const PostVoucherModal = ({
   }, [data]);
 
   useEffect(() => {
-    if (isUpdate == true) {
-      modalHandler("create_voucher", true, true);
+    if (isUpdate) {
       reset();
+      modalHandler("create_voucher", true, voucher);
     }
   }, [isUpdate]);
 
@@ -441,111 +438,46 @@ const PostVoucherModal = ({
               label={["Quota", "voucherQuota", "Enter voucher quota"]}
               validations={validation}
             />
-            <label className="form-control w-full">
-              <div className="label">
-                <span className="label-text -ms-1 text-base text-white">
-                  Status
-                </span>
-              </div>
-              <select
-                className="select select-bordered"
-                onChange={(e) =>
-                  setData((prev) => ({
-                    ...prev,
-                    status: e.target.value,
-                  }))
-                }
-                value={data.status}
-              >
-                <option disabled value={""}>
-                  Select status
-                </option>
-                <option value={"Active"}>Active</option>
-                <option value={"Inactive"}>Inactive</option>
-              </select>
-              <div className="label">
-                {validation.map(
-                  (val) =>
-                    val.field == "status" && (
-                      <span
-                        key={val.field}
-                        className="label-text-alt text-error"
-                      >
-                        {val.message}
-                      </span>
-                    ),
-                )}
-              </div>
-            </label>
-            <label className="form-control w-full">
-              <div className="label">
-                <span className="label-text -ms-1 text-base text-white">
-                  Validity Period
-                </span>
-              </div>
-              <input
-                type="date"
-                className="input input-bordered input-sm box-content rounded-md bg-transparent px-2 py-1 uppercase transition-all focus:outline-none focus:ring-0"
-                onChange={(e) =>
-                  setData((prev) => ({
-                    ...prev,
-                    validUntil: e.target.value,
-                  }))
-                }
-                value={data.validUntil}
-              />
-              <div className="label">
-                {validation.map(
-                  (val) =>
-                    val.field == "validUntil" && (
-                      <span
-                        key={val.field}
-                        className="label-text-alt text-error"
-                      >
-                        {val.message}
-                      </span>
-                    ),
-                )}
-              </div>
-            </label>
-          </div>
-          <div className="divider"></div>
-          {/* Voucher Conditions */}
-          <label className="form-control mx-auto w-full max-w-xs">
-            <div className="label">
-              <span className="label-text -ms-1 w-full text-center text-base text-white">
-                Voucher Conditions
-              </span>
-            </div>
-            <select
-              className="select select-bordered"
+            <StatusSelect
+              label={["Status", "status", "Select voucher status"]}
+              value={data.status}
               onChange={(e) =>
                 setData((prev) => ({
                   ...prev,
-                  conditions: e.target.value,
+                  status: e.target.value,
                 }))
               }
-              value={data.conditions}
-            >
-              <option disabled value={""}>
-                Select conditions
-              </option>
-              <option value={"None"}>None</option>
-              <option value={"Minimal Transaction"}>Minimal Transaction</option>
-              <option value={"Particular Product"}>Particular Product</option>
-              <option value={"Particular Category"}>Particular Category</option>
-            </select>
-            <div className="label">
-              {validation.map(
-                (val) =>
-                  val.field == "conditions" && (
-                    <span key={val.field} className="label-text-alt text-error">
-                      {val.message}
-                    </span>
-                  ),
-              )}
-            </div>
-          </label>
+              validations={validation}
+            />
+            <ValidityPeriod
+              label={["Validity Period", "validUntil"]}
+              value={data.validUntil}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  validUntil: e.target.value,
+                }))
+              }
+              validations={validation}
+            />
+          </div>
+          <div className="divider"></div>
+          {/* Voucher Conditions */}
+          <ConditionsSelect
+            label={[
+              "Voucher Conditions",
+              "conditions",
+              "Select voucher conditions",
+            ]}
+            value={data.conditions}
+            onChange={(e) =>
+              setData((prev) => ({
+                ...prev,
+                conditions: e.target.value,
+              }))
+            }
+            validations={validation}
+          />
 
           {data.conditions == "Minimal Transaction" && (
             <div className="mx-auto w-full max-w-xs">
@@ -561,6 +493,7 @@ const PostVoucherModal = ({
               />
             </div>
           )}
+
           {data.conditions == "Particular Product" && (
             <EntitySelect
               data={data}
