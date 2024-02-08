@@ -5,17 +5,13 @@ import { MouseEventHandler } from "react";
 import { CrossSvg } from "../../Misc/SvgGroup";
 
 interface ThisProps {
-  key: number | string;
   product: ProductTypes;
   deselect: MouseEventHandler<HTMLButtonElement>;
 }
 
-const ProductDisplay = ({ key, product, deselect }: ThisProps) => {
+const ProductDisplay = ({ product, deselect }: ThisProps) => {
   return (
-    <div
-      key={key}
-      className="relative flex items-center gap-x-3 rounded-md bg-white px-3 py-2 shadow-lg"
-    >
+    <div className="relative flex items-center gap-x-3 rounded-md bg-white px-3 py-2 shadow-lg">
       <Image
         src={productImageUrl(product.thumbnail)}
         height={500}

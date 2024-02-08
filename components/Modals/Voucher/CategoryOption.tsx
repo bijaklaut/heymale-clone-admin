@@ -3,14 +3,13 @@ import { CategoryTypes } from "../../../services/types";
 import { CircleCheckSvg } from "../../Misc/SvgGroup";
 
 interface ThisProps extends InputHTMLAttributes<HTMLInputElement> {
-  key: number | string;
   category: CategoryTypes;
   selectHandler: ChangeEventHandler<HTMLInputElement>;
 }
 
-const CategoryOption = ({ key, category, selectHandler }: ThisProps) => {
+const CategoryOption = ({ category, selectHandler }: ThisProps) => {
   return (
-    <li key={key} id={category._id}>
+    <li id={category._id}>
       <label className="label w-full cursor-pointer rounded-md p-2 transition-all">
         <input
           type="checkbox"

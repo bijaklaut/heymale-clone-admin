@@ -5,14 +5,13 @@ import { productImageUrl } from "../../../services/helper";
 import { CircleCheckSvg } from "../../Misc/SvgGroup";
 
 interface ThisProps extends InputHTMLAttributes<HTMLInputElement> {
-  key: number | string;
   product: ProductTypes;
   selectHandler: ChangeEventHandler<HTMLInputElement>;
 }
 
-const ProductOption = ({ key, product, selectHandler }: ThisProps) => {
+const ProductOption = ({ product, selectHandler }: ThisProps) => {
   return (
-    <li key={key} id={product._id}>
+    <li id={product._id}>
       <label className="label w-full cursor-pointer rounded-md p-2 transition-all">
         <input
           type="checkbox"
