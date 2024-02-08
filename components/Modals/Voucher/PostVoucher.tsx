@@ -93,9 +93,12 @@ const PostVoucherModal = (props: ThisProps) => {
       setDisable(true);
       setValidation([]);
 
-      if (updateItem && show) {
+      if (updateItem) {
         setData(initData(updateItem));
         setUpdateState(true);
+      }
+
+      if (updateItem && show) {
         return modal.showModal();
       }
 
@@ -168,13 +171,13 @@ const PostVoucherModal = (props: ThisProps) => {
   );
 
   const deselectHandler = useCallback(
-    (productId: string, fieldLabel: string) => {
+    (entityId: string, fieldLabel: string) => {
       const newArray: Array<string> = JSON.parse(
         JSON.stringify((data as any)[fieldLabel]),
       );
-      const label = document.getElementById(productId)?.children[0];
+      const label = document.getElementById(entityId)?.children[0];
       const input = label?.children[0] as HTMLInputElement;
-      const arrayIndex = newArray.indexOf(productId);
+      const arrayIndex = newArray.indexOf(entityId);
 
       input.checked = false;
       label?.classList.remove("bg-primary/80");

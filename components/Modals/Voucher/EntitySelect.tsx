@@ -1,13 +1,10 @@
-import Image from "next/image";
-import { CrossSvg } from "../../Misc/SvgGroup";
-import { productImageUrl } from "../../../services/helper";
 import {
-  ChangeEvent,
   ChangeEventHandler,
   Fragment,
   InputHTMLAttributes,
   MouseEventHandler,
   useCallback,
+  useEffect,
 } from "react";
 import {
   CategoryTypes,
@@ -50,8 +47,10 @@ const EntitySelect = ({
   searchHandler,
   validations,
 }: ThisProps) => {
-  const [textSearchLabel, placeholderSearch] = searchLabel;
-  // const validation = validations.filter((val) => val.field == fieldLabel);
+  const [textSearchLabel, fieldLabel, placeholderSearch] = searchLabel;
+  const validation = validations.filter((val) =>
+    val.field.includes(fieldLabel),
+  )[0];
 
   const deselectAllCond = useCallback(() => {
     if (interfaceCheck(entities)) {
@@ -68,6 +67,55 @@ const EntitySelect = ({
 
     return data.validCategories.length == entities.length;
   }, [data, entities]);
+
+  const checkedSelect = useCallback(() => {
+    entities.map((entity) => {
+      const label = document.getElementById(entity._id)?.children[0];
+      const input = label?.children[0] as HTMLInputElement;
+
+      input.checked = false;
+      label?.classList.remove("bg-primary/80");
+    });
+
+    if (data.conditions == "Particular Product") {
+      (entities as ProductTypes[]).map((entity) => {
+        const label = document.getElementById(entity._id)?.children[0];
+        const input = label?.children[0] as HTMLInputElement;
+
+        if (data.validProducts.includes(entity._id)) {
+          input.checked = true;
+          label?.classList.add("bg-primary/80");
+        } else {
+          input.checked = false;
+          label?.classList.remove("bg-primary/80");
+        }
+      });
+    }
+
+    if (data.conditions == "Particular Category") {
+      (entities as CategoryTypes[]).map((entity) => {
+        const label = document.getElementById(entity._id)?.children[0];
+        const input = label?.children[0] as HTMLInputElement;
+
+        if (data.validProducts.includes(entity._id)) {
+          input.checked = true;
+          label?.classList.add("bg-primary/80");
+        } else {
+          input.checked = false;
+          label?.classList.remove("bg-primary/80");
+        }
+      });
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (
+      data.conditions == "Particular Product" ||
+      data.conditions == "Particular Category"
+    ) {
+      checkedSelect();
+    }
+  }, [data]);
 
   return (
     <Fragment>
@@ -90,8 +138,12 @@ const EntitySelect = ({
               "input input-bordered input-sm w-full rounded-md py-5 text-lg transition-all"
             }
             onChange={searchHandler}
-            onClick={() => console.log(interfaceCheck(filteredEntity))}
           />
+          <div className="label">
+            <span className="label-text-alt text-error">
+              {validation ? validation.message : ""}
+            </span>
+          </div>
         </label>
         <ul
           tabIndex={0}
