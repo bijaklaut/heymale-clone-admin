@@ -96,15 +96,14 @@ export interface PostAddressTypes {
   addressLabel: string;
   recipientName: string;
   address: string;
-  province: {
-    id: string;
-    name: string;
+  addressNote: string;
+  addressArea: {
+    areaId: string;
+    province: string;
+    city: string;
+    district: string;
+    postalCode: string;
   };
-  city: {
-    id: string;
-    name: string;
-  };
-  postcode: string;
   phone: string;
   asDefault: boolean;
   user: string;
@@ -174,4 +173,18 @@ export interface ChangePassTypes {
   oldPassword: string;
   newPassword: string;
   confirm: string;
+}
+
+export interface AreaDataTypes {
+  administrative_division_level_1_name: string;
+  administrative_division_level_1_type: string;
+  administrative_division_level_2_name: string;
+  administrative_division_level_2_type: string;
+  administrative_division_level_3_name: string;
+  administrative_division_level_3_type: string;
+  country_code: string;
+  country_name: string;
+  id: string;
+  name: string;
+  postal_code: string;
 }
