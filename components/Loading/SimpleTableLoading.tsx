@@ -1,6 +1,6 @@
 const SimpleTableLoading = () => {
   return (
-    <div className="max-w-3xl">
+    <div className="w-full">
       <table data-theme={"nord"} className="table w-full rounded-md">
         <thead className="[&>tr>td:last-of-type]:max-sm:hidden [&>tr>td]:pt-8">
           <tr>
