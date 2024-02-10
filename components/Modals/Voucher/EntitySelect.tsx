@@ -47,10 +47,14 @@ const EntitySelect = ({
   searchHandler,
   validations,
 }: ThisProps) => {
-  const [textSearchLabel, fieldLabel, placeholderSearch] = searchLabel;
-  const validation = validations.filter((val) =>
-    val.field.includes(fieldLabel),
-  )[0];
+  const [textSearchLabel, placeholderSearch] = searchLabel;
+  const validation = validations.filter((val) => {
+    if (interfaceCheck(entities)) {
+      return val.field.includes("validProducts");
+    }
+
+    return val.field.includes("validCategories");
+  })[0];
 
   const deselectAllCond = useCallback(() => {
     if (interfaceCheck(entities)) {

@@ -6,18 +6,18 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import {
   AddressTypes,
+  AreaDataTypes,
   PostAddressTypes,
   ValidationTypes,
 } from "../../../services/types";
 import Cookies from "js-cookie";
 import cx from "classnames";
 import TextInput from "../../Form/TextInput";
-import { getCity, getProvince } from "../../../services/actions";
+import { getArea } from "../../../services/actions";
 import TextAreaInput from "../../Form/TextAreaInput";
-import SelectProvince from "./SelectProvince";
-import SelectCity from "./SelectCity";
 import Checkbox from "./CheckboxDefault";
 import { populateValidation } from "../../../services/helper";
+import AreaSelect from "./AreaSelect";
 
 interface thisProps {
   id: string;
@@ -29,19 +29,21 @@ interface thisProps {
   stateChanges(): void;
 }
 
-const initData = (id: string, address?: AddressTypes) => {
+const initData = (userId: string, address?: AddressTypes) => {
   return {
     addressLabel: address?.addressLabel || "",
     recipientName: address?.recipientName || "",
     address: address?.address || "",
-    province: {
-      id: address?.province.id || "",
-      name: address?.province.name || "",
+    addressNote: address?.addressNote || "",
+    addressArea: {
+      areaId: address?.addressArea.areaId || "",
+      province: address?.addressArea.province || "",
+      city: address?.addressArea.city || "",
+      district: address?.addressArea.district || "",
+      postalCode: address?.addressArea.postalCode || "",
     },
-    city: { id: address?.city.id || "", name: address?.city.name || "" },
-    postcode: address?.postcode || "",
     phone: address?.phone || "",
-    user: address?.user || id,
+    user: address?.user || userId,
     asDefault: address?.asDefault || false,
   };
 };
@@ -61,13 +63,14 @@ const PostAddressCollapse = (props: thisProps) => {
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
-
   const [showCollapse, setShowCollapse] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
 
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [areaSearch, setAreaSearch] = useState("");
+  const [areaData, setAreaData] = useState<AreaDataTypes[]>();
+
+  const [isUpdate, setIsUpdate] = useState(false);
   const [isDefault, setIsDefault] = useState<boolean>(false);
-  const [provincesData, setProvincesData] = useState([{}]);
-  const [citiesData, setCitiesData] = useState([{}]);
 
   const classItem = cx({
     "origin-top ease-linear rounded-md w-full px-4 sm:px-10 py-5 overflow-hidden duration-300 transition-all":
@@ -84,9 +87,10 @@ const PostAddressCollapse = (props: thisProps) => {
   const collapseHandler = useCallback(
     (isShow: boolean, userid: string, address?: AddressTypes) => {
       setValidation([]);
+      setAreaSearch("");
+      setDisable(true);
 
       if (isShow && address) {
-        setDisable(true);
         setData(initData(userid, address));
         setIsUpdate(true);
         setIsDefault(address.asDefault);
@@ -95,28 +99,50 @@ const PostAddressCollapse = (props: thisProps) => {
       }
 
       if (isShow) {
-        setDisable(true);
         setData(initData(userid));
         setIsDefault(isFirst);
 
         return setShowCollapse(true);
       }
 
-      reset();
       setIsUpdate(false);
       return setShowCollapse(false);
     },
     [],
   );
 
+  const selectAreaHandler = useCallback(
+    (areaId: string) => {
+      const selectedArea = areaData?.filter((area) => area.id == areaId)[0];
+
+      if (selectedArea)
+        setData((prev) => ({
+          ...prev,
+          addressArea: {
+            areaId: selectedArea?.id,
+            province: selectedArea?.administrative_division_level_1_name,
+            city: selectedArea?.administrative_division_level_2_name,
+            district: selectedArea?.administrative_division_level_3_name,
+            postalCode: selectedArea?.postal_code,
+          },
+        }));
+    },
+    [data, areaData],
+  );
+
+  const getAreaAPI = useCallback(async () => {
+    const result = await getArea(areaSearch);
+    console.log("RESULT: ", result);
+    setAreaData(result.areas);
+    setSearchLoading(false);
+  }, [areaSearch]);
+
   const formAppend = useCallback(() => {
     const form = new FormData();
     for (const [key, value] of Object.entries(data)) {
-      if (key != "province" && key != "city") {
+      if (key != "addressArea") {
         form.append(key, value);
-      }
-
-      if (key == "province" || key == "city") {
+      } else {
         for (const [k, v] of Object.entries(data[key])) {
           form.append(`${key}[${k}]`, v);
         }
@@ -125,82 +151,59 @@ const PostAddressCollapse = (props: thisProps) => {
     return form;
   }, [data]);
 
-  const submitHandler = async (userid: any) => {
-    setLoading(true);
-    setValidation([]);
+  const submitHandler = useCallback(
+    async (userId: string) => {
+      try {
+        const form = formAppend();
+        setLoading(true);
+        setValidation([]);
 
-    const form = formAppend();
+        if (!isUpdate) {
+          const token = Cookies.get("token");
+          const result = await createAddress(form, token!);
 
-    try {
-      const token = Cookies.get("token");
-      const result = await createAddress(form, token!);
+          setTimeout(() => {
+            setLoading(false);
+            toast.success(result.message, { containerId: "Main" });
+            collapseHandler(false, userid);
+            router.refresh();
+            stateChanges();
+          }, 700);
+        } else {
+          const token = Cookies.get("token");
+          const result = await updateAddress(form, address._id, token!);
 
-      setTimeout(() => {
-        setLoading(false);
-        toast.success(result.message, { containerId: "Main" });
-        collapseHandler(false, userid);
-        router.refresh();
-        stateChanges();
-      }, 700);
-    } catch (error: any) {
-      setTimeout(() => {
-        setLoading(false);
-
-        if (error.message == "Validation Error" || error.code == 11000) {
-          return populateValidation(error, setValidation);
+          setTimeout(() => {
+            setLoading(false);
+            toast.success(result.message, { containerId: "Main" });
+            collapseHandler(false, userid);
+            router.refresh();
+            stateChanges();
+          }, 700);
         }
-        toast.error(error.message, { containerId: "AddressList" });
-      }, 700);
-    }
-  };
+      } catch (error: any) {
+        setTimeout(() => {
+          setLoading(false);
 
-  const updateHandler = async (userid: string) => {
-    setLoading(true);
-    setValidation([]);
+          if (error.message == "Validation Error" || error.code == 11000) {
+            return populateValidation(error, setValidation);
+          }
+          toast.error(error.message, { containerId: "AddressList" });
+        }, 700);
+      }
+    },
+    [isUpdate, data],
+  );
 
-    const form = formAppend();
-
-    try {
-      const token = Cookies.get("token");
-      const result = await updateAddress(form, address._id, token!);
-
-      setTimeout(() => {
-        setLoading(false);
-        toast.success(result.message, { containerId: "Main" });
-        collapseHandler(false, userid);
-        router.refresh();
-        stateChanges();
-      }, 700);
-    } catch (error: any) {
-      setTimeout(() => {
-        setLoading(false);
-
-        if (error.message == "Validation Error" || error.code == 11000) {
-          return populateValidation(error, setValidation);
-        }
-        toast.error(error.message, { containerId: "AddressList" });
-      }, 700);
-    }
-  };
-
-  // Get province
+  // Get Area
   useEffect(() => {
-    const getProvinceAPI = async () => {
-      const result = await getProvince();
-      setProvincesData(result.rajaongkir.results);
-    };
-    getProvinceAPI();
-  }, []);
+    setSearchLoading(true);
+    let timer = setTimeout(() => {
+      getAreaAPI();
+    }, 1000);
 
-  // Get city data
-  useEffect(() => {
-    const getCityAPI = async () => {
-      const result = await getCity(data.province.id);
-      setCitiesData(result.rajaongkir.results);
-    };
-
-    if (data.province.id) getCityAPI();
-  }, [data.province]);
+    return () => clearTimeout(timer);
+  }, [areaSearch]);
 
   // Auto close when modal closed
   useEffect(() => {
@@ -222,34 +225,31 @@ const PostAddressCollapse = (props: thisProps) => {
         "addressLabel",
         "recipientName",
         "address",
-        "province",
-        "city",
-        "postcode",
+        "addressArea",
         "phone",
       ];
 
       for (let i = 0; i < reqField.length; i++) {
         const field = reqField[i];
 
-        if (field == "province") {
-          if (!(data as any)[field]["id"]) {
-            setDisable(true);
-            break;
+        if (field == "addressArea") {
+          for (let j = 0; j < Object.entries(data.addressArea).length; j++) {
+            const [key, value] = Object.entries(data.addressArea)[j];
+            if (!value) {
+              console.log(value);
+              return setDisable(true);
+            }
           }
         }
 
-        if (field == "city") {
-          if (!(data as any)[field]["id"]) {
-            setDisable(true);
-            break;
-          }
-        }
-
-        if (!(data as any)[field]) {
+        if (!(data as any)[field] && field != "addressArea") {
           setDisable(true);
           break;
         }
-        setDisable(false);
+
+        if ((data as any)[field] && field != "addressArea") {
+          setDisable(false);
+        }
       }
     };
     buttonCheck();
@@ -283,75 +283,42 @@ const PostAddressCollapse = (props: thisProps) => {
             validations={validation}
           />
 
+          {/* Phone Number */}
+          <TextInput
+            dataState={{ data, setData }}
+            label={["Recipient's Phone", "phone", "e.g. 0859xxxxxxx"]}
+            validations={validation}
+          />
+
           {/* Address */}
           <TextAreaInput
             dataState={{ data, setData }}
             label={["Full Address", "address", "Enter full address"]}
             validations={validation}
           />
-
-          {/* Province & City */}
-          <div className="grid w-full grid-cols-1 items-center justify-between gap-x-5 sm:grid-cols-2">
-            {/* Province */}
-            <SelectProvince
-              data={data}
-              onChange={(e) =>
-                provincesData.map((pro: any) => {
-                  if (pro.province_id == e.target.value) {
-                    return setData({
-                      ...data,
-                      province: {
-                        id: pro.province_id,
-                        name: pro.province,
-                      },
-                      city: {
-                        id: "",
-                        name: "",
-                      },
-                    });
-                  }
-                })
-              }
-              provincesData={provincesData}
-              validations={validation}
-            />
-            {/* City */}
-            <SelectCity
-              data={data}
-              onChange={(e) =>
-                citiesData.map((cit: any) => {
-                  if (cit.city_id == e.target.value) {
-                    return setData((prev) => ({
-                      ...prev,
-                      city: {
-                        id: cit.city_id,
-                        name: cit.city_name,
-                      },
-                    }));
-                  }
-                })
-              }
-              citiesData={citiesData}
-              validations={validation}
-            />
-          </div>
-
-          {/* Postal Code & Phone Number*/}
-          <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
-            {/* Postal Code */}
-            <TextInput
-              dataState={{ data, setData }}
-              label={["Postal Code", "postcode", "e.g. 14045"]}
-              validations={validation}
-            />
-
-            {/* Phone Number */}
-            <TextInput
-              dataState={{ data, setData }}
-              label={["Phone Number", "phone", "e.g. 0859xxxxxxx"]}
-              validations={validation}
-            />
-          </div>
+          <TextInput
+            dataState={{ data, setData }}
+            label={[
+              "Address Note",
+              "addressNote",
+              "e.g. white house across circle k",
+            ]}
+            validations={validation}
+          />
+          <AreaSelect
+            data={data}
+            areaData={areaData}
+            searchLabel={[
+              "Address Area",
+              "addressArea.Province",
+              "Search city, district, or postal code",
+            ]}
+            searchHandler={(e) => setAreaSearch(e.target.value)}
+            selectHandler={selectAreaHandler}
+            searchLoading={searchLoading}
+            validations={validation}
+            value={areaSearch}
+          />
 
           {/* As Default */}
           <Checkbox
@@ -369,10 +336,7 @@ const PostAddressCollapse = (props: thisProps) => {
           <div className="mt-5 flex justify-end">
             {!loading ? (
               <button
-                onClick={() => {
-                  if (isUpdate) return updateHandler(userid);
-                  submitHandler(userid);
-                }}
+                onClick={() => submitHandler(userid)}
                 disabled={disable}
                 className="btn btn-primary btn-sm text-white"
               >

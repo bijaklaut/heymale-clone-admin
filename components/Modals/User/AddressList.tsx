@@ -67,10 +67,6 @@ const AddressListModal = (props: thisProps) => {
     }
   };
 
-  const reset = () => {
-    setShowUpdate(false);
-  };
-
   const updateMisc = (address: AddressTypes) => {
     setShowUpdate(!showUpdate);
     setData(address);
@@ -118,7 +114,7 @@ const AddressListModal = (props: thisProps) => {
               address={data!}
               isFirst={addresses.length == 0}
               showUpdate={showUpdate}
-              reset={reset}
+              reset={() => setShowUpdate(false)}
               stateChanges={stateChanges}
             />
           ) : (
@@ -153,9 +149,10 @@ const AddressListModal = (props: thisProps) => {
                       <p className="text-sm">{`${address.recipientName} - ${address.phone}`}</p>
                     </div>
                     <p className="mt-3 text-sm">{address.address}</p>
+                    <p className="mt-3 text-sm">{`Note: ${address.addressNote}`}</p>
                     <div className="mb-7 flex flex-col">
-                      <p className="mb-0 font-semibold">{address.city.name}</p>
-                      <p className="font-semibold">{`${address.province.name} ${address.postcode}`}</p>
+                      <p className="mb-0 font-semibold">{`${address.addressArea.district}, ${address.addressArea.city}`}</p>
+                      <p className="font-semibold">{`${address.addressArea.province} ${address.addressArea.postalCode}`}</p>
                     </div>
                     {deleteShow == i ? (
                       <div className="card-actions mt-7">
