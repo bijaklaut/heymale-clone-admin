@@ -6,8 +6,8 @@ import { jwtDecode } from "jwt-decode";
 import { UserToken } from "./types";
 import axios from "axios";
 
-const KING_API = process.env.KING;
-const API_KEY = process.env.API_KEY;
+const BITESHIP = process.env.BITESHIP_BASEURL;
+const BTS_APIKEY = process.env.BITESHIP_APIKEY;
 
 export async function authSignout() {
   cookies().delete("token");
@@ -22,32 +22,13 @@ export async function getUserToken() {
   return id;
 }
 
-export const getProvince = async () => {
-  try {
-    const url = `${KING_API}/province`;
-    const response = await axios({
-      url,
-      method: "GET",
-      headers: { key: API_KEY },
-    });
+export const getArea = async (input: string) => {
+  const url = `${BITESHIP}/v1/maps/areas?countries=ID&input=${input}&type=single`;
+  const response = await axios({
+    url,
+    method: "GET",
+    headers: { Authorization: `Bearer ${BTS_APIKEY}` },
+  });
 
-    return response.data;
-  } catch (error: any) {
-    throw error;
-  }
-};
-
-export const getCity = async (prov_id: string) => {
-  try {
-    const url = `${KING_API}/city?province=${prov_id}`;
-    const response = await axios({
-      url,
-      method: "GET",
-      headers: { key: API_KEY },
-    });
-
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  return response.data;
 };
