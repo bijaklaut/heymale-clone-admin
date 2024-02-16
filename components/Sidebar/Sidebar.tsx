@@ -62,13 +62,13 @@ export const Sidebar = () => {
       setIsLoading(false);
     };
 
-    if (token) {
-      const reverse = atob(token);
+    if (!user.name) {
+      const reverse = atob(token!);
       const { id } = jwtDecode<UserToken>(reverse);
       setIsLoading(true);
       getUserAPI(id);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (checked && window.innerWidth < 640) {
