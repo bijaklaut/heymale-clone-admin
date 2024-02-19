@@ -337,8 +337,8 @@ export interface TransactionTypes {
 export interface OrderTypes {
   _id?: string;
   invoice: string;
-  user: string;
-  orderItem: OrderItemTypes[];
+  user: Partial<UserTypes>;
+  order_item: OrderItemTypes[];
   status: string;
   shipping_detail: Partial<ShipmentTypes>;
   transaction: Partial<TransactionTypes>;

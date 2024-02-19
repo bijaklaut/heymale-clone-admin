@@ -245,3 +245,7 @@ export const productImageUrl = (imageName: string) => {
   const IMG_API = process.env.NEXT_PUBLIC_IMG;
   return imageName ? `${IMG_API}/product/${imageName}` : "icon/image.svg";
 };
+
+export const capitalize = (word: string) => {
+  return word[0].toUpperCase() + word.slice(1);
+};
