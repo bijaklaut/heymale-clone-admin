@@ -290,6 +290,17 @@ export const deleteVoucher = async (id: string, token: string) => {
 };
 // End of Voucher
 
+// Order
+export const getOrders = async () => {
+  const url = `${ROOT_API}/${API_VER}/order`;
+
+  return callApi({
+    url,
+    method: "POST",
+  });
+};
+// End of Order
+
 // Auth
 export const signIn = async (data: SignInTypes) => {
   const url = `${ROOT_API}/${API_VER}/user/signin`;

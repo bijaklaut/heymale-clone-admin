@@ -30,7 +30,8 @@ export type DataTypes =
   | AddressTypes
   | PaymentTypes
   | ProductTypes
-  | UserTypes;
+  | UserTypes
+  | OrderTypes;
 
 export type PostDataTypes =
   | PostCategoryTypes
@@ -188,3 +189,173 @@ export interface AreaDataTypes {
   name: string;
   postal_code: string;
 }
+
+export interface OrderItemTypes {
+  _id: string;
+  item_name: string;
+  thumbnail: string;
+  quantity: number;
+  price: number;
+}
+
+export interface ShipmentItemTypes {
+  name: string;
+  description: string;
+  sku: string;
+  value: number;
+  quantity: number;
+  length: number;
+  width: number;
+  height: number;
+  weight: number;
+}
+
+export interface UserOrderTypes {
+  _id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  avatar: string;
+}
+
+export interface PostShipmentTypes {
+  address: {
+    destination_contact_name: string;
+    destination_contact_phone: string;
+    destination_address: string;
+    destination_city: string;
+    destination_postal_code: string;
+    destination_area_id?: string;
+    destination_note: string;
+  };
+  courier_company: string;
+  courier_type: string;
+  price: number;
+}
+
+export interface ShipmentTypes {
+  _id: string;
+  shipper: {
+    name: string;
+    email: string;
+    phone: string;
+    organization: string;
+  };
+  origin: {
+    contact_name: string;
+    contact_phone: string;
+    contact_email: string;
+    address: string;
+    note: string;
+    postal_code: string;
+    coordinate: {
+      latitude: number;
+      longitude: number;
+    };
+  };
+  destination: {
+    contact_name: string;
+    contact_phone: string;
+    contact_email: string;
+    address: string;
+    note: string;
+    postal_code: string;
+    coordinate: {
+      latitude: number;
+      longitude: number;
+    };
+    proof_of_delivery: {
+      use: boolean;
+      fee: number;
+      note: string;
+      link: string;
+    };
+    cash_on_delivery: {
+      id: boolean;
+      amount: boolean;
+      fee: number;
+      note: string;
+      link: string;
+      type: string;
+    };
+  };
+  courier: {
+    tracking_id: string;
+    waybill_id: string;
+    company: string;
+    name: string;
+    phone: string;
+    type: string;
+    link: string;
+    insurance: {
+      amount: number;
+      fee: number;
+      note: string;
+    };
+    routing_code: string;
+  };
+  delivery: {
+    datetime: string;
+    note: string;
+    type: string;
+    distance: number;
+    distance_unit: string;
+  };
+  reference_id: string;
+  items: Partial<ShipmentItemTypes[]>;
+  extra: any;
+  price: number;
+  metadata: any;
+  note: string;
+  status: string;
+  manual_updated: boolean;
+}
+
+export interface TransactionTypes {
+  _id: string;
+  transaction_id: string;
+  order_id: string;
+  merchant_id: string;
+  gross_amount: number;
+  currency: string;
+  payment_type: string;
+  transaction_time: string;
+  transaction_status: string;
+  va_numbers: [
+    {
+      bank: string;
+      va_number: string;
+    },
+  ];
+  fraud_status: string;
+  bill_key: string;
+  bill_code: string;
+  expiry_time: string;
+  manual_updated: boolean;
+}
+
+export interface OrderTypes {
+  _id?: string;
+  invoice: string;
+  user: string;
+  orderItem: OrderItemTypes[];
+  status: string;
+  shipping_detail: Partial<ShipmentTypes>;
+  transaction: Partial<TransactionTypes>;
+  voucher: {
+    voucher_id: string;
+    value: number;
+  };
+  shipping_fee: number;
+  price: number;
+  total_price: number;
+  manual_updated: boolean;
+}
+
+// export interface OrderTypes {
+//   _id?: string;
+//   invoice: string;
+//   user: UserOrderTypes;
+//   shipping_detail: Partial<ShipmentTypes>;
+//   transaction: Partial<TransactionTypes>;
+// }
