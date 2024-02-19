@@ -1,13 +1,13 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { getCategories, getOrders } from "../../services/admin";
+import { getOrders } from "../../services/admin";
 import SearchFilter from "../Misc/SearchFilter";
-import CategoryTable from "../Tables/CategoryTable";
 import SimpleTableLoading from "../Loading/SimpleTableLoading";
-import CreateCategoryModal from "../Modals/Category/CreateCategory";
 import { initPagination } from "../../services/helper";
 import OrderTable from "../Tables/OrderTable";
+import { OrderItemTypes } from "../../services/types";
+import OrderItemModal from "../Modals/Order/OrderItem";
 
 const OrderWrapper = () => {
   const [search, setSearch] = useState("");
@@ -15,6 +15,9 @@ const OrderWrapper = () => {
   const [pagination, setPagination] = useState(initPagination());
   const [changes, setChanges] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const [itemsDetailShow, setItemsDetailShow] = useState(false);
+  const [itemsDetail, setItemsDetail] = useState<OrderItemTypes[]>();
 
   const stateChanges = () => setChanges((prev) => !prev);
   const pageHandler = (pageNumber: number) => setPage(pageNumber);
@@ -36,6 +39,11 @@ const OrderWrapper = () => {
   //   getFilteredOrders(search, pageParams);
   // }, [search, changes]);
 
+  const itemsDetailMisc = useCallback((items: OrderItemTypes[]) => {
+    setItemsDetailShow(true);
+    setItemsDetail(items);
+  }, []);
+
   // Pagination
   useEffect(() => {
     getFilteredOrders(page, search);
@@ -45,6 +53,11 @@ const OrderWrapper = () => {
     <Fragment>
       <h2 className="text-3xl font-semibold">Order Dashboard</h2>
       <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
+        <OrderItemModal
+          isShow={itemsDetailShow}
+          orderItems={itemsDetail}
+          reset={() => setItemsDetailShow(false)}
+        />
         {/* <CreateCategoryModal stateChanges={stateChanges} /> */}
         {/* <SearchFilter
           search={search}
@@ -58,6 +71,7 @@ const OrderWrapper = () => {
             paginateAction={(e) =>
               pageHandler(Number(e.currentTarget.dataset.page))
             }
+            itemsDetailMisc={itemsDetailMisc}
           />
         ) : (
           <SimpleTableLoading />
