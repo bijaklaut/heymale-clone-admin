@@ -4,6 +4,7 @@ import {
   OrderItemTypes,
   OrderTypes,
   PaginationTypes,
+  TransactionTypes,
 } from "../../services/types";
 import NoDisplay from "../Misc/NoDisplay";
 import Pagination from "../Misc/Pagination";
@@ -20,6 +21,7 @@ interface ThisProps {
   paginateAction: MouseEventHandler<HTMLButtonElement>;
   stateChanges(): void;
   itemsDetailMisc(items: OrderItemTypes[]): void;
+  trxDetailMisc(transaction: Partial<TransactionTypes>): void;
 }
 
 const OrderTable = ({
@@ -27,6 +29,7 @@ const OrderTable = ({
   paginateAction,
   stateChanges,
   itemsDetailMisc,
+  trxDetailMisc,
 }: ThisProps) => {
   const { docs: orders } = paginate;
 
@@ -93,7 +96,7 @@ const OrderTable = ({
                           <li>
                             <span>Edit Order</span>
                           </li>
-                          <li>
+                          <li onClick={() => trxDetailMisc(order.transaction)}>
                             <span>Transaction Detail</span>
                           </li>
                           <li>

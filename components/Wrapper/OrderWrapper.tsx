@@ -6,8 +6,9 @@ import SearchFilter from "../Misc/SearchFilter";
 import SimpleTableLoading from "../Loading/SimpleTableLoading";
 import { initPagination } from "../../services/helper";
 import OrderTable from "../Tables/OrderTable";
-import { OrderItemTypes } from "../../services/types";
+import { OrderItemTypes, TransactionTypes } from "../../services/types";
 import OrderItemModal from "../Modals/Order/OrderItem";
+import TransactionDetailModal from "../Modals/Order/TransactionDetail";
 
 const OrderWrapper = () => {
   const [search, setSearch] = useState("");
@@ -18,6 +19,9 @@ const OrderWrapper = () => {
 
   const [itemsDetailShow, setItemsDetailShow] = useState(false);
   const [itemsDetail, setItemsDetail] = useState<OrderItemTypes[]>();
+
+  const [trxDetailShow, setTrxDetailShow] = useState(false);
+  const [trxDetail, setTrxDetail] = useState<Partial<TransactionTypes>>();
 
   const stateChanges = () => setChanges((prev) => !prev);
   const pageHandler = (pageNumber: number) => setPage(pageNumber);
@@ -44,6 +48,14 @@ const OrderWrapper = () => {
     setItemsDetail(items);
   }, []);
 
+  const trxDetailMisc = useCallback(
+    (transaction: Partial<TransactionTypes>) => {
+      setTrxDetail(transaction);
+      setTrxDetailShow(true);
+    },
+    [],
+  );
+
   // Pagination
   useEffect(() => {
     getFilteredOrders(page, search);
@@ -57,6 +69,11 @@ const OrderWrapper = () => {
           isShow={itemsDetailShow}
           orderItems={itemsDetail}
           reset={() => setItemsDetailShow(false)}
+        />
+        <TransactionDetailModal
+          isShow={trxDetailShow}
+          transaction={trxDetail}
+          reset={() => setTrxDetailShow(false)}
         />
         {/* <CreateCategoryModal stateChanges={stateChanges} /> */}
         {/* <SearchFilter
@@ -72,6 +89,7 @@ const OrderWrapper = () => {
               pageHandler(Number(e.currentTarget.dataset.page))
             }
             itemsDetailMisc={itemsDetailMisc}
+            trxDetailMisc={trxDetailMisc}
           />
         ) : (
           <SimpleTableLoading />
