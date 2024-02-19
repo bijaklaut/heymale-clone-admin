@@ -50,9 +50,8 @@ export const Sidebar = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  useEffect(() => {
-    const token = Cookies.get("token");
-    const getUserAPI = async (id: string) => {
+  const getUserAPI = useCallback(
+    async (id: string) => {
       const { payload } = await getUserById(id);
 
       setUser({
@@ -60,13 +59,24 @@ export const Sidebar = () => {
         name: payload.name,
       });
       setIsLoading(false);
-    };
+    },
+    [user],
+  );
 
+  useEffect(() => {
     if (!user.name) {
-      const reverse = atob(token!);
-      const { id } = jwtDecode<UserToken>(reverse);
-      setIsLoading(true);
-      getUserAPI(id);
+      let token = Cookies.get("token");
+
+      while (!token) {
+        token = Cookies.get("token");
+      }
+
+      if (token) {
+        const reverse = atob(token);
+        const { id } = jwtDecode<UserToken>(reverse);
+        setIsLoading(true);
+        getUserAPI(id);
+      }
     }
   }, [user]);
 
@@ -129,9 +139,9 @@ export const Sidebar = () => {
                   <div className="menu text-lg font-semibold text-gray-400 sm:text-sm sm:font-bold">
                     COMMERCIAL
                   </div>
-                  <MenuItem onClick={resetNavbar} href="/transaction">
+                  <MenuItem onClick={resetNavbar} href="/order">
                     <TransactionSvg className="sidebar-svg stroke-current" />
-                    <p className={"sidebar-menu-text"}>Transactions</p>
+                    <p className={"sidebar-menu-text"}>Orders</p>
                   </MenuItem>
                   <MenuItem onClick={resetNavbar} href="/history">
                     <HistorySvg className="sidebar-svg fill-current stroke-current" />
@@ -180,11 +190,7 @@ export const Sidebar = () => {
                   <div className="menu text-lg font-semibold text-gray-400 sm:text-sm sm:font-bold">
                     COM
                   </div>
-                  <MenuItem
-                    centered
-                    datatip={"Transactions"}
-                    href="/transaction"
-                  >
+                  <MenuItem centered datatip={"Orders"} href="/order">
                     <TransactionSvg className="sidebar-svg stroke-current" />
                   </MenuItem>
                   <MenuItem
