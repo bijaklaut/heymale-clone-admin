@@ -247,5 +247,43 @@ export const productImageUrl = (imageName: string) => {
 };
 
 export const capitalize = (word: string) => {
-  return word[0].toUpperCase() + word.slice(1);
+  if (word) return word[0].toUpperCase() + word.slice(1);
+};
+
+export const transformPaymentType = (payment: string) => {
+  if (!payment) return null;
+  if (payment != "echannel") {
+    return payment
+      .toLowerCase()
+      .split("_")
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
+  return "Mandiri E-Channel";
+};
+
+export const transformDate = (dateString: string) => {
+  if (dateString) {
+    const theday = new Date(dateString);
+    const date =
+      theday.getDate() < 10 ? `0${theday.getDate()}` : theday.getDate();
+    const month =
+      theday.getMonth() + 1 < 10
+        ? `0${theday.getMonth() + 1}`
+        : theday.getMonth() + 1;
+    const year = theday.getFullYear();
+    const hours =
+      theday.getHours() < 10 ? `0${theday.getHours()}` : theday.getHours();
+    const minutes =
+      theday.getMinutes() < 10
+        ? `0${theday.getMinutes()}`
+        : theday.getMinutes();
+    const seconds =
+      theday.getSeconds() < 10
+        ? `0${theday.getSeconds()}`
+        : theday.getSeconds();
+
+    return `${year}-${month}-${date} ${hours}:${minutes}:${seconds}`;
+  }
 };

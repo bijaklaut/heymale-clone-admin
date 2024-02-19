@@ -329,7 +329,7 @@ export interface TransactionTypes {
   ];
   fraud_status: string;
   bill_key: string;
-  bill_code: string;
+  biller_code: string;
   expiry_time: string;
   manual_updated: boolean;
 }
