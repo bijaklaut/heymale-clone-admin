@@ -74,7 +74,7 @@ const OrderItemModal = ({ orderItems, isShow, reset }: ThisProps) => {
             <form method="dialog">
               <button
                 className="btn btn-outline btn-sm"
-                onClick={() => simpleModalHandler("voucherCond", false)}
+                onClick={() => simpleModalHandler("itemsDetail", false)}
               >
                 Close
               </button>

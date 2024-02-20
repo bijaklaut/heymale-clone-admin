@@ -104,7 +104,7 @@ const TransactionDetailModal = ({ transaction, isShow, reset }: ThisProps) => {
               <form method="dialog">
                 <button
                   className="btn btn-outline btn-sm"
-                  onClick={() => simpleModalHandler("voucherCond", false)}
+                  onClick={() => simpleModalHandler("transactionDetail", false)}
                 >
                   Close
                 </button>
