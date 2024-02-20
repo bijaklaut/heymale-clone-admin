@@ -287,3 +287,13 @@ export const transformDate = (dateString: string) => {
     return `${year}-${month}-${date} ${hours}:${minutes}:${seconds}`;
   }
 };
+
+export const underscoreTransform = (words: string) => {
+  if (!words) return null;
+
+  return words
+    .toLowerCase()
+    .split("_")
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(" ");
+};

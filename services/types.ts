@@ -235,6 +235,7 @@ export interface PostShipmentTypes {
 
 export interface ShipmentTypes {
   _id: string;
+  shipment_order_id: string;
   shipper: {
     name: string;
     email: string;
