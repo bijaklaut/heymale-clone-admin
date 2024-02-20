@@ -11,7 +11,7 @@ import NumFormatWrapper from "../../Wrapper/NumFormatWrapper";
 
 interface ThisProps {
   transaction?: Partial<TransactionTypes>;
-  isShow: boolean;
+  isShow: string;
   reset(): void;
 }
 
@@ -19,7 +19,7 @@ const TransactionDetailModal = ({ transaction, isShow, reset }: ThisProps) => {
   const [data, setData] = useState<Partial<TransactionTypes>>();
 
   useEffect(() => {
-    if (isShow) {
+    if (isShow == "transaction") {
       setData(transaction);
 
       setTimeout(() => {

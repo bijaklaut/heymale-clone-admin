@@ -6,9 +6,14 @@ import SearchFilter from "../Misc/SearchFilter";
 import SimpleTableLoading from "../Loading/SimpleTableLoading";
 import { initPagination } from "../../services/helper";
 import OrderTable from "../Tables/OrderTable";
-import { OrderItemTypes, TransactionTypes } from "../../services/types";
+import {
+  OrderItemTypes,
+  ShipmentTypes,
+  TransactionTypes,
+} from "../../services/types";
 import OrderItemModal from "../Modals/Order/OrderItem";
 import TransactionDetailModal from "../Modals/Order/TransactionDetail";
+import ShipmentDetailModal from "../Modals/Order/ShipmentDetail";
 
 const OrderWrapper = () => {
   const [search, setSearch] = useState("");
@@ -17,11 +22,12 @@ const OrderWrapper = () => {
   const [changes, setChanges] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const [itemsDetailShow, setItemsDetailShow] = useState(false);
-  const [itemsDetail, setItemsDetail] = useState<OrderItemTypes[]>();
+  const [detailModal, setDetailModal] = useState("none");
 
-  const [trxDetailShow, setTrxDetailShow] = useState(false);
+  const [itemsDetail, setItemsDetail] = useState<OrderItemTypes[]>();
   const [trxDetail, setTrxDetail] = useState<Partial<TransactionTypes>>();
+  const [shipmentDetail, setShipmentDetail] =
+    useState<Partial<ShipmentTypes>>();
 
   const stateChanges = () => setChanges((prev) => !prev);
   const pageHandler = (pageNumber: number) => setPage(pageNumber);
@@ -29,7 +35,6 @@ const OrderWrapper = () => {
     async (page?: number, search?: string) => {
       setLoading(true);
       const { payload } = await getOrders();
-      console.log("PAYLOAD: ", payload);
       setPagination(initPagination(payload));
       return setTimeout(() => setLoading(false), 500);
     },
@@ -44,17 +49,22 @@ const OrderWrapper = () => {
   // }, [search, changes]);
 
   const itemsDetailMisc = useCallback((items: OrderItemTypes[]) => {
-    setItemsDetailShow(true);
+    setDetailModal("items");
     setItemsDetail(items);
   }, []);
 
   const trxDetailMisc = useCallback(
     (transaction: Partial<TransactionTypes>) => {
       setTrxDetail(transaction);
-      setTrxDetailShow(true);
+      setDetailModal("transaction");
     },
     [],
   );
+
+  const shipmentDetailMisc = useCallback((shipment: Partial<ShipmentTypes>) => {
+    setShipmentDetail(shipment);
+    setDetailModal("shipment");
+  }, []);
 
   // Pagination
   useEffect(() => {
@@ -66,14 +76,19 @@ const OrderWrapper = () => {
       <h2 className="text-3xl font-semibold">Order Dashboard</h2>
       <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
         <OrderItemModal
-          isShow={itemsDetailShow}
+          isShow={detailModal}
           orderItems={itemsDetail}
-          reset={() => setItemsDetailShow(false)}
+          reset={() => setDetailModal("none")}
         />
         <TransactionDetailModal
-          isShow={trxDetailShow}
+          isShow={detailModal}
           transaction={trxDetail}
-          reset={() => setTrxDetailShow(false)}
+          reset={() => setDetailModal("none")}
+        />
+        <ShipmentDetailModal
+          isShow={detailModal}
+          shipment={shipmentDetail}
+          reset={() => setDetailModal("none")}
         />
         {/* <CreateCategoryModal stateChanges={stateChanges} /> */}
         {/* <SearchFilter
@@ -90,6 +105,7 @@ const OrderWrapper = () => {
             }
             itemsDetailMisc={itemsDetailMisc}
             trxDetailMisc={trxDetailMisc}
+            shipmentDetailMisc={shipmentDetailMisc}
           />
         ) : (
           <SimpleTableLoading />

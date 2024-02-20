@@ -4,6 +4,7 @@ import {
   OrderItemTypes,
   OrderTypes,
   PaginationTypes,
+  ShipmentTypes,
   TransactionTypes,
 } from "../../services/types";
 import NoDisplay from "../Misc/NoDisplay";
@@ -22,6 +23,7 @@ interface ThisProps {
   stateChanges(): void;
   itemsDetailMisc(items: OrderItemTypes[]): void;
   trxDetailMisc(transaction: Partial<TransactionTypes>): void;
+  shipmentDetailMisc(shipment: Partial<ShipmentTypes>): void;
 }
 
 const OrderTable = ({
@@ -30,6 +32,7 @@ const OrderTable = ({
   stateChanges,
   itemsDetailMisc,
   trxDetailMisc,
+  shipmentDetailMisc,
 }: ThisProps) => {
   const { docs: orders } = paginate;
 
@@ -99,8 +102,12 @@ const OrderTable = ({
                           <li onClick={() => trxDetailMisc(order.transaction)}>
                             <span>Transaction Detail</span>
                           </li>
-                          <li>
-                            <span>Shipment Detail</span>
+                          <li
+                            onClick={() =>
+                              shipmentDetailMisc(order.shipping_detail)
+                            }
+                          >
+                            <span>Shipping Detail</span>
                           </li>
                         </ul>
                       </div>

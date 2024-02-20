@@ -7,7 +7,7 @@ import NumFormatWrapper from "../../Wrapper/NumFormatWrapper";
 
 interface ThisProps {
   orderItems?: OrderItemTypes[];
-  isShow: boolean;
+  isShow: string;
   reset(): void;
 }
 
@@ -23,7 +23,7 @@ const OrderItemModal = ({ orderItems, isShow, reset }: ThisProps) => {
   }, []);
 
   useEffect(() => {
-    if (isShow) {
+    if (isShow == "items") {
       setItems(orderItems);
 
       setTimeout(() => {
