@@ -17,12 +17,15 @@ import {
   HistorySvg,
   PaymentSvg,
   ProductSvg,
+  CardSvg,
   TransactionSvg,
+  TruckSvg,
   UsersSvg,
   VoucherSvg,
 } from "../Misc/SvgGroup";
 import cx from "classnames";
 import { TopNavbar } from "./TopNavbar";
+import { getUserToken } from "../../services/actions";
 
 export const Sidebar = () => {
   const [user, setUser] = useState({
@@ -50,34 +53,26 @@ export const Sidebar = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const getUserAPI = useCallback(
-    async (id: string) => {
-      const { payload } = await getUserById(id);
+  const getUserAPI = useCallback(async () => {
+    if (!user.name) {
+      let id = await getUserToken();
 
-      setUser({
-        avatar: payload.avatar,
-        name: payload.name,
-      });
+      if (id) {
+        const { payload } = await getUserById(id);
+
+        setIsLoading(true);
+        setUser({
+          avatar: payload.avatar,
+          name: payload.name,
+        });
+      }
+
       setIsLoading(false);
-    },
-    [user],
-  );
+    }
+  }, [user]);
 
   useEffect(() => {
-    if (!user.name) {
-      let token = Cookies.get("token");
-
-      while (!token) {
-        token = Cookies.get("token");
-      }
-
-      if (token) {
-        const reverse = atob(token);
-        const { id } = jwtDecode<UserToken>(reverse);
-        setIsLoading(true);
-        getUserAPI(id);
-      }
-    }
+    getUserAPI();
   }, [user]);
 
   useEffect(() => {
@@ -94,7 +89,7 @@ export const Sidebar = () => {
         {checked ? (
           <>
             <div>
-              {/* Mobile */}
+              {/* Mobile Title */}
               <div className="title hidden h-[50px] w-full items-center justify-center sm:flex">
                 <Link href={"/"}>
                   <Image
@@ -105,7 +100,7 @@ export const Sidebar = () => {
                   />
                 </Link>
               </div>
-              {/* Tablet, Laptop, Desktop */}
+              {/* Tablet, Laptop, Desktop Title*/}
               <div className="title left-0 right-0 top-0 flex h-[50px] w-full items-center justify-between py-8 ps-3 sm:hidden ">
                 <Link href={"/"}>
                   <Image
@@ -135,17 +130,25 @@ export const Sidebar = () => {
               </div>
               <div className="divider mb-4 mt-2"></div>
               <div className="w-full">
-                <div className="menu-list flex flex-col gap-y-[10px]">
+                <div className="menu-list flex flex-col gap-y-[5px]">
                   <div className="menu text-lg font-semibold text-gray-400 sm:text-sm sm:font-bold">
                     COMMERCIAL
                   </div>
                   <MenuItem onClick={resetNavbar} href="/order">
-                    <TransactionSvg className="sidebar-svg stroke-current" />
+                    <CardSvg className="sidebar-svg stroke-current" />
                     <p className={"sidebar-menu-text"}>Orders</p>
                   </MenuItem>
                   <MenuItem onClick={resetNavbar} href="/history">
                     <HistorySvg className="sidebar-svg fill-current stroke-current" />
                     <p className={"sidebar-menu-text"}>History Transactions</p>
+                  </MenuItem>
+                  <MenuItem onClick={resetNavbar} href="/shipment">
+                    <TruckSvg className="sidebar-svg fill-current stroke-current" />
+                    <p className={"sidebar-menu-text"}>Shipments</p>
+                  </MenuItem>
+                  <MenuItem onClick={resetNavbar} href="/transaction">
+                    <TransactionSvg className="sidebar-svg fill-current stroke-current" />
+                    <p className={"sidebar-menu-text"}>Transactions</p>
                   </MenuItem>
                   <MenuItem onClick={resetNavbar} href="/voucher">
                     <VoucherSvg className="sidebar-svg stroke-current" />
@@ -153,7 +156,7 @@ export const Sidebar = () => {
                   </MenuItem>
                 </div>
 
-                <div className="menu-list mt-8 flex flex-col gap-y-[10px]">
+                <div className="menu-list mt-4 flex flex-col gap-y-[5px]">
                   <div className="menu text-lg font-semibold text-gray-400 sm:text-sm sm:font-bold">
                     ADMINISTRATION
                   </div>
@@ -186,12 +189,12 @@ export const Sidebar = () => {
               </div>
               <div className="divider mb-4 mt-2"></div>
               <div className="w-full">
-                <div className="menu-list flex flex-col items-center gap-y-[10px]">
+                <div className="menu-list flex flex-col items-center gap-y-[5px]">
                   <div className="menu text-lg font-semibold text-gray-400 sm:text-sm sm:font-bold">
                     COM
                   </div>
                   <MenuItem centered datatip={"Orders"} href="/order">
-                    <TransactionSvg className="sidebar-svg stroke-current" />
+                    <CardSvg className="sidebar-svg stroke-current" />
                   </MenuItem>
                   <MenuItem
                     centered
@@ -200,12 +203,22 @@ export const Sidebar = () => {
                   >
                     <HistorySvg className="sidebar-svg fill-current stroke-current" />
                   </MenuItem>
+                  <MenuItem centered datatip={"Shipments"} href="/shipment">
+                    <TruckSvg className="sidebar-svg fill-current stroke-current" />
+                  </MenuItem>
+                  <MenuItem
+                    centered
+                    datatip={"Transactions"}
+                    href="/transaction"
+                  >
+                    <TransactionSvg className="sidebar-svg fill-current stroke-current" />
+                  </MenuItem>
                   <MenuItem centered datatip={"Vouchers"} href="/voucher">
                     <VoucherSvg className="sidebar-svg stroke-current" />
                   </MenuItem>
                 </div>
 
-                <div className="menu-list mt-8 flex flex-col items-center gap-y-[10px]">
+                <div className="menu-list mt-4 flex flex-col items-center gap-y-[5px]">
                   <div className="menu text-lg font-semibold text-gray-400 sm:text-sm sm:font-bold">
                     ADM
                   </div>
@@ -252,34 +265,6 @@ export const Sidebar = () => {
         checked={checked}
         onChange={() => setChecked((prev) => !prev)}
       />
-      {/* <nav
-        data-theme={"nord"}
-        className="title fixed left-0 right-0 top-0 z-10 flex h-[50px] w-full items-center justify-between py-8 pe-2 ps-5 sm:hidden "
-      >
-        <Link href={"/"}>
-          <Image
-            src={heymaleLogo}
-            width={180}
-            alt="heymale-logo"
-            className="h-auto w-[170px] sm:w-[180px]"
-          />
-        </Link>
-        <div className="form-control">
-          <label className="label cursor-pointer">
-            <input
-              type="checkbox"
-              checked={checked}
-              className="peer checkbox hidden"
-              onChange={}
-            />
-            <div className="btn btn-ghost label-text flex w-fit flex-col gap-y-[5px]">
-              <div className="h-[2px] w-5 bg-neutral"></div>
-              <div className="h-[2px] w-5 bg-neutral"></div>
-              <div className="h-[2px] w-5 bg-neutral"></div>
-            </div>
-          </label>
-        </div>
-      </nav> */}
     </>
   ) : (
     <SidebarLoading />
