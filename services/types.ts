@@ -253,6 +253,9 @@ export interface ShipmentTypes {
       latitude: number;
       longitude: number;
     };
+    province: string;
+    city: string;
+    district: string;
   };
   destination: {
     contact_name: string;
@@ -261,6 +264,9 @@ export interface ShipmentTypes {
     address: string;
     note: string;
     postal_code: string;
+    province: string;
+    city: string;
+    district: string;
     coordinate: {
       latitude: number;
       longitude: number;
