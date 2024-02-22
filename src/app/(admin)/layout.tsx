@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "../globals.css";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Sidebar } from "../../../components/Sidebar/Sidebar";
 
@@ -24,12 +23,6 @@ export default function AdminLayout({
       >
         {children}
       </main>
-      <ToastContainer
-        hideProgressBar
-        enableMultiContainer
-        containerId={"Main"}
-        theme="dark"
-      />
     </section>
   );
 }
