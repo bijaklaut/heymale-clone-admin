@@ -14,11 +14,13 @@ export async function authSignout() {
   redirect("/signin");
 }
 
+export const redirectRoot = async () => redirect("/");
+
 export async function getUserToken() {
-  const token = cookies().get("token")?.value;
+  const cookieStore = cookies();
+  const token = cookieStore.get("token")?.value;
   const jwt = Buffer.from(token!, "base64").toString("ascii");
   const { id } = jwtDecode<UserToken>(jwt);
-
   return id;
 }
 
