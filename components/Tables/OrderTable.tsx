@@ -37,15 +37,39 @@ const OrderTable = ({
 }: ThisProps) => {
   const { docs: orders } = paginate;
   const statusClass = useCallback((status: string) => {
+    const errorStatus = [
+      "deny",
+      "cancel",
+      "expire",
+      "failure",
+      "courier_not_found",
+      "cancelled",
+      "rejected",
+      "disposed",
+      "returned",
+    ];
+
+    const ongoingStatus = [
+      "confirmed",
+      "allocated",
+      "picking_up",
+      "picked",
+      "dropping_off",
+      "return_in_transit",
+    ];
+
     return cx({
-      "w-fit py-2 font-semibold px-1": true,
+      "w-fit py-3 badge badge-outline font-semibold": true,
       "xl:text-neutral/50": status == "pending",
-      "xl:text-primary": status == "settlement",
+      "xl:text-primary": status == "delivered",
+      "xl:text-success border-2": status == "settlement",
+      "xl:text-error": errorStatus.includes(status),
+      "xl:text-accent": ongoingStatus.includes(status),
     });
   }, []);
 
   return (
-    <div className="min-h-screen max-w-[1920px]">
+    <div className="text- min-h-screen max-w-[1920px]">
       {orders.length ? (
         <Fragment>
           <div className="rounded-md bg-transparent xl:bg-neutral-100 xl:px-3 xl:py-5">
@@ -75,9 +99,9 @@ const OrderTable = ({
                     </div>
                     <div className="flex items-center justify-center">
                       <div className={statusClass(order.status)}>
-                        {capitalize(order.status)}
+                        {underscoreTransform(order.status)}
                       </div>
-                      {order.status != "pending" && (
+                      {/* {order.status != "pending" && (
                         <div className="dropdown dropdown-end">
                           <button
                             tabIndex={0}
@@ -94,7 +118,13 @@ const OrderTable = ({
                                 <span className="text-sm text-black/60">
                                   Payment Status
                                 </span>
-                                <span>{capitalize(order.status)}</span>
+                                <span>
+                                  {order.transaction.transaction_status
+                                    ? underscoreTransform(
+                                        order.transaction.transaction_status,
+                                      )
+                                    : "-"}
+                                </span>
                               </div>
                               <div className="grid grid-cols-1">
                                 <span className="text-sm text-black/60">
@@ -111,7 +141,7 @@ const OrderTable = ({
                             </div>
                           </div>
                         </div>
-                      )}
+                      )} */}
                     </div>
                     <div>
                       <button
