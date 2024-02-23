@@ -289,7 +289,7 @@ export const transformDate = (dateString: string) => {
 };
 
 export const underscoreTransform = (words: string) => {
-  if (!words) return null;
+  if (!words) return "-";
 
   return words
     .toLowerCase()

@@ -312,6 +312,17 @@ export const getShipments = async () => {
 };
 // End of Shipment
 
+// Transaction
+export const getTransactions = async () => {
+  const url = `${ROOT_API}/${API_VER}/transaction`;
+
+  return callApi({
+    url,
+    method: "POST",
+  });
+};
+// End of Transaction
+
 // Auth
 export const signIn = async (data: SignInTypes) => {
   const url = `${ROOT_API}/${API_VER}/user/signin`;
