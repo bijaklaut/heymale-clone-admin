@@ -301,6 +301,17 @@ export const getOrders = async () => {
 };
 // End of Order
 
+// Shipment
+export const getShipments = async () => {
+  const url = `${ROOT_API}/${API_VER}/shipment`;
+
+  return callApi({
+    url,
+    method: "POST",
+  });
+};
+// End of Shipment
+
 // Auth
 export const signIn = async (data: SignInTypes) => {
   const url = `${ROOT_API}/${API_VER}/user/signin`;

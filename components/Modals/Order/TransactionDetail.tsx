@@ -53,6 +53,10 @@ const TransactionDetailModal = ({ transaction, isShow, reset }: ThisProps) => {
                 <div>{data?.merchant_id}</div>
               </div>
               <div className="grid grid-cols-2">
+                <div className="font-semibold">Transaction Status</div>
+                <div>{capitalize(data?.transaction_status!)}</div>
+              </div>
+              <div className="grid grid-cols-2">
                 <div className="font-semibold">Gross Amount</div>
                 <div>
                   <NumFormatWrapper
@@ -67,14 +71,6 @@ const TransactionDetailModal = ({ transaction, isShow, reset }: ThisProps) => {
               <div className="grid grid-cols-2">
                 <div className="font-semibold">Payment Type</div>
                 <div>{transformPaymentType(data?.payment_type!)}</div>
-              </div>
-              <div className="grid grid-cols-2">
-                <div className="font-semibold">Transaction Time</div>
-                <div>{transformDate(data?.transaction_time!)}</div>
-              </div>
-              <div className="grid grid-cols-2">
-                <div className="font-semibold">Transaction Status</div>
-                <div>{capitalize(data?.transaction_status!)}</div>
               </div>
               <div className="grid grid-cols-2">
                 <div className="font-semibold">Fraud Status</div>
@@ -99,6 +95,10 @@ const TransactionDetailModal = ({ transaction, isShow, reset }: ThisProps) => {
                     <div>{`${va.bank.toUpperCase()} - ${va.va_number}`}</div>
                   </div>
                 ))}
+              <div className="grid grid-cols-2">
+                <div className="font-semibold">Transaction Time</div>
+                <div>{transformDate(data?.transaction_time!)}</div>
+              </div>
             </div>
             <div className="modal-action">
               <form method="dialog">

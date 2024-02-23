@@ -6,10 +6,14 @@ import {
   transformPaymentType,
   underscoreTransform,
 } from "../../../services/helper";
-import { ShipmentTypes, TransactionTypes } from "../../../services/types";
+import {
+  OrderTrackingTypes,
+  ShipmentTypes,
+  TransactionTypes,
+} from "../../../services/types";
 import cx from "classnames";
 import NumFormatWrapper from "../../Wrapper/NumFormatWrapper";
-import { getArea } from "../../../services/actions";
+import { getArea, trackOrder } from "../../../services/actions";
 
 interface ThisProps {
   shipment?: Partial<ShipmentTypes>;
@@ -17,55 +21,21 @@ interface ThisProps {
   reset(): void;
 }
 
-interface PopulateDetail {
-  origin: {
-    district: string;
-    city: string;
-    province: string;
-    postal_code: string;
-  };
-  destination: {
-    district: string;
-    city: string;
-    province: string;
-    postal_code: string;
-  };
-}
-
 const ShipmentDetailModal = ({ shipment, isShow, reset }: ThisProps) => {
-  const [data, setData] = useState<PopulateDetail>();
+  const [orderHistory, setOrderHistory] =
+    useState<Partial<OrderTrackingTypes>>();
 
-  const getAddressDetail = useCallback(async () => {
-    if (!shipment) {
-      return null;
+  const trackOrderAPI = useCallback(async () => {
+    if (shipment?.courier?.tracking_id) {
+      const result = await trackOrder(shipment?.courier?.tracking_id);
+      console.log("RESULT: ", result);
+      setOrderHistory(result);
     }
-    const originDetail = await getArea(shipment?.origin?.postal_code!);
-    const destinationDetail = await getArea(
-      shipment?.destination?.postal_code!,
-    );
-    const origin = {
-      district: originDetail.areas[0].administrative_division_level_3_name,
-      city: originDetail.areas[0].administrative_division_level_2_name,
-      province: originDetail.areas[0].administrative_division_level_1_name,
-      postal_code: originDetail.areas[0].postal_code,
-    };
-    const destination = {
-      district: destinationDetail.areas[0].administrative_division_level_3_name,
-      city: destinationDetail.areas[0].administrative_division_level_2_name,
-      province: destinationDetail.areas[0].administrative_division_level_1_name,
-      postal_code: destinationDetail.areas[0].postal_code,
-    };
-
-    setData((prev) => ({
-      ...prev,
-      origin,
-      destination,
-    }));
   }, [shipment]);
 
   useEffect(() => {
     if (isShow == "shipment" && shipment) {
-      getAddressDetail();
+      trackOrderAPI();
       setTimeout(() => {
         simpleModalHandler("shipmentDetail", true);
         reset();
@@ -164,24 +134,24 @@ const ShipmentDetailModal = ({ shipment, isShow, reset }: ThisProps) => {
                         <span className="text-sm text-black/60">
                           Postal Code
                         </span>
-                        <span>{data?.origin.postal_code}</span>
+                        <span>{shipment.origin?.postal_code || "-"}</span>
                       </div>
                       <div className="grid grid-cols-1">
                         <span className="text-sm text-black/60">District</span>
-                        <span>{data?.origin.district}</span>
+                        <span>{shipment.origin?.district || "-"}</span>
                       </div>
                       <div className="grid grid-cols-1">
                         <span className="text-sm text-black/60">City</span>
-                        <span>{data?.origin.city}</span>
+                        <span>{shipment.origin?.city || "-"}</span>
                       </div>
                       <div className="grid grid-cols-1">
                         <span className="text-sm text-black/60">Province</span>
-                        <span>{data?.origin.province}</span>
+                        <span>{shipment.origin?.province || "-"}</span>
                       </div>
                     </div>
                     <div className="mb-1 grid grid-cols-1">
                       <span className="text-sm text-black/60">Note</span>
-                      <span>{shipment.origin?.note}</span>
+                      <span>{shipment.origin?.note || "-"}</span>
                     </div>
                   </div>
                 </div>
@@ -214,24 +184,24 @@ const ShipmentDetailModal = ({ shipment, isShow, reset }: ThisProps) => {
                         <span className="text-sm text-black/60">
                           Postal Code
                         </span>
-                        <span>{data?.destination.postal_code}</span>
+                        <span>{shipment.destination?.postal_code}</span>
                       </div>
                       <div className="grid grid-cols-1">
                         <span className="text-sm text-black/60">District</span>
-                        <span>{data?.destination.district}</span>
+                        <span>{shipment.destination?.district || "-"}</span>
                       </div>
                       <div className="grid grid-cols-1">
                         <span className="text-sm text-black/60">City</span>
-                        <span>{data?.destination.city}</span>
+                        <span>{shipment.destination?.city || "-"}</span>
                       </div>
                       <div className="grid grid-cols-1">
                         <span className="text-sm text-black/60">Province</span>
-                        <span>{data?.destination.province}</span>
+                        <span>{shipment.destination?.province || "-"}</span>
                       </div>
                     </div>
                     <div className="mb-1 grid grid-cols-1">
                       <span className="text-sm text-black/60">Note</span>
-                      <span>{shipment.destination?.note}</span>
+                      <span>{shipment.destination?.note || "-"}</span>
                     </div>
                   </div>
                 </div>
@@ -274,6 +244,35 @@ const ShipmentDetailModal = ({ shipment, isShow, reset }: ThisProps) => {
                   </div>
                 </div>
               </div>
+
+              {/* History */}
+              {orderHistory?.history && (
+                <div className="collapse collapse-arrow bg-white shadow-md">
+                  <input type="checkbox" />
+                  <div className="collapse-title text-lg font-semibold">
+                    History
+                  </div>
+                  <div className="collapse-content">
+                    <ul className="steps steps-vertical w-full gap-3 [&>.step:after]:scale-75">
+                      {orderHistory.history.map((his, index) => (
+                        <li
+                          key={index}
+                          data-content={""}
+                          className="step last:step-primary"
+                        >
+                          <div className="ms-2 flex flex-col items-start justify-start text-left">
+                            <span>{transformDate(his.updated_at)}</span>
+                            <span>{`${his.note}`}</span>
+                            <span className="font-semibold">
+                              {`[${underscoreTransform(his.status)}]`}
+                            </span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="modal-action">
               <form method="dialog">
