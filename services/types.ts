@@ -31,7 +31,9 @@ export type DataTypes =
   | PaymentTypes
   | ProductTypes
   | UserTypes
-  | OrderTypes;
+  | OrderTypes
+  | ShipmentTypes
+  | TransactionTypes;
 
 export type PostDataTypes =
   | PostCategoryTypes
@@ -300,6 +302,14 @@ export interface ShipmentTypes {
       note: string;
     };
     routing_code: string;
+    history: [
+      {
+        service_type: string;
+        status: string;
+        note: string;
+        updated_at: string;
+      },
+    ];
   };
   delivery: {
     datetime: string;
@@ -359,10 +369,34 @@ export interface OrderTypes {
   manual_updated: boolean;
 }
 
-// export interface OrderTypes {
-//   _id?: string;
-//   invoice: string;
-//   user: UserOrderTypes;
-//   shipping_detail: Partial<ShipmentTypes>;
-//   transaction: Partial<TransactionTypes>;
-// }
+export interface OrderTrackingTypes {
+  success: boolean;
+  messsage: string;
+  object: string;
+  id: string;
+  waybill_id: string;
+  courier: {
+    company: string;
+    name: string;
+    phone: string;
+  };
+  origin: {
+    contact_name: string;
+    address: string;
+  };
+  destination: {
+    contact_name: string;
+    address: string;
+  };
+  history: [
+    {
+      note: string;
+      service_type: string;
+      updated_at: string;
+      status: string;
+    },
+  ];
+  link: string;
+  order_id: string;
+  status: string;
+}

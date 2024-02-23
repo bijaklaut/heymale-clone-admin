@@ -34,3 +34,14 @@ export const getArea = async (input: string) => {
 
   return response.data;
 };
+
+export const trackOrder = async (id: string) => {
+  const url = `${BITESHIP}/v1/trackings/${id}`;
+  const response = await axios({
+    url,
+    method: "GET",
+    headers: { Authorization: `Bearer ${BTS_APIKEY}` },
+  });
+
+  return response.data;
+};
