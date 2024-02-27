@@ -198,17 +198,18 @@ export interface OrderItemTypes {
   thumbnail: string;
   quantity: number;
   price: number;
+  weight: number;
 }
 
 export interface ShipmentItemTypes {
   name: string;
   description: string;
-  sku: string;
+  sku?: string;
   value: number;
   quantity: number;
-  length: number;
-  width: number;
-  height: number;
+  length?: number;
+  width?: number;
+  height?: number;
   weight: number;
 }
 
@@ -369,6 +370,39 @@ export interface OrderTypes {
   manual_updated: boolean;
 }
 
+export interface PostOrderTypes {
+  user: string;
+  orderItems: OrderItemTypes[];
+  voucher: {
+    voucher_id: string;
+    value: number;
+  };
+  shipping: {
+    address: {
+      destination_contact_name: string;
+      destination_contact_phone: string;
+      destination_address: string;
+      destination_province: string;
+      destination_city: string;
+      destination_district: string;
+      destination_postal_code: string;
+      destination_area_id: string;
+      destination_note: string;
+    };
+    courier_company: string;
+    courier_type: string;
+    price: number;
+    total_weight: number;
+  };
+  payment: {
+    payment_type: string;
+    bank?: string;
+  };
+  subtotal: number;
+  total: number;
+  total_items: number;
+}
+
 export interface OrderTrackingTypes {
   success: boolean;
   messsage: string;
@@ -399,4 +433,46 @@ export interface OrderTrackingTypes {
   link: string;
   order_id: string;
   status: string;
+}
+
+export interface CartTypes {
+  user: string;
+  items: CartItemTypes[];
+}
+
+export interface CartItemTypes {
+  _id: string;
+  item_name: string;
+  thumbnail: string;
+  price: number;
+  variants: Partial<VariantTypes>;
+  weight: number;
+}
+
+export interface GetCourierRatesTypes {
+  origin_area_id: string;
+  destination_area_id: string;
+  couriers: string;
+  items: ShipmentItemTypes[];
+}
+
+export interface PricingRatesTypes {
+  available_collection_method: string[];
+  available_for_cash_on_delivery: boolean;
+  available_for_proof_of_delivery: boolean;
+  available_for_instant_waybill_id: boolean;
+  available_for_insurance: boolean;
+  company: string;
+  courier_name: string;
+  courier_code: string;
+  courier_service_name: string;
+  courier_service_code: string;
+  description: string;
+  duration: string;
+  shipment_duration_range: string;
+  shipment_duration_unit: string;
+  service_type: string;
+  shipping_type: string;
+  price: number;
+  type: string;
 }
