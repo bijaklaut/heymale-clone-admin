@@ -1,5 +1,10 @@
 import callApi from "./callApi";
-import { PostPaymentTypes, SignInTypes } from "./types";
+import {
+  CartItemTypes,
+  CartTypes,
+  PostPaymentTypes,
+  SignInTypes,
+} from "./types";
 
 const ROOT_API = process.env.NEXT_PUBLIC_API;
 const API_VER = "api/v1";
@@ -245,6 +250,17 @@ export const deleteAddress = async (id: string, token: string) => {
     token,
   });
 };
+
+export const getAddressByUser = async (user: string, token: string) => {
+  const url = `${ROOT_API}/${API_VER}/address/byuser`;
+
+  return callApi({
+    url,
+    data: { user },
+    method: "POST",
+    token,
+  });
+};
 // End of Address
 
 // Voucher
@@ -254,6 +270,15 @@ export const getVouchers = async () => {
   return callApi({
     url,
     method: "POST",
+  });
+};
+
+export const getAvailableVouchers = async () => {
+  const url = `${ROOT_API}/${API_VER}/voucher/available`;
+
+  return callApi({
+    url,
+    method: "GET",
   });
 };
 
@@ -322,6 +347,32 @@ export const getTransactions = async () => {
   });
 };
 // End of Transaction
+
+// Cart
+export const updateCart = async (data: {
+  user: string;
+  items: CartItemTypes[];
+}) => {
+  const url = `${ROOT_API}/${API_VER}/cart/updatecart`;
+
+  // console.log("data: ", data);
+  return callApi({
+    url,
+    data,
+    method: "POST",
+  });
+};
+
+export const getUserCart = async (data: { user: string }) => {
+  const url = `${ROOT_API}/${API_VER}/cart/usercart`;
+
+  return callApi({
+    url,
+    data,
+    method: "POST",
+  });
+};
+// End of Cart
 
 // Auth
 export const signIn = async (data: SignInTypes) => {
