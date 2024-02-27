@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
-import { UserToken } from "./types";
+import { GetCourierRatesTypes, UserToken } from "./types";
 import axios from "axios";
 
 const BITESHIP = process.env.BITESHIP_BASEURL;
@@ -29,6 +29,18 @@ export const getArea = async (input: string) => {
   const response = await axios({
     url,
     method: "GET",
+    headers: { Authorization: `Bearer ${BTS_APIKEY}` },
+  });
+
+  return response.data;
+};
+
+export const getCourierRates = async (data: GetCourierRatesTypes) => {
+  const url = `${BITESHIP}/v1/rates/couriers`;
+  const response = await axios({
+    url,
+    method: "POST",
+    data,
     headers: { Authorization: `Bearer ${BTS_APIKEY}` },
   });
 
