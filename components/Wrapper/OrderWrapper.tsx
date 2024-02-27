@@ -14,6 +14,7 @@ import {
 import OrderItemModal from "../Modals/Order/OrderItem";
 import TransactionDetailModal from "../Modals/Order/TransactionDetail";
 import ShipmentDetailModal from "../Modals/Order/ShipmentDetail";
+import CatalogProductModal from "../Modals/Order/Catalog";
 
 const OrderWrapper = () => {
   const [search, setSearch] = useState("");
@@ -75,6 +76,11 @@ const OrderWrapper = () => {
     <Fragment>
       <h2 className="text-3xl font-semibold">Order Dashboard</h2>
       <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
+        <CatalogProductModal
+          stateChanges={() => setChanges((prev) => !prev)}
+          isUpdate={false}
+          reset={() => null}
+        />
         <OrderItemModal
           isShow={detailModal}
           orderItems={itemsDetail}
@@ -90,7 +96,6 @@ const OrderWrapper = () => {
           shipment={shipmentDetail}
           reset={() => setDetailModal("none")}
         />
-        {/* <CreateCategoryModal stateChanges={stateChanges} /> */}
         {/* <SearchFilter
           search={search}
           onChange={(e) => setSearch(e.target.value)}
