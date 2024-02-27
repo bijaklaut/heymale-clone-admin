@@ -132,7 +132,6 @@ const PostAddressCollapse = (props: thisProps) => {
 
   const getAreaAPI = useCallback(async () => {
     const result = await getArea(areaSearch);
-    console.log("RESULT: ", result);
     setAreaData(result.areas);
     setSearchLoading(false);
   }, [areaSearch]);
