@@ -53,6 +53,7 @@ const CheckoutWrapper = () => {
   const [deliveryItems, setDeliveryItems] = useState<ShipmentItemTypes[]>([]);
   const [rates, setRates] = useState<PricingRatesTypes[]>([]);
   const [vouchers, setVouchers] = useState<VoucherTypes[]>([]);
+  const [disable, setDisable] = useState(true);
 
   const [addresses, setAddresses] = useState<Partial<AddressTypes[]>>();
 
@@ -69,6 +70,41 @@ const CheckoutWrapper = () => {
         !thumbnail,
     });
   }, []);
+
+  const orderDataCheck = useCallback(() => {
+    const complexFields = ["shipping", "payment"];
+
+    if (data) {
+      for (let i = 0; i < Object.entries(data).length; i++) {
+        const [key] = Object.entries(data)[i];
+
+        if (Array.isArray((data as any)[key])) {
+          const newArray: Array<string> = (data as any)[key];
+
+          if (newArray.length == 0) {
+            setDisable(true);
+            break;
+          }
+        }
+
+        if (!complexFields.includes(key) && !(data as any)[key]) {
+          setDisable(true);
+          break;
+        }
+
+        if (
+          !data.shipping.address.destination_postal_code ||
+          !data.shipping.price ||
+          !data.payment.payment_type
+        ) {
+          setDisable(true);
+          break;
+        }
+
+        setDisable(false);
+      }
+    }
+  }, [data]);
 
   const populateData = useCallback(() => {
     let order_items: OrderItemTypes[] = [];
@@ -95,6 +131,7 @@ const CheckoutWrapper = () => {
 
           order_items.push(order_item);
         });
+
         let dataDlv = {
           name: item.item_name,
           description: "Clothes",
@@ -134,8 +171,8 @@ const CheckoutWrapper = () => {
           destination_area_id: address ? address.addressArea.areaId : "",
           destination_note: address ? address.addressNote : "",
         },
-        courier_company: "jne",
-        courier_type: "reg",
+        courier_company: "",
+        courier_type: "",
         price: 0,
         total_weight: total_weight,
       },
@@ -243,6 +280,7 @@ const CheckoutWrapper = () => {
   }, [data, deliveryItems]);
 
   useEffect(() => {
+    orderDataCheck();
     console.log("DATA: ", data);
   }, [data]);
 
@@ -503,7 +541,9 @@ const CheckoutWrapper = () => {
                 </div>
               </div>
             </div>
-            <button className="btn btn-accent text-white">Confirm Order</button>
+            <button disabled={disable} className="btn btn-accent text-white">
+              Confirm Order
+            </button>
           </div>
         </div>
       </div>
