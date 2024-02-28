@@ -142,6 +142,7 @@ const CatalogProductModal = (props: ThisProps) => {
           label.classList.remove("bg-black/10");
         }
       });
+
       setSelected({
         _id: product._id,
         item_name: product.name,
@@ -196,8 +197,6 @@ const CatalogProductModal = (props: ThisProps) => {
       const newCart = populateCart();
       const user = await getUserToken();
       const { payload } = await updateCart({ user, items: newCart! });
-      console.log("PAYLOAD ITEMS: ", payload.items);
-      console.log("PAYLOAD REF: ", payload.reference_items);
       setCart((prev) => ({
         ...prev!,
         items: payload.items,

@@ -89,10 +89,6 @@ const VoucherListModal = ({
     [validityCheck],
   );
 
-  useEffect(() => {
-    console.log("VOUCHERS: ", vouchers);
-  }, [vouchers]);
-
   // useEffect(() => {
   //   if (isShow == "transaction") {
   //     setData(transaction);
