@@ -16,7 +16,11 @@ import cx from "classnames";
 import { CircleCheckSvg } from "../Misc/SvgGroup";
 import NumFormatWrapper from "./NumFormatWrapper";
 import { getCourierRates, getUserToken } from "../../services/actions";
-import { getAddressByUser, getAvailableVouchers } from "../../services/admin";
+import {
+  createOrder,
+  getAddressByUser,
+  getAvailableVouchers,
+} from "../../services/admin";
 import Cookies from "js-cookie";
 import VoucherListModal from "../Misc/VoucherList";
 
@@ -151,8 +155,7 @@ const CheckoutWrapper = () => {
     }
 
     const order_data: PostOrderTypes = {
-      user: cart?.user ? cart?.user : "",
-      orderItems: order_items ? order_items : [],
+      orderItems: cart?.items ? cart.items : [],
       voucher: {
         voucher_id: "",
         value: 0,
@@ -193,11 +196,6 @@ const CheckoutWrapper = () => {
     setVouchers(payload.docs);
   }, []);
 
-  const getItems = useCallback(() => {
-    const local = localStorage.getItem("cart");
-    setCart(JSON.parse(local!));
-  }, []);
-
   const getAddressAPI = useCallback(async () => {
     const id = await getUserToken();
     const token = Cookies.get("token");
@@ -206,6 +204,11 @@ const CheckoutWrapper = () => {
     if (payload.length > 0) {
       setAddresses(payload);
     }
+  }, []);
+
+  const getItems = useCallback(() => {
+    const local = localStorage.getItem("cart");
+    setCart(JSON.parse(local!));
   }, []);
 
   const getCourierRatesAPI = useCallback(async () => {
@@ -261,16 +264,32 @@ const CheckoutWrapper = () => {
     }));
   }, []);
 
+  const confirmOrder = useCallback(async () => {
+    const token = Cookies.get("token");
+
+    if (data && token) {
+      try {
+        const result = await createOrder(data, token);
+        console.log(result);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }, [data]);
+
+  // Get cart items, addresses, vouchers exec
   useEffect(() => {
     getItems();
     getAddressAPI();
     getVouchersAPI();
   }, []);
 
+  // Populate Data Exec
   useEffect(() => {
     populateData();
   }, [cart, addresses]);
 
+  // Get Courier Rates Exec
   useEffect(() => {
     let timer = setTimeout(() => {
       getCourierRatesAPI();
@@ -279,6 +298,7 @@ const CheckoutWrapper = () => {
     return () => clearTimeout(timer);
   }, [data, deliveryItems]);
 
+  // Order Data Null Check
   useEffect(() => {
     orderDataCheck();
     console.log("DATA: ", data);
@@ -541,7 +561,11 @@ const CheckoutWrapper = () => {
                 </div>
               </div>
             </div>
-            <button disabled={disable} className="btn btn-accent text-white">
+            <button
+              disabled={disable}
+              className="btn btn-accent text-white"
+              onClick={confirmOrder}
+            >
               Confirm Order
             </button>
           </div>
