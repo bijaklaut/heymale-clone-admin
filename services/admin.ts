@@ -2,6 +2,7 @@ import callApi from "./callApi";
 import {
   CartItemTypes,
   CartTypes,
+  PostOrderTypes,
   PostPaymentTypes,
   SignInTypes,
 } from "./types";
@@ -322,6 +323,27 @@ export const getOrders = async () => {
   return callApi({
     url,
     method: "POST",
+  });
+};
+
+export const createOrder = async (data: PostOrderTypes, token: string) => {
+  const url = `${ROOT_API}/${API_VER}/order/create`;
+
+  return callApi({
+    url,
+    data,
+    method: "POST",
+    token,
+  });
+};
+
+export const getOrderDetail = async (invoice: string, token: string) => {
+  const url = `${ROOT_API}/${API_VER}/order/${invoice}`;
+
+  return callApi({
+    url,
+    method: "GET",
+    token,
   });
 };
 // End of Order

@@ -360,10 +360,7 @@ export interface OrderTypes {
   status: string;
   shipping_detail: Partial<ShipmentTypes>;
   transaction: Partial<TransactionTypes>;
-  voucher: {
-    voucher_id: string;
-    value: number;
-  };
+  voucher: Partial<VoucherTypes>;
   shipping_fee: number;
   price: number;
   total_price: number;
@@ -371,8 +368,7 @@ export interface OrderTypes {
 }
 
 export interface PostOrderTypes {
-  user: string;
-  orderItems: OrderItemTypes[];
+  orderItems: CartItemTypes[];
   voucher: {
     voucher_id: string;
     value: number;
