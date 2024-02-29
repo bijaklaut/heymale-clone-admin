@@ -377,7 +377,6 @@ export const updateCart = async (data: {
 }) => {
   const url = `${ROOT_API}/${API_VER}/cart/updatecart`;
 
-  // console.log("data: ", data);
   return callApi({
     url,
     data,
@@ -392,6 +391,16 @@ export const getUserCart = async (data: { user: string }) => {
     url,
     data,
     method: "POST",
+  });
+};
+
+export const emptyCart = async (user: string, token: string) => {
+  const url = `${ROOT_API}/${API_VER}/cart/${user}?_method=DELETE`;
+
+  return callApi({
+    url,
+    method: "POST",
+    token,
   });
 };
 // End of Cart

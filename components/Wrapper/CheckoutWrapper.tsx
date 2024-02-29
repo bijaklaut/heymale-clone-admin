@@ -18,11 +18,14 @@ import NumFormatWrapper from "./NumFormatWrapper";
 import { getCourierRates, getUserToken } from "../../services/actions";
 import {
   createOrder,
+  emptyCart,
   getAddressByUser,
   getAvailableVouchers,
 } from "../../services/admin";
 import Cookies from "js-cookie";
 import VoucherListModal from "../Misc/VoucherList";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const virtual_accounts = [
   {
@@ -52,12 +55,14 @@ const virtual_accounts = [
 ];
 
 const CheckoutWrapper = () => {
+  const router = useRouter();
   const [cart, setCart] = useState<CartTypes>();
   const [data, setData] = useState<PostOrderTypes>();
   const [deliveryItems, setDeliveryItems] = useState<ShipmentItemTypes[]>([]);
   const [rates, setRates] = useState<PricingRatesTypes[]>([]);
   const [vouchers, setVouchers] = useState<VoucherTypes[]>([]);
   const [disable, setDisable] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [addresses, setAddresses] = useState<Partial<AddressTypes[]>>();
 
@@ -260,22 +265,34 @@ const CheckoutWrapper = () => {
         voucher_id: voucher._id,
         value: voucher.value,
       },
-      total: prev?.total! - voucher.value,
+      total: prev!.subtotal + prev!.shipping.price - voucher.value,
     }));
   }, []);
 
   const confirmOrder = useCallback(async () => {
     const token = Cookies.get("token");
+    setLoading(true);
 
     if (data && token) {
       try {
-        const result = await createOrder(data, token);
-        console.log(result);
-      } catch (error) {
-        console.error(error);
+        const { status, payload, message } = await createOrder(data, token);
+
+        if (status == 201) {
+          await emptyCart(cart!.user, token);
+          setTimeout(() => {
+            setLoading(false);
+            toast.success(message, { containerId: "Main" });
+            router.push(`/order/${payload}`);
+          }, 700);
+        }
+      } catch (error: any) {
+        toast.error(
+          `Failed to process order. Please try again later (${error.status})`,
+          { containerId: "Main" },
+        );
       }
     }
-  }, [data]);
+  }, [data, cart]);
 
   // Get cart items, addresses, vouchers exec
   useEffect(() => {
@@ -363,7 +380,10 @@ const CheckoutWrapper = () => {
                                 courier_company: rate.courier_code,
                                 courier_type: rate.courier_service_code,
                               },
-                              total: prev!.total + rate.price,
+                              total:
+                                prev!.subtotal +
+                                prev!.voucher.value +
+                                rate.price,
                             }));
                           }}
                         />
@@ -561,13 +581,20 @@ const CheckoutWrapper = () => {
                 </div>
               </div>
             </div>
-            <button
-              disabled={disable}
-              className="btn btn-accent text-white"
-              onClick={confirmOrder}
-            >
-              Confirm Order
-            </button>
+            {!loading ? (
+              <button
+                className="btn btn-accent text-white"
+                disabled={disable}
+                onClick={confirmOrder}
+              >
+                Confirm Order
+              </button>
+            ) : (
+              <button className="btn btn-sm pointer-events-none">
+                <span className="loading loading-spinner loading-sm"></span>
+                Confirming..
+              </button>
+            )}
           </div>
         </div>
       </div>
