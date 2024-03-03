@@ -233,10 +233,13 @@ const CatalogProductModal = (props: ThisProps) => {
   );
 
   const getCart = useCallback(async () => {
-    const user = await getUserToken();
-    const { payload } = await getUserCart({ user });
-    console.log("PAYLOAD: ", payload);
-    setCart(payload ? payload : []);
+    try {
+      const user = await getUserToken();
+      const { payload } = await getUserCart({ user });
+      if (payload) {
+        setCart(payload);
+      }
+    } catch (error) {}
   }, []);
 
   useEffect(() => {
@@ -245,109 +248,10 @@ const CatalogProductModal = (props: ThisProps) => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-    console.log("CART: ", cart);
+    if (cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
   }, [cart]);
-
-  // const formCheck = useCallback(() => {
-  //   for (let i = 0; i < Object.entries(data).length; i++) {
-  //     const [key] = Object.entries(data)[i];
-
-  //     if (
-  //       key == "minTransaction" &&
-  //       data.conditions !== "Minimal Transaction"
-  //     ) {
-  //       continue;
-  //     }
-
-  //     if (key == "validProducts" && data.conditions !== "Particular Product") {
-  //       continue;
-  //     }
-
-  //     if (
-  //       key == "validCategories" &&
-  //       data.conditions !== "Particular Category"
-  //     ) {
-  //       continue;
-  //     }
-
-  //     if (Array.isArray((data as any)[key])) {
-  //       const newArray: Array<string> = (data as any)[key];
-
-  //       if (newArray.length == 0) {
-  //         setDisable(true);
-  //         break;
-  //       }
-  //     }
-
-  //     if (!Array.isArray((data as any)[key]) && !(data as any)[key]) {
-  //       setDisable(true);
-  //       break;
-  //     }
-
-  //     setDisable(false);
-  //   }
-  // }, [data]);
-
-  // const formAppend = useCallback(() => {
-  //   const form = new FormData();
-  //   for (const [key, value] of Object.entries(data)) {
-  //     if (key == "validProducts" || key == "validCategories") {
-  //       for (const [k, v] of Object.entries((data as any)[key])) {
-  //         form.append(`${key}[${k}]`, v as string);
-  //       }
-  //     } else {
-  //       form.append(key, value);
-  //     }
-  //   }
-
-  //   return form;
-  // }, [data]);
-
-  // const submitHandler = useCallback(async () => {
-  //   try {
-  //     const form = formAppend();
-
-  //     const token = Cookies.get("token");
-  //     setLoading(true);
-  //     setValidation([]);
-
-  //     if (!updateState) {
-  //       const result = await createVoucher(form, token!);
-
-  //       setTimeout(() => {
-  //         setLoading(false);
-  //         toast.success(result.message, { containerId: "Main" });
-  //         modalHandler("create_voucher", false);
-
-  //         router.refresh();
-  //         stateChanges();
-  //       }, 700);
-  //     } else {
-  //       const result = await updateVoucher(form, token!);
-  //       setTimeout(() => {
-  //         setLoading(false);
-  //         toast.success(result.message, { containerId: "Main" });
-  //         modalHandler("create_voucher", false);
-
-  //         router.refresh();
-  //         stateChanges();
-  //       }, 700);
-  //     }
-  //   } catch (error: any) {
-  //     setTimeout(() => {
-  //       setLoading(false);
-  //       if (error.message == "ValidationError" || error.code == 11000) {
-  //         return populateValidation(error, setValidation);
-  //       }
-  //       toast.error(error.message, { containerId: "CreateUser" });
-  //     }, 700);
-  //   }
-  // }, [data, updateState]);
-
-  // useEffect(() => {
-  //   formCheck();
-  // }, [data]);
 
   return (
     <>
@@ -506,19 +410,9 @@ const CatalogProductModal = (props: ThisProps) => {
 
           {/* Submit */}
           <div className="modal-action flex">
-            {!loading ? (
-              <Link className="btn btn-primary btn-sm" href={"/checkout"}>
-                {/* {!updateState ? "Create" : "Update"} */}
-                Checkout
-              </Link>
-            ) : (
-              <button className="btn btn-sm pointer-events-none">
-                <span className="loading loading-spinner loading-sm"></span>
-                {/* {!updateState ? "Creating.." : "Updating.."} */}
-                Creating..
-              </button>
-            )}
-
+            <Link className="btn btn-primary btn-sm" href={"/checkout"}>
+              Checkout
+            </Link>
             <form method="dialog">
               <button
                 className="btn btn-outline btn-sm"

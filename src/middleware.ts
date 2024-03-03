@@ -69,6 +69,7 @@ export default async function middleware(request: NextRequest) {
           value: accessEncoded,
           maxAge: 60 * 1,
           httpOnly: true,
+          sameSite: "strict",
         });
 
         return response;
