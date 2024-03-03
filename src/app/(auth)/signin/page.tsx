@@ -1,16 +1,8 @@
 "use client";
 import Image from "next/image";
-import {
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
-import { signIn } from "../../../../services/admin";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import heymaleLogo from "@/../public/images/logo/heymale-logo.png";
 import { SignInTypes, ValidationTypes } from "../../../../services/types";
 import {
@@ -18,6 +10,7 @@ import {
   populateErrorFloating,
   populateValidation,
 } from "../../../../services/helper";
+import axios from "axios";
 
 const Signin = () => {
   const router = useRouter();
@@ -34,28 +27,21 @@ const Signin = () => {
     setDisable,
   };
 
-  const textInputHandler = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    inputLabel: string,
-    data: SignInTypes,
-    setData: Dispatch<SetStateAction<SignInTypes>>,
-  ) => {
-    setData({
-      ...data,
-      [inputLabel]: event.target.value,
-    });
-  };
-
-  const submitHandler = async () => {
+  const submitHandler = useCallback(async () => {
     setLoading(true);
     setValidation([]);
     try {
-      const result = await signIn(data);
+      const { data: result } = await axios({
+        url: "/api/signin",
+        data,
+        method: "POST",
+      });
+
+      if (result.status != 200) throw result;
 
       setTimeout(() => {
         setLoading(false);
         toast.success(result.message, { containerId: "Main" });
-        Cookies.set("token", btoa(result.payload), { expires: 1 });
         router.push("/");
       }, 700);
     } catch (error: any) {
@@ -65,10 +51,10 @@ const Signin = () => {
           return populateValidation(error, setValidation);
         }
 
-        toast.error(error.message, { containerId: "Main" });
+        toast.error(error.message, { containerId: "Signin" });
       }, 700);
     }
-  };
+  }, [data]);
 
   useEffect(() => {
     populateErrorFloating(validation, data);
@@ -101,7 +87,9 @@ const Signin = () => {
             placeholder="email"
             type="email"
             className="mini-input peer"
-            onChange={(e) => textInputHandler(e, "email", data, setData)}
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, email: e.target.value }))
+            }
           />
           <label htmlFor="email" className="floating-label float-label-black">
             Email
@@ -115,7 +103,9 @@ const Signin = () => {
             autoComplete="off"
             type="password"
             className="mini-input peer shadow-transparent"
-            onChange={(e) => textInputHandler(e, "password", data, setData)}
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, password: e.target.value }))
+            }
           />
           <label
             htmlFor="password"
@@ -137,7 +127,7 @@ const Signin = () => {
           ) : (
             <button className="btn btn-sm pointer-events-none">
               <span className="loading loading-spinner loading-sm"></span>
-              Signing..
+              Signing in..
             </button>
           )}
         </div>

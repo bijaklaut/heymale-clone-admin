@@ -1,34 +1,22 @@
 import { PaginationTypes, UserTypes, VoucherTypes } from "../../services/types";
-import DeleteUserModal from "../Modals/User/DeleteUser";
-import UpdateUserModal from "../Modals/User/UpdateUser";
-import ChangePasswordModal from "../Modals/User/ChangePassword";
 import {
   ChangeEvent,
-  Dispatch,
   Fragment,
   MouseEventHandler,
-  SetStateAction,
   useCallback,
   useState,
 } from "react";
 import NoDisplay from "../Misc/NoDisplay";
 import Pagination from "../Misc/Pagination";
-import AddressListModal from "../Modals/User/AddressList";
 import {
   ArrowDownSvg,
   EditSvg,
-  MailSvg,
   NoteSvg,
   OptionDotSvg,
-  PhoneSvg,
   TrashSvg,
-  UserSvg,
 } from "../Misc/SvgGroup";
-import { ProductExpand } from "../Misc/ProductExpand";
 import cx from "classnames";
-import VoucherCondition from "../Modals/Voucher/VoucherCondition";
 import NumFormatWrapper from "../Wrapper/NumFormatWrapper";
-import DeleteVoucherModal from "../Modals/Voucher/DeleteVoucher";
 
 interface ThisProps {
   paginate: PaginationTypes;
