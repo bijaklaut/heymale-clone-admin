@@ -1,10 +1,8 @@
 "use client";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import { signIn } from "../../../../services/admin";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import heymaleLogo from "@/../public/images/logo/heymale-logo.png";
 import { SignInTypes, ValidationTypes } from "../../../../services/types";
 import {
@@ -12,6 +10,7 @@ import {
   populateErrorFloating,
   populateValidation,
 } from "../../../../services/helper";
+import axios from "axios";
 
 const Signin = () => {
   const router = useRouter();
@@ -21,7 +20,6 @@ const Signin = () => {
   });
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
   const [disable, setDisable] = useState(true);
-  const [logged, setLogged] = useState("");
   const [loading, setLoading] = useState(false);
   const btnCheckProps = {
     data,
@@ -33,15 +31,16 @@ const Signin = () => {
     setLoading(true);
     setValidation([]);
     try {
-      const result = await signIn(data);
+      const { data: result } = await axios({
+        url: "/api/signin",
+        data,
+        method: "POST",
+      });
+
+      if (result.status != 200) throw result;
 
       setTimeout(() => {
         setLoading(false);
-        Cookies.set("token", btoa(result.payload), {
-          expires: 1,
-          sameSite: "strict",
-        });
-
         toast.success(result.message, { containerId: "Main" });
         router.push("/");
       }, 700);
@@ -128,7 +127,7 @@ const Signin = () => {
           ) : (
             <button className="btn btn-sm pointer-events-none">
               <span className="loading loading-spinner loading-sm"></span>
-              Signing..
+              Signing in..
             </button>
           )}
         </div>
