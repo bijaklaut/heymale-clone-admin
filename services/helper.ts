@@ -180,15 +180,27 @@ export const variantHandler = (
 };
 
 export const initPagination = (payload?: any) => {
+  if (payload) {
+    return {
+      docs: payload.docs,
+      page: payload.page,
+      totalPages: payload.totalPages,
+      pagingCounter: payload.pagingCounter,
+      hasPrevPage: payload.hasPrevPage,
+      hasNextPage: payload.hasNextPage,
+      prevPage: payload.prevPage,
+      nextPage: payload.nextPage,
+    };
+  }
   return {
-    docs: payload?.docs || [],
-    page: payload?.page || 1,
-    totalPages: payload?.totalPages || 1,
-    pagingCounter: payload?.pagingCounter || 1,
-    hasPrevPage: payload?.hasPrevPage || false,
-    hasNextPage: payload?.hasNextPage || false,
-    prevPage: payload?.prevPage || null,
-    nextPage: payload?.nextPage || null,
+    docs: [],
+    page: 1,
+    totalPages: 1,
+    pagingCounter: 1,
+    hasPrevPage: false,
+    hasNextPage: false,
+    prevPage: null,
+    nextPage: null,
   };
 };
 

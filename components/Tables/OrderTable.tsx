@@ -1,5 +1,11 @@
 "use client";
-import { Fragment, MouseEventHandler, useCallback } from "react";
+import {
+  Fragment,
+  MouseEventHandler,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import {
   OrderItemTypes,
   OrderTypes,
@@ -13,6 +19,9 @@ import { InfoSvg, OptionDotSvg } from "../Misc/SvgGroup";
 import NumFormatWrapper from "../Wrapper/NumFormatWrapper";
 import cx from "classnames";
 import { capitalize, underscoreTransform } from "../../services/helper";
+import { createShippingOrder } from "../../services/admin";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
 
 interface OrderPagination extends PaginationTypes {
   docs: OrderTypes[];
@@ -25,6 +34,8 @@ interface ThisProps {
   itemsDetailMisc(items: OrderItemTypes[]): void;
   trxDetailMisc(transaction: Partial<TransactionTypes>): void;
   shipmentDetailMisc(shipment: Partial<ShipmentTypes>): void;
+  tabHandler(tab: string): void;
+  activeTab: string;
 }
 
 const OrderTable = ({
@@ -34,46 +45,75 @@ const OrderTable = ({
   itemsDetailMisc,
   trxDetailMisc,
   shipmentDetailMisc,
+  tabHandler,
+  activeTab: tab,
 }: ThisProps) => {
   const { docs: orders } = paginate;
+
   const statusClass = useCallback((status: string) => {
-    const errorStatus = [
-      "deny",
-      "cancel",
-      "expire",
-      "failure",
-      "courier_not_found",
-      "cancelled",
-      "rejected",
-      "disposed",
-      "returned",
-    ];
-
-    const ongoingStatus = [
-      "confirmed",
-      "allocated",
-      "picking_up",
-      "picked",
-      "dropping_off",
-      "return_in_transit",
-    ];
-
     return cx({
       "w-fit py-3 badge badge-outline font-semibold": true,
-      "xl:text-neutral/50": status == "pending",
-      "xl:text-primary": status == "delivered",
-      "xl:text-success border-2": status == "settlement",
-      "xl:text-error": errorStatus.includes(status),
-      "xl:text-accent": ongoingStatus.includes(status),
+      "text-neutral/50": status == "pending",
+      "text-primary": status == "delivered",
+      "text-success border-2": status == "settlement",
+      "text-error": errorStatus.includes(status),
+      "text-accent": ongoingStatus.includes(status),
     });
   }, []);
 
+  const createShippingOrderAPI = useCallback(async (invoice: string) => {
+    try {
+      const result = await createShippingOrder({ invoice });
+      toast.success(result.message, { containerId: "Main" });
+    } catch (error: any) {
+      toast.error(error.message, { containerId: "Main" });
+    }
+  }, []);
+
+  // const getPaidOrder = useCallback(() => {
+  //   let tempPending: OrderTypes[] = [];
+  //   let tempPaid: OrderTypes[] = [];
+  //   let tempOngoing: OrderTypes[] = [];
+  //   let tempFailed: OrderTypes[] = [];
+  //   let tempFinished: OrderTypes[] = [];
+
+  //   orders.forEach((order) => {
+  //     if (order.status == "pending") {
+  //       tempPending.push(order);
+  //     }
+  //     if (order.status == "settlement") {
+  //       tempPaid.push(order);
+  //     }
+  //     if (ongoingStatus.includes(order.status)) {
+  //       tempOngoing.push(order);
+  //     }
+  //     if (errorStatus.includes(order.status)) {
+  //       tempFailed.push(order);
+  //     }
+  //     if (order.status == "finished") {
+  //       tempFinished.push(order);
+  //     }
+  //   });
+
+  //   setPendingOrder(tempPending);
+  //   setPaidOrder(tempPaid);
+  //   setOngoingOrder(tempOngoing);
+  //   setFailedOrder(tempFailed);
+  //   setFinishedOrder(tempFinished);
+  // }, [orders]);
+
+  // useEffect(() => {
+  //   if (orders.length > 0) {
+  //     getPaidOrder();
+  //   }
+  // }, [orders]);
+
   return (
-    <div className="text- min-h-screen max-w-[1920px]">
+    <div className="min-h-screen max-w-[1920px]">
       {orders.length ? (
         <Fragment>
-          <div className="rounded-md bg-transparent xl:bg-neutral-100 xl:px-3 xl:py-5">
-            <div className="mb-4 hidden grid-cols-[50px_1fr_1fr_200px_200px_150px_50px] justify-items-center gap-x-2 font-semibold text-black/60 xl:grid">
+          <div className="rounded-md bg-neutral-100 px-3 py-5">
+            <div className="mb-4 grid grid-cols-[50px_1fr_1fr_200px_200px_150px_50px] justify-items-center gap-x-2 font-semibold text-black/60">
               <div className="">#</div>
               <div className="">Invoice</div>
               <div className="">User</div>
@@ -101,51 +141,10 @@ const OrderTable = ({
                       <div className={statusClass(order.status)}>
                         {underscoreTransform(order.status)}
                       </div>
-                      {/* {order.status != "pending" && (
-                        <div className="dropdown dropdown-end">
-                          <button
-                            tabIndex={0}
-                            className="btn-icon-primary translate-y-1"
-                          >
-                            <InfoSvg className="w-4 stroke-current" />
-                          </button>
-                          <div
-                            tabIndex={0}
-                            className="card dropdown-content z-[1] h-[150px] w-64 rounded-md border bg-white p-0 shadow-md"
-                          >
-                            <div tabIndex={0} className="card-body">
-                              <div className="grid grid-cols-1">
-                                <span className="text-sm text-black/60">
-                                  Payment Status
-                                </span>
-                                <span>
-                                  {order.transaction.transaction_status
-                                    ? underscoreTransform(
-                                        order.transaction.transaction_status,
-                                      )
-                                    : "-"}
-                                </span>
-                              </div>
-                              <div className="grid grid-cols-1">
-                                <span className="text-sm text-black/60">
-                                  Shipping Status
-                                </span>
-                                <span>
-                                  {order.shipping_detail.status
-                                    ? underscoreTransform(
-                                        order.shipping_detail.status,
-                                      )
-                                    : "-"}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )} */}
                     </div>
                     <div>
                       <button
-                        className="btn btn-outline btn-primary btn-sm"
+                        className="btn btn-primary btn-xs text-sm"
                         onClick={() => itemsDetailMisc(order.order_item)}
                       >
                         See Details
@@ -171,11 +170,20 @@ const OrderTable = ({
                         </div>
                         <ul
                           tabIndex={0}
-                          className="no-scrollbar dropdown-content z-[1] flex w-[200px] flex-col gap-y-2 rounded-box bg-base-100 p-2 text-sm text-white shadow [&>li:hover]:bg-white/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
+                          className="no-scrollbar dropdown-content z-[1] flex max-h-[150px] w-[200px] flex-col gap-y-2 overflow-y-auto rounded-box bg-base-100 p-2 text-sm text-white shadow [&>li:hover]:bg-white/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
                         >
-                          <li>
+                          {order.status == "settlement" && (
+                            <li
+                              onClick={() =>
+                                createShippingOrderAPI(order.invoice)
+                              }
+                            >
+                              <span>Create Shipping Order</span>
+                            </li>
+                          )}
+                          {/* <li>
                             <span>Edit Order</span>
-                          </li>
+                          </li> */}
                           <li onClick={() => trxDetailMisc(order.transaction)}>
                             <span>Transaction Detail</span>
                           </li>
@@ -206,3 +214,25 @@ const OrderTable = ({
 };
 
 export default OrderTable;
+
+const errorStatus = [
+  "deny",
+  "cancel",
+  "expire",
+  "failure",
+  "courier_not_found",
+  "cancelled",
+  "rejected",
+  "disposed",
+  "returned",
+];
+
+const ongoingStatus = [
+  "confirmed",
+  "allocated",
+  "picking_up",
+  "picked",
+  "dropping_off",
+  "return_in_transit",
+  "delivered",
+];

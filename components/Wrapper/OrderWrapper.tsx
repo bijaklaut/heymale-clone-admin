@@ -15,6 +15,7 @@ import OrderItemModal from "../Modals/Order/OrderItem";
 import TransactionDetailModal from "../Modals/Order/TransactionDetail";
 import ShipmentDetailModal from "../Modals/Order/ShipmentDetail";
 import CatalogProductModal from "../Modals/Order/Catalog";
+import cx from "classnames";
 
 const OrderWrapper = () => {
   const [search, setSearch] = useState("");
@@ -24,6 +25,7 @@ const OrderWrapper = () => {
   const [loading, setLoading] = useState(true);
 
   const [detailModal, setDetailModal] = useState("none");
+  const [filter, setFilter] = useState("all");
 
   const [itemsDetail, setItemsDetail] = useState<OrderItemTypes[]>();
   const [trxDetail, setTrxDetail] = useState<Partial<TransactionTypes>>();
@@ -31,23 +33,44 @@ const OrderWrapper = () => {
     useState<Partial<ShipmentTypes>>();
 
   const stateChanges = () => setChanges((prev) => !prev);
+  const tabHandler = useCallback((tab: string) => setFilter(tab), []);
   const pageHandler = (pageNumber: number) => setPage(pageNumber);
+
+  const activeTab = useCallback((active: string, value: string) => {
+    return cx({
+      "btn btn-sm text-white": true,
+      "bg-base-300 hover:bg-base-200": active != value,
+      "btn-accent": active == value,
+    });
+  }, []);
+
   const getFilteredOrders = useCallback(
-    async (page?: number, search?: string) => {
-      setLoading(true);
-      const { payload } = await getOrders();
-      setPagination(initPagination(payload));
-      return setTimeout(() => setLoading(false), 500);
+    async (page: number, data: { filter: string; search: string }) => {
+      try {
+        setLoading(true);
+        const { payload } = await getOrders(page, data);
+
+        setPagination(initPagination(payload));
+      } catch (error) {
+        setPagination(initPagination());
+      } finally {
+        return setTimeout(() => setLoading(false), 500);
+      }
     },
-    [search, page, changes],
+    [],
   );
 
   // Search filter then reset pagination
-  // useEffect(() => {
-  //   const pageParams = 1;
+  useEffect(() => {
+    const resetPage = 1;
 
-  //   getFilteredOrders(search, pageParams);
-  // }, [search, changes]);
+    getFilteredOrders(resetPage, { filter, search });
+  }, [filter, search, changes]);
+
+  // Pagination
+  useEffect(() => {
+    getFilteredOrders(page, { filter, search });
+  }, [page]);
 
   const itemsDetailMisc = useCallback((items: OrderItemTypes[]) => {
     setDetailModal("items");
@@ -66,11 +89,6 @@ const OrderWrapper = () => {
     setShipmentDetail(shipment);
     setDetailModal("shipment");
   }, []);
-
-  // Pagination
-  useEffect(() => {
-    getFilteredOrders(page, search);
-  }, [page]);
 
   return (
     <Fragment>
@@ -96,6 +114,44 @@ const OrderWrapper = () => {
           shipment={shipmentDetail}
           reset={() => setDetailModal("none")}
         />
+        <div className="my-3 flex gap-2">
+          <div
+            className={activeTab(filter, "all")}
+            onClick={() => tabHandler("all")}
+          >
+            All
+          </div>
+          <div
+            className={activeTab(filter, "pending")}
+            onClick={() => tabHandler("pending")}
+          >
+            Pending
+          </div>
+          <div
+            className={activeTab(filter, "settlement")}
+            onClick={() => tabHandler("settlement")}
+          >
+            Paid
+          </div>
+          <div
+            className={activeTab(filter, "ongoing")}
+            onClick={() => tabHandler("ongoing")}
+          >
+            On-going
+          </div>
+          <div
+            className={activeTab(filter, "completed")}
+            onClick={() => tabHandler("completed")}
+          >
+            Completed
+          </div>
+          <div
+            className={activeTab(filter, "failed")}
+            onClick={() => tabHandler("failed")}
+          >
+            Failed
+          </div>
+        </div>
         {/* <SearchFilter
           search={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -111,6 +167,8 @@ const OrderWrapper = () => {
             itemsDetailMisc={itemsDetailMisc}
             trxDetailMisc={trxDetailMisc}
             shipmentDetailMisc={shipmentDetailMisc}
+            tabHandler={(tab) => setFilter(tab)}
+            activeTab={filter}
           />
         ) : (
           <SimpleTableLoading />

@@ -6,6 +6,7 @@ import { ArrowDownSvg, ArrowRightSvg } from "../Misc/SvgGroup";
 import { Fragment, useState } from "react";
 import cx from "classnames";
 import { SignoutModal } from "./SignoutModal";
+import { PUBLIC_API_IMG } from "../../constants";
 
 interface ThisProps {
   user: {
@@ -16,7 +17,7 @@ interface ThisProps {
 }
 
 const UserAction = (props: ThisProps) => {
-  const IMG = `${process.env.NEXT_PUBLIC_IMG}/user`;
+  const IMG = `${PUBLIC_API_IMG}/user`;
   const { user, compact = false } = props;
   const [checked, setChecked] = useState(false);
   const menuMobile = cx({

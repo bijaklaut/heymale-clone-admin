@@ -306,12 +306,11 @@ const PostVoucherModal = (props: ThisProps) => {
     try {
       const form = formAppend();
 
-      const token = Cookies.get("token");
       setLoading(true);
       setValidation([]);
 
       if (!updateState) {
-        const result = await createVoucher(form, token!);
+        const result = await createVoucher(form, true);
 
         setTimeout(() => {
           setLoading(false);
@@ -322,7 +321,7 @@ const PostVoucherModal = (props: ThisProps) => {
           stateChanges();
         }, 700);
       } else {
-        const result = await updateVoucher(form, token!);
+        const result = await updateVoucher(form, true);
         setTimeout(() => {
           setLoading(false);
           toast.success(result.message, { containerId: "Main" });

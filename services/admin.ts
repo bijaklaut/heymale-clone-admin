@@ -1,20 +1,17 @@
+import { PUBLIC_API_BASEURL, PUBLIC_API_VER } from "../constants";
 import callApi from "./callApi";
 import {
   CartItemTypes,
-  CartTypes,
   PostOrderTypes,
   PostPaymentTypes,
   SignInTypes,
 } from "./types";
 
-const ROOT_API = process.env.NEXT_PUBLIC_API;
-const API_VER = "api/v1";
-
 // Category Dashboard
 export const getCategories = async (search?: string, page?: number) => {
   const searchQuery = search ? `?search=${search}` : "";
   const pageQuery = page ? (searchQuery ? `&p=${page}` : `?p=${page}`) : "";
-  const url = `${ROOT_API}/${API_VER}/category${searchQuery}${pageQuery}`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/category${searchQuery}${pageQuery}`;
 
   return callApi({
     url,
@@ -22,8 +19,11 @@ export const getCategories = async (search?: string, page?: number) => {
   });
 };
 
-export const createCategory = async (data: { name: string }, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/category/create`;
+export const createCategory = async (
+  data: { name: string },
+  token: boolean,
+) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/category/create`;
 
   return callApi({
     url,
@@ -36,9 +36,9 @@ export const createCategory = async (data: { name: string }, token: string) => {
 export const updateCategory = async (
   data: { name: string },
   id: string,
-  token: string,
+  token: boolean,
 ) => {
-  const url = `${ROOT_API}/${API_VER}/category/${id}`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/category/${id}`;
 
   return callApi({
     url,
@@ -48,8 +48,8 @@ export const updateCategory = async (
   });
 };
 
-export const deleteCategory = async (id: string, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/category/${id}?_method=DELETE`;
+export const deleteCategory = async (id: string, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/category/${id}?_method=DELETE`;
 
   return callApi({
     url,
@@ -64,7 +64,7 @@ export const deleteCategory = async (id: string, token: string) => {
 export const getPayments = async (search: string, page?: number) => {
   const searchQuery = `?search=${search}` || "";
   const pageQuery = page ? (searchQuery ? `&p=${page}` : `?p=${page}`) : "";
-  const url = `${ROOT_API}/${API_VER}/payment${searchQuery}${pageQuery}`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/payment${searchQuery}${pageQuery}`;
 
   return callApi({
     url,
@@ -72,8 +72,8 @@ export const getPayments = async (search: string, page?: number) => {
   });
 };
 
-export const createPayment = async (data: PostPaymentTypes, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/payment/create`;
+export const createPayment = async (data: PostPaymentTypes, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/payment/create`;
 
   return callApi({
     url,
@@ -86,9 +86,9 @@ export const createPayment = async (data: PostPaymentTypes, token: string) => {
 export const updatePayment = async (
   data: PostPaymentTypes,
   id: string,
-  token: string,
+  token: boolean,
 ) => {
-  const url = `${ROOT_API}/${API_VER}/payment/${id}`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/payment/${id}`;
 
   return callApi({
     url,
@@ -98,8 +98,8 @@ export const updatePayment = async (
   });
 };
 
-export const deletePayment = async (id: string, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/payment/${id}?_method=DELETE`;
+export const deletePayment = async (id: string, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/payment/${id}?_method=DELETE`;
 
   return callApi({
     url,
@@ -116,7 +116,7 @@ export const getProducts = async (
   data?: { query: string; search: string },
 ) => {
   const queryString = page ? `?p=${page}` : "";
-  const url = `${ROOT_API}/${API_VER}/product${queryString}`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/product${queryString}`;
 
   return callApi({
     url,
@@ -125,8 +125,8 @@ export const getProducts = async (
   });
 };
 
-export const createProduct = async (data: FormData, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/product/create`;
+export const createProduct = async (data: FormData, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/product/create`;
   return callApi({
     url,
     method: "POST",
@@ -138,9 +138,9 @@ export const createProduct = async (data: FormData, token: string) => {
 export const updateProduct = async (
   data: FormData,
   id: string,
-  token: string,
+  token: boolean,
 ) => {
-  const url = `${ROOT_API}/${API_VER}/product/update/${id}`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/product/update/${id}`;
 
   return callApi({
     url,
@@ -150,8 +150,8 @@ export const updateProduct = async (
   });
 };
 
-export const deleteProduct = async (id: string, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/product/${id}?_method=DELETE`;
+export const deleteProduct = async (id: string, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/product/${id}?_method=DELETE`;
 
   return callApi({
     url,
@@ -165,7 +165,7 @@ export const deleteProduct = async (id: string, token: string) => {
 export const getUsers = async (page: number, search: string) => {
   const searchQuery = search ? `?search=${search}` : "";
   const pageQuery = page ? (searchQuery ? `&p=${page}` : `?p=${page}`) : "";
-  const url = `${ROOT_API}/${API_VER}/user${searchQuery}${pageQuery}`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/user${searchQuery}${pageQuery}`;
 
   return callApi({
     url,
@@ -174,7 +174,7 @@ export const getUsers = async (page: number, search: string) => {
 };
 
 export const getUserById = async (id: string) => {
-  const url = `${ROOT_API}/${API_VER}/user/${id}`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/user/${id}`;
 
   return callApi({
     url,
@@ -182,8 +182,8 @@ export const getUserById = async (id: string) => {
   });
 };
 
-export const createUser = async (data: FormData, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/user/create`;
+export const createUser = async (data: FormData, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/user/create`;
 
   return callApi({
     url,
@@ -193,8 +193,12 @@ export const createUser = async (data: FormData, token: string) => {
   });
 };
 
-export const updateUser = async (data: FormData, id: string, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/user/update/${id}`;
+export const updateUser = async (
+  data: FormData,
+  id: string,
+  token: boolean,
+) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/user/update/${id}`;
 
   return callApi({
     url,
@@ -204,8 +208,8 @@ export const updateUser = async (data: FormData, id: string, token: string) => {
   });
 };
 
-export const deleteUser = async (id: string, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/user/${id}?_method=DELETE`;
+export const deleteUser = async (id: string, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/user/${id}?_method=DELETE`;
 
   return callApi({
     url,
@@ -216,8 +220,8 @@ export const deleteUser = async (id: string, token: string) => {
 // End of User Dashboard
 
 // Address
-export const createAddress = async (data: FormData, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/address/create`;
+export const createAddress = async (data: FormData, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/address/create`;
 
   return callApi({
     url,
@@ -230,9 +234,9 @@ export const createAddress = async (data: FormData, token: string) => {
 export const updateAddress = async (
   data: FormData,
   id: string,
-  token: string,
+  token: boolean,
 ) => {
-  const url = `${ROOT_API}/${API_VER}/address/update/${id}`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/address/update/${id}`;
 
   return callApi({
     url,
@@ -242,8 +246,8 @@ export const updateAddress = async (
   });
 };
 
-export const deleteAddress = async (id: string, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/address/${id}?_method=DELETE`;
+export const deleteAddress = async (id: string, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/address/${id}?_method=DELETE`;
 
   return callApi({
     url,
@@ -252,8 +256,8 @@ export const deleteAddress = async (id: string, token: string) => {
   });
 };
 
-export const getAddressByUser = async (user: string, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/address/byuser`;
+export const getAddressByUser = async (user: string, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/address/byuser`;
 
   return callApi({
     url,
@@ -266,7 +270,7 @@ export const getAddressByUser = async (user: string, token: string) => {
 
 // Voucher
 export const getVouchers = async () => {
-  const url = `${ROOT_API}/${API_VER}/voucher/`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/voucher/`;
 
   return callApi({
     url,
@@ -275,7 +279,7 @@ export const getVouchers = async () => {
 };
 
 export const getAvailableVouchers = async () => {
-  const url = `${ROOT_API}/${API_VER}/voucher/available`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/voucher/available`;
 
   return callApi({
     url,
@@ -283,8 +287,8 @@ export const getAvailableVouchers = async () => {
   });
 };
 
-export const createVoucher = async (data: FormData, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/voucher/create`;
+export const createVoucher = async (data: FormData, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/voucher/create`;
 
   return callApi({
     url,
@@ -294,8 +298,8 @@ export const createVoucher = async (data: FormData, token: string) => {
   });
 };
 
-export const updateVoucher = async (data: FormData, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/voucher/update`;
+export const updateVoucher = async (data: FormData, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/voucher/update`;
 
   return callApi({
     url,
@@ -305,8 +309,8 @@ export const updateVoucher = async (data: FormData, token: string) => {
   });
 };
 
-export const deleteVoucher = async (id: string, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/voucher/${id}?_method=DELETE`;
+export const deleteVoucher = async (id: string, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/voucher/${id}?_method=DELETE`;
 
   return callApi({
     url,
@@ -317,17 +321,22 @@ export const deleteVoucher = async (id: string, token: string) => {
 // End of Voucher
 
 // Order
-export const getOrders = async () => {
-  const url = `${ROOT_API}/${API_VER}/order`;
+export const getOrders = async (
+  page?: number,
+  data?: { filter: string; search: string },
+) => {
+  const pageQuery = page ? `?p=${page}` : "";
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/order${pageQuery}`;
 
   return callApi({
     url,
     method: "POST",
+    data,
   });
 };
 
-export const createOrder = async (data: PostOrderTypes, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/order/create`;
+export const createOrder = async (data: PostOrderTypes, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/order/create`;
 
   return callApi({
     url,
@@ -337,8 +346,8 @@ export const createOrder = async (data: PostOrderTypes, token: string) => {
   });
 };
 
-export const getOrderDetail = async (invoice: string, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/order/${invoice}`;
+export const getOrderDetail = async (invoice: string, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/order/${invoice}`;
 
   return callApi({
     url,
@@ -346,11 +355,21 @@ export const getOrderDetail = async (invoice: string, token: string) => {
     token,
   });
 };
+
+export const createShippingOrder = async (data: { invoice: string }) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/order/shipping`;
+
+  return callApi({
+    url,
+    data,
+    method: "POST",
+  });
+};
 // End of Order
 
 // Shipment
 export const getShipments = async () => {
-  const url = `${ROOT_API}/${API_VER}/shipment`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/shipment`;
 
   return callApi({
     url,
@@ -361,7 +380,7 @@ export const getShipments = async () => {
 
 // Transaction
 export const getTransactions = async () => {
-  const url = `${ROOT_API}/${API_VER}/transaction`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/transaction`;
 
   return callApi({
     url,
@@ -375,7 +394,7 @@ export const updateCart = async (data: {
   user: string;
   items: CartItemTypes[];
 }) => {
-  const url = `${ROOT_API}/${API_VER}/cart/updatecart`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/cart/updatecart`;
 
   return callApi({
     url,
@@ -385,7 +404,7 @@ export const updateCart = async (data: {
 };
 
 export const getUserCart = async (data: { user: string }) => {
-  const url = `${ROOT_API}/${API_VER}/cart/usercart`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/cart/usercart`;
 
   return callApi({
     url,
@@ -394,8 +413,8 @@ export const getUserCart = async (data: { user: string }) => {
   });
 };
 
-export const emptyCart = async (user: string, token: string) => {
-  const url = `${ROOT_API}/${API_VER}/cart/${user}?_method=DELETE`;
+export const emptyCart = async (user: string, token: boolean) => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/cart/${user}?_method=DELETE`;
 
   return callApi({
     url,
@@ -407,7 +426,7 @@ export const emptyCart = async (user: string, token: string) => {
 
 // Auth
 export const signIn = async (data: SignInTypes) => {
-  const url = `${ROOT_API}/${API_VER}/user/signin`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/user/signin`;
 
   return callApi({
     url,
@@ -419,9 +438,9 @@ export const signIn = async (data: SignInTypes) => {
 export const changePassword = async (
   data: FormData,
   id: string,
-  token: string,
+  token: boolean,
 ) => {
-  const url = `${ROOT_API}/${API_VER}/user/reauth/${id}`;
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/user/reauth/${id}`;
 
   return callApi({
     url,

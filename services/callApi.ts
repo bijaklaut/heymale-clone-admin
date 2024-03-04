@@ -1,16 +1,22 @@
+"use server";
 import axios, { AxiosRequestConfig } from "axios";
+import { cookies } from "next/headers";
 
 interface CallAPIProps extends AxiosRequestConfig {
-  token?: string;
+  token?: boolean;
 }
 
-const callApi = async ({ url, method, data, token = "" }: CallAPIProps) => {
+const callApi = async ({ url, method, data, token = false }: CallAPIProps) => {
   let headers = {};
   if (token) {
-    const jwt = Buffer.from(token, "base64").toString("ascii");
-    headers = {
-      authorization: `Bearer ${jwt}`,
-    };
+    const accessToken = cookies().get("accessToken")?.value;
+
+    if (accessToken) {
+      const jwt = Buffer.from(accessToken, "base64").toString("ascii");
+      headers = {
+        authorization: `Bearer ${jwt}`,
+      };
+    }
   }
 
   try {

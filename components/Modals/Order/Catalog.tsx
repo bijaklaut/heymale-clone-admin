@@ -32,6 +32,7 @@ import cx from "classnames";
 import Image from "next/image";
 import { getUserToken } from "../../../services/actions";
 import Link from "next/link";
+import { PUBLIC_API_IMG } from "../../../constants";
 
 // const initData = () => {
 //   return {
@@ -95,9 +96,11 @@ const CatalogProductModal = (props: ThisProps) => {
       xl: 0,
     },
   });
-  const IMG_API = process.env.NEXT_PUBLIC_IMG;
+
   const IMG_URL = useCallback((thumbnail: string) => {
-    return thumbnail ? `${IMG_API}/product/${thumbnail}` : "icon/image.svg";
+    return thumbnail
+      ? `${PUBLIC_API_IMG}/product/${thumbnail}`
+      : "icon/image.svg";
   }, []);
 
   const imageClass = useCallback((thumbnail: boolean) => {

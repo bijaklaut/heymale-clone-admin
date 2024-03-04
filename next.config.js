@@ -8,6 +8,9 @@ const nextConfig = {
       {
         hostname: "127.0.0.1",
       },
+      {
+        hostname: "sore-lime-rabbit-tutu.cyclic.app",
+      },
     ],
   },
 };
