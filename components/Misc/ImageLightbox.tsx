@@ -18,10 +18,6 @@ export const ImageLightbox = ({
   width,
 }: ThisProps) => {
   const overlayRef = useRef<HTMLDialogElement>(null);
-  const IMG_API = process.env.NEXT_PUBLIC_IMG;
-  const IMG_URL = thumbnail
-    ? `${IMG_API}/product/${thumbnail}`
-    : "icon/image.svg";
 
   const thumbnailClass = useCallback(() => {
     return cx({
@@ -56,7 +52,7 @@ export const ImageLightbox = ({
     <Fragment>
       <div className="group relative w-fit overflow-hidden">
         <Image
-          src={IMG_URL}
+          src={thumbnail}
           width={width}
           height={height}
           alt={alt}
@@ -72,7 +68,7 @@ export const ImageLightbox = ({
       <dialog ref={overlayRef} className="modal max-xl:transition-none">
         <div className="flex flex-col items-center gap-y-3">
           <Image
-            src={IMG_URL}
+            src={thumbnail}
             width={width}
             height={height}
             alt={alt}

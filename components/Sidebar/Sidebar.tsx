@@ -25,7 +25,7 @@ import {
 } from "../Misc/SvgGroup";
 import cx from "classnames";
 import { TopNavbar } from "./TopNavbar";
-import { getUserToken } from "../../services/actions";
+import { getUserId } from "../../services/actions";
 
 export const Sidebar = () => {
   const [user, setUser] = useState({
@@ -55,7 +55,7 @@ export const Sidebar = () => {
 
   const getUserAPI = useCallback(async () => {
     if (!user.name) {
-      let id = await getUserToken();
+      let id = await getUserId();
 
       if (id) {
         const { payload } = await getUserById(id);

@@ -98,8 +98,7 @@ const UpdateProductModal = (props: ThisProps) => {
     }
 
     try {
-      const token = Cookies.get("token");
-      const result = await updateProduct(form, id, token!);
+      const result = await updateProduct(form, id, true);
 
       setTimeout(() => {
         setLoading(false);
@@ -212,7 +211,7 @@ const UpdateProductModal = (props: ThisProps) => {
                 />
               ) : data.thumbnail ? (
                 <Image
-                  src={`${IMG_API}/product/${data.thumbnail}`}
+                  src={data.thumbnail as string}
                   width={150}
                   height={150}
                   alt="preview"

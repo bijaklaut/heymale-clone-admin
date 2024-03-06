@@ -10,7 +10,6 @@ import {
   PostAddressTypes,
   ValidationTypes,
 } from "../../../services/types";
-import Cookies from "js-cookie";
 import cx from "classnames";
 import TextInput from "../../Form/TextInput";
 import { getArea } from "../../../services/actions";
@@ -150,49 +149,44 @@ const PostAddressCollapse = (props: thisProps) => {
     return form;
   }, [data]);
 
-  const submitHandler = useCallback(
-    async (userId: string) => {
-      try {
-        const form = formAppend();
-        setLoading(true);
-        setValidation([]);
+  const submitHandler = useCallback(async () => {
+    try {
+      const form = formAppend();
+      setLoading(true);
+      setValidation([]);
 
-        if (!isUpdate) {
-          const token = Cookies.get("token");
-          const result = await createAddress(form, token!);
+      if (!isUpdate) {
+        const result = await createAddress(form, true);
 
-          setTimeout(() => {
-            setLoading(false);
-            toast.success(result.message, { containerId: "Main" });
-            collapseHandler(false, userid);
-            router.refresh();
-            stateChanges();
-          }, 700);
-        } else {
-          const token = Cookies.get("token");
-          const result = await updateAddress(form, address._id, token!);
-
-          setTimeout(() => {
-            setLoading(false);
-            toast.success(result.message, { containerId: "Main" });
-            collapseHandler(false, userid);
-            router.refresh();
-            stateChanges();
-          }, 700);
-        }
-      } catch (error: any) {
         setTimeout(() => {
           setLoading(false);
+          toast.success(result.message, { containerId: "Main" });
+          collapseHandler(false, userid);
+          router.refresh();
+          stateChanges();
+        }, 700);
+      } else {
+        const result = await updateAddress(form, address._id, true);
 
-          if (error.message == "Validation Error" || error.code == 11000) {
-            return populateValidation(error, setValidation);
-          }
-          toast.error(error.message, { containerId: "AddressList" });
+        setTimeout(() => {
+          setLoading(false);
+          toast.success(result.message, { containerId: "Main" });
+          collapseHandler(false, userid);
+          router.refresh();
+          stateChanges();
         }, 700);
       }
-    },
-    [isUpdate, data],
-  );
+    } catch (error: any) {
+      setTimeout(() => {
+        setLoading(false);
+
+        if (error.message == "Validation Error" || error.code == 11000) {
+          return populateValidation(error, setValidation);
+        }
+        toast.error(error.message, { containerId: "AddressList" });
+      }, 700);
+    }
+  }, [isUpdate, data]);
 
   // Get Area
   useEffect(() => {
@@ -235,7 +229,6 @@ const PostAddressCollapse = (props: thisProps) => {
           for (let j = 0; j < Object.entries(data.addressArea).length; j++) {
             const [key, value] = Object.entries(data.addressArea)[j];
             if (!value) {
-              console.log(value);
               return setDisable(true);
             }
           }
@@ -335,7 +328,7 @@ const PostAddressCollapse = (props: thisProps) => {
           <div className="mt-5 flex justify-end">
             {!loading ? (
               <button
-                onClick={() => submitHandler(userid)}
+                onClick={() => submitHandler()}
                 disabled={disable}
                 className="btn btn-primary btn-sm text-white"
               >

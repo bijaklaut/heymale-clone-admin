@@ -15,11 +15,6 @@ export const ProductThumbnail = ({
   thumbnail,
   width,
 }: ThisProps) => {
-  const IMG_API = process.env.NEXT_PUBLIC_IMG;
-  const IMG_URL = thumbnail
-    ? `${IMG_API}/product/${thumbnail}`
-    : "icon/image.svg";
-
   const imageClass = useCallback(() => {
     return cx({
       "xl:max-w-[100px] h-auto w-full max-w-[200px] rounded-md border-2 border-neutral bg-cover":
@@ -31,7 +26,7 @@ export const ProductThumbnail = ({
 
   return (
     <Image
-      src={IMG_URL}
+      src={thumbnail}
       width={width}
       height={height}
       alt={alt}

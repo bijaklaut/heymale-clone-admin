@@ -28,7 +28,6 @@ const ShipmentDetailModal = ({ shipment, isShow, reset }: ThisProps) => {
   const trackOrderAPI = useCallback(async () => {
     if (shipment?.courier?.tracking_id) {
       const result = await trackOrder(shipment?.courier?.tracking_id);
-      console.log("RESULT: ", result);
       setOrderHistory(result);
     }
   }, [shipment]);
