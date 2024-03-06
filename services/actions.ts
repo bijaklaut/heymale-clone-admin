@@ -9,7 +9,7 @@ import { BITESHIP_APIKEY, BITESHIP_BASEURL } from "../constants";
 
 export const redirectRoot = async () => redirect("/");
 
-export async function getUserToken() {
+export async function getUserId() {
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
   const jwt = Buffer.from(token!, "base64").toString("ascii");
