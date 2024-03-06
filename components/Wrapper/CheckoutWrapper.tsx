@@ -15,17 +15,19 @@ import Image from "next/image";
 import cx from "classnames";
 import { CircleCheckSvg } from "../Misc/SvgGroup";
 import NumFormatWrapper from "./NumFormatWrapper";
-import { getCourierRates, getUserToken } from "../../services/actions";
+import { getCourierRates, getUserId } from "../../services/actions";
 import {
   createOrder,
   emptyCart,
   getAddressByUser,
   getAvailableVouchers,
+  getUserCart,
 } from "../../services/admin";
 import Cookies from "js-cookie";
 import VoucherListModal from "../Misc/VoucherList";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { PUBLIC_API_IMG } from "../../constants";
 
 const virtual_accounts = [
   {
@@ -65,11 +67,6 @@ const CheckoutWrapper = () => {
   const [loading, setLoading] = useState(false);
 
   const [addresses, setAddresses] = useState<Partial<AddressTypes[]>>();
-
-  const IMG_API = process.env.NEXT_PUBLIC_IMG;
-  const IMG_URL = useCallback((thumbnail: string) => {
-    return thumbnail ? `${IMG_API}/product/${thumbnail}` : "icon/image.svg";
-  }, []);
 
   const imageClass = useCallback((thumbnail: boolean) => {
     return cx({
@@ -202,9 +199,8 @@ const CheckoutWrapper = () => {
   }, []);
 
   const getAddressAPI = useCallback(async () => {
-    const id = await getUserToken();
-    const token = Cookies.get("token");
-    const { payload } = await getAddressByUser(id, token!);
+    const id = await getUserId();
+    const { payload } = await getAddressByUser(id, true);
 
     if (payload.length > 0) {
       setAddresses(payload);
@@ -228,8 +224,8 @@ const CheckoutWrapper = () => {
         const result = await getCourierRates(postData);
         setRates(result.pricing);
       }
-    } catch (error) {
-      console.log("Courier Rates Error: ", error);
+    } catch (error: any) {
+      toast.error(error.message, { containerId: "Main" });
     }
   }, [data, deliveryItems]);
 
@@ -270,27 +266,26 @@ const CheckoutWrapper = () => {
   }, []);
 
   const confirmOrder = useCallback(async () => {
-    const token = Cookies.get("token");
-    setLoading(true);
-
-    if (data && token) {
-      try {
-        const { status, payload, message } = await createOrder(data, token);
+    try {
+      if (data && cart?.items.length! > 0) {
+        const { status, payload, message } = await createOrder(data, true);
+        setLoading(true);
 
         if (status == 201) {
-          await emptyCart(cart!.user, token);
+          const { payload } = await emptyCart(cart!.user, true);
+          setCart((prev) => ({ ...prev!, items: payload }));
           setTimeout(() => {
             setLoading(false);
             toast.success(message, { containerId: "Main" });
             router.push(`/order/${payload}`);
           }, 700);
         }
-      } catch (error: any) {
-        toast.error(
-          `Failed to process order. Please try again later (${error.status})`,
-          { containerId: "Main" },
-        );
       }
+    } catch (error: any) {
+      toast.error(
+        `Failed to process order. Please try again later (${error.status})`,
+        { containerId: "Main" },
+      );
     }
   }, [data, cart]);
 
@@ -301,10 +296,16 @@ const CheckoutWrapper = () => {
     getVouchersAPI();
   }, []);
 
+  useEffect(() => {
+    if (cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+  }, [cart]);
+
   // Populate Data Exec
   useEffect(() => {
     populateData();
-  }, [cart, addresses]);
+  }, [addresses]);
 
   // Get Courier Rates Exec
   useEffect(() => {
@@ -318,7 +319,6 @@ const CheckoutWrapper = () => {
   // Order Data Null Check
   useEffect(() => {
     orderDataCheck();
-    console.log("DATA: ", data);
   }, [data]);
 
   return (
@@ -463,36 +463,37 @@ const CheckoutWrapper = () => {
               <div className="flex flex-col gap-2">
                 {cart?.items.map((item) => {
                   return Object.entries(item.variants).map(([k, v], index) => {
-                    return (
-                      <div
-                        key={index}
-                        className="flex h-fit items-center gap-x-3 rounded-md bg-white p-3 shadow-md"
-                      >
-                        <div>
-                          <Image
-                            src={IMG_URL(item.thumbnail!)}
-                            width={500}
-                            height={500}
-                            alt={`thm-${item.item_name}`}
-                            className={imageClass(true)}
-                          />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <span className="">{item.item_name}</span>
-                          <span className="text-xs">{`Variant: ${k.toUpperCase()}`}</span>
-                          <div className="text-xs">
-                            <NumFormatWrapper
-                              value={item.price}
-                              displayType="text"
-                              prefix="Rp. "
-                              thousandSeparator="."
-                              decimalSeparator=","
+                    if (v > 0)
+                      return (
+                        <div
+                          key={index}
+                          className="flex h-fit items-center gap-x-3 rounded-md bg-white p-3 shadow-md"
+                        >
+                          <div>
+                            <Image
+                              src={item.thumbnail}
+                              width={500}
+                              height={500}
+                              alt={`thm-${item.item_name}`}
+                              className={imageClass(true)}
                             />
-                            <span>{` x ${v}`}</span>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <span className="">{item.item_name}</span>
+                            <span className="text-xs">{`Variant: ${k.toUpperCase()}`}</span>
+                            <div className="text-xs">
+                              <NumFormatWrapper
+                                value={item.price}
+                                displayType="text"
+                                prefix="Rp. "
+                                thousandSeparator="."
+                                decimalSeparator=","
+                              />
+                              <span>{` x ${v}`}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
+                      );
                   });
                 })}
               </div>
