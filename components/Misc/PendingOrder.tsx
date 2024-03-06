@@ -77,7 +77,6 @@ const PendingOrder = ({ order }: ThisProps) => {
 
   useEffect(() => {
     const interval = setInterval(() => countdownGenerator(), 1000);
-    console.log("ORDER: ", order);
     return () => clearInterval(interval);
   }, [order]);
 
@@ -128,7 +127,28 @@ const PendingOrder = ({ order }: ThisProps) => {
         <div className="divider"></div>
         <div className="flex flex-col gap-3">
           <span className="text-sm">Virtual Account</span>
+          {/* Permata Bank */}
+          {order.transaction.permata_va_number != "" && (
+            <div className="grid w-full grid-cols-[75px_1fr_min-content] items-center gap-5">
+              <Image
+                src={`/images/logo/permata.png`}
+                width={200}
+                height={200}
+                alt={"permata"}
+              />
+              <div className="flex flex-col">
+                <span>Permata Virtual Account</span>
+                <div className="flex items-center gap-2">
+                  <span>{order.transaction.permata_va_number}</span>
+                  <CopySvg className="btn-icon-accent h-5 w-5 fill-current" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Bank Transfer & Except Permata */}
           {order.transaction.payment_type == "bank_transfer" &&
+            !order.transaction.permata_va_number &&
             virtual_accounts.map((va) => {
               return (
                 va.value == order.transaction.va_numbers![0].bank && (
@@ -152,6 +172,8 @@ const PendingOrder = ({ order }: ThisProps) => {
                 )
               );
             })}
+
+          {/* Mandiri E-Channel */}
           {order.transaction.payment_type == "echannel" && (
             <div className="grid w-full grid-cols-[75px_1fr_min-content] items-center gap-5">
               <Image
