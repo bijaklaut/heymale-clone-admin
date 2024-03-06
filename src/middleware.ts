@@ -2,7 +2,7 @@
 
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-import { API_BASEURL, JWT_SECRET } from "../constants";
+import { API_BASEURL, EXPIRED_ACCESS, JWT_SECRET } from "../constants";
 import { jwtVerify } from "jose";
 
 // This function can be marked `async` if using `await` inside
@@ -67,7 +67,7 @@ export default async function middleware(request: NextRequest) {
         response.cookies.set({
           name: "accessToken",
           value: accessEncoded,
-          maxAge: 60 * 1,
+          maxAge: EXPIRED_ACCESS,
           httpOnly: true,
           sameSite: "strict",
         });
@@ -81,32 +81,44 @@ export default async function middleware(request: NextRequest) {
             "ascii",
           );
 
-          await jwtVerify(decodedToken, new TextEncoder().encode(JWT_SECRET));
+          const verified = await jwtVerify(
+            decodedToken,
+            new TextEncoder().encode(JWT_SECRET),
+          );
+
+          if (!verified) throw "Unauthorized. Cannot verify token";
+
           return NextResponse.next();
         } catch (error: any) {
           url.pathname = "/signin";
-          return NextResponse.redirect(url);
+
+          const response = NextResponse.redirect(url);
+
+          response.cookies.delete("refreshToken");
+          response.cookies.delete("accessToken");
+
+          return response;
         }
       }
     }
   }
 
   if (request.nextUrl.pathname.startsWith("/signin")) {
-    let token = request.cookies.get("accessToken")?.value;
+    try {
+      let token = request.cookies.get("accessToken")?.value;
 
-    if (token) {
-      try {
+      if (token) {
         const decodedToken = Buffer.from(token, "base64").toString("ascii");
         const url = request.nextUrl.clone();
         url.pathname = "/";
 
         await jwtVerify(decodedToken, new TextEncoder().encode(JWT_SECRET));
         return NextResponse.redirect(url);
-      } catch (error: any) {
-        request.cookies.delete("accessToken");
-
-        return NextResponse.next();
       }
+    } catch (error: any) {
+      request.cookies.delete("accessToken");
+
+      return NextResponse.next();
     }
   }
 }
@@ -121,4 +133,5 @@ const paths = [
   "/voucher",
   "/order",
   "/shipment",
+  "/checkout",
 ];
