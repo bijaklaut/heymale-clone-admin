@@ -345,6 +345,7 @@ export interface TransactionTypes {
       va_number: string;
     },
   ];
+  permata_va_number: string;
   fraud_status: string;
   bill_key: string;
   biller_code: string;
