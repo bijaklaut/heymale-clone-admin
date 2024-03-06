@@ -39,7 +39,7 @@ const ProductWrapper = (props: ThisProps) => {
         setPagination(initPagination(payload));
       }, 500);
     },
-    [search, filters, page, changes],
+    [],
   );
 
   // Search filter then reset pagination

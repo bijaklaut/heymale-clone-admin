@@ -112,13 +112,25 @@ export default async function middleware(request: NextRequest) {
         const url = request.nextUrl.clone();
         url.pathname = "/";
 
-        await jwtVerify(decodedToken, new TextEncoder().encode(JWT_SECRET));
-        return NextResponse.redirect(url);
-      }
-    } catch (error: any) {
-      request.cookies.delete("accessToken");
+        const verified = await jwtVerify(
+          decodedToken,
+          new TextEncoder().encode(JWT_SECRET),
+        );
 
-      return NextResponse.next();
+        if (verified) return NextResponse.redirect(url);
+      }
+
+      const response = NextResponse.next();
+      response.cookies.delete("accessToken");
+      response.cookies.delete("refreshToken");
+
+      return response;
+    } catch (error: any) {
+      const response = NextResponse.next();
+      response.cookies.delete("accessToken");
+      response.cookies.delete("refreshToken");
+
+      return response;
     }
   }
 }
