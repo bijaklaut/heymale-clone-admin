@@ -1,71 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import {
-  createVoucher,
-  getCategories,
-  getProducts,
-  getUserCart,
-  updateCart,
-  updateVoucher,
-} from "../../../services/admin";
+import { getProducts, getUserCart, updateCart } from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import {
   CartItemTypes,
   CartTypes,
-  CategoryTypes,
   OrderTypes,
-  PostOrderTypes,
-  PostVoucherTypes,
   ProductTypes,
-  ValidationTypes,
-  VariantTypes,
-  VoucherTypes,
 } from "../../../services/types";
-import Cookies from "js-cookie";
-import { populateValidation } from "../../../services/helper";
-import { ImageSvg } from "../../Misc/SvgGroup";
+import { TrashSvg } from "../../Misc/SvgGroup";
 import NumFormatWrapper from "../../Wrapper/NumFormatWrapper";
-import { ProductThumbnail } from "../../Misc/ProductThumbnail";
 import cx from "classnames";
 import Image from "next/image";
-import { getUserToken } from "../../../services/actions";
+import { getUserId } from "../../../services/actions";
 import Link from "next/link";
-import { PUBLIC_API_IMG } from "../../../constants";
-
-// const initData = () => {
-//   return {
-//     user: "",
-//     orderItems: [
-//       { _id: "", item_name: "", thumbnail: "", quantity: 0, price: 0 },
-//     ],
-//     voucher: {
-//       voucher_id: "",
-//       value: 0,
-//     },
-//     shipping: {
-//       address: {
-//         destination_contact_name: "",
-//         destination_contact_phone: "",
-//         destination_address: "",
-//         destination_province: "",
-//         destination_city: "",
-//         destination_district: "",
-//         destination_postal_code: "",
-//         destination_area_id: "",
-//         destination_note: "",
-//       },
-//       courier_company: "",
-//       courier_type: "",
-//       price: 0,
-//     },
-//     payment: {
-//       payment_type: "",
-//       bank: "",
-//     },
-//   };
-// };
 
 interface ThisProps {
   stateChanges(): void;
@@ -78,7 +28,6 @@ const CatalogProductModal = (props: ThisProps) => {
   const { stateChanges, order, isUpdate, reset } = props;
   const router = useRouter();
   const [disable, setDisable] = useState(true);
-  // const [data, setData] = useState<PostOrderTypes>(initData());
   const [loading, setLoading] = useState(false);
 
   const [products, setProducts] = useState<ProductTypes[]>([]);
@@ -97,12 +46,6 @@ const CatalogProductModal = (props: ThisProps) => {
     },
   });
 
-  const IMG_URL = useCallback((thumbnail: string) => {
-    return thumbnail
-      ? `${PUBLIC_API_IMG}/product/${thumbnail}`
-      : "icon/image.svg";
-  }, []);
-
   const imageClass = useCallback((thumbnail: boolean) => {
     return cx({
       "w-auto h-[150px] rounded-md shadow-lg border-2 border-neutral/40":
@@ -113,12 +56,11 @@ const CatalogProductModal = (props: ThisProps) => {
   }, []);
 
   const modalHandler = useCallback(
-    (id: string, show: boolean, updateItem?: VoucherTypes) => {
+    (id: string, show: boolean) => {
       const modal = document.getElementById(id) as HTMLDialogElement;
       setDisable(true);
 
       if (show) {
-        // setData(initData());
         return modal.showModal();
       }
 
@@ -198,14 +140,19 @@ const CatalogProductModal = (props: ThisProps) => {
   const storeCart = useCallback(async () => {
     try {
       const newCart = populateCart();
-      const user = await getUserToken();
-      const { payload } = await updateCart({ user, items: newCart! });
+      const user = await getUserId();
+      const { payload, message } = await updateCart({ user, items: newCart! });
       setCart((prev) => ({
         ...prev!,
         items: payload.items,
       }));
-    } catch (error) {
-      console.log("ERROR: ", error);
+
+      if (message) {
+        toast.success(message, { containerId: "catalog" });
+      }
+    } catch (error: any) {
+      await getCart();
+      toast.error("Failed to update cart", { containerId: "catalog" });
     }
   }, [selected, cart]);
 
@@ -222,14 +169,52 @@ const CatalogProductModal = (props: ThisProps) => {
           ...copyItems[itemIndex].variants,
           [label]: updateValue,
         };
-
         setCart((prev) => ({ ...prev!, items: copyItems }));
 
-        const user = await getUserToken();
-        const result = await updateCart({ user, items: copyItems });
-        console.log("update cart: ", result);
-      } catch (error) {
-        console.log("ERROR: ", error);
+        const user = await getUserId();
+        const result = await updateCart({
+          user,
+          items: copyItems,
+        });
+
+        if (result) {
+          toast.success(result.message, { containerId: "catalog" });
+        }
+      } catch (error: any) {
+        await getCart();
+        toast.error("Failed to update cart", { containerId: "catalog" });
+      }
+    },
+    [cart],
+  );
+
+  const removeVariant = useCallback(
+    async (item: CartItemTypes, label: string) => {
+      try {
+        const copyItems = JSON.parse(
+          JSON.stringify(cart?.items),
+        ) as CartItemTypes[];
+        const itemIndex = copyItems.findIndex((copy) => copy._id == item._id);
+
+        delete (copyItems[itemIndex].variants as any)[label];
+
+        if (Object.entries(copyItems[itemIndex].variants).length == 0) {
+          copyItems.splice(itemIndex, 1);
+        }
+
+        setCart((prev) => ({ ...prev!, items: copyItems }));
+        const user = await getUserId();
+        const { message } = await updateCart({
+          user,
+          items: copyItems,
+        });
+
+        if (message) {
+          toast.success(message, { containerId: "catalog" });
+        }
+      } catch (error: any) {
+        await getCart();
+        toast.error("Failed to update cart", { containerId: "catalog" });
       }
     },
     [cart],
@@ -237,12 +222,15 @@ const CatalogProductModal = (props: ThisProps) => {
 
   const getCart = useCallback(async () => {
     try {
-      const user = await getUserToken();
+      const user = await getUserId();
       const { payload } = await getUserCart({ user });
+
       if (payload) {
         setCart(payload);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("Cart not found");
+    }
   }, []);
 
   useEffect(() => {
@@ -267,7 +255,7 @@ const CatalogProductModal = (props: ThisProps) => {
       <dialog data-theme={"skies"} id="create_order" className="modal">
         <ToastContainer
           enableMultiContainer
-          containerId={"CreateUser"}
+          containerId={"catalog"}
           theme="dark"
         />
         <div className="no-scrollbar modal-box absolute max-w-[700px] text-white">
@@ -290,7 +278,7 @@ const CatalogProductModal = (props: ThisProps) => {
                   >
                     <div className="mb-5 flex w-full justify-center">
                       <Image
-                        src={IMG_URL(product.thumbnail)}
+                        src={product.thumbnail}
                         width={500}
                         height={500}
                         alt={`thm-${product.name}`}
@@ -355,11 +343,11 @@ const CatalogProductModal = (props: ThisProps) => {
             </div>
           </div>
 
-          <div className="mt-3 flex flex-col rounded-md bg-base-200 p-4">
-            <h4 className="modal-title mx-auto mb-5">Cart</h4>
-            <div className="grid grid-cols-1 gap-3">
-              {cart?.items &&
-                cart?.items.map((item) => {
+          {cart && (
+            <div className="mt-3 flex flex-col rounded-md bg-base-200 p-4">
+              <h4 className="modal-title mx-auto mb-5">Cart</h4>
+              <div className="grid grid-cols-1 gap-3">
+                {cart.items.map((item) => {
                   return Object.entries(item.variants).map(([k, v], index) => {
                     return (
                       <div
@@ -368,7 +356,7 @@ const CatalogProductModal = (props: ThisProps) => {
                       >
                         <div>
                           <Image
-                            src={IMG_URL(item.thumbnail!)}
+                            src={item.thumbnail}
                             width={500}
                             height={500}
                             alt={`thm-${item.item_name}`}
@@ -389,12 +377,22 @@ const CatalogProductModal = (props: ThisProps) => {
                             />
                           </div>
                           <div className="mt-2 grid w-fit grid-cols-3 items-center justify-between justify-items-center overflow-hidden rounded-lg border border-neutral text-center text-neutral">
-                            <button
-                              className="w-full rounded-lg transition-all hover:bg-black/10 active:bg-black/10"
-                              onClick={() => directUpdate(item, k, -1)}
-                            >
-                              -
-                            </button>
+                            {(item.variants as any)[k] > 1 ? (
+                              <button
+                                className="w-full rounded-lg transition-all hover:bg-black/10 active:bg-black/10"
+                                onClick={() => directUpdate(item, k, -1)}
+                              >
+                                -
+                              </button>
+                            ) : (
+                              <button
+                                className="flex h-full w-full items-center justify-center rounded-lg transition-all hover:bg-black/10 active:bg-black/10"
+                                onClick={() => removeVariant(item, k)}
+                              >
+                                <TrashSvg className="h-[18px] w-[18px] stroke-current" />
+                              </button>
+                            )}
+
                             <div className="w-[35px] bg-red-200">{v}</div>
                             <button
                               className="w-full rounded-lg transition-all hover:bg-black/10 active:bg-black/10"
@@ -408,8 +406,9 @@ const CatalogProductModal = (props: ThisProps) => {
                     );
                   });
                 })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Submit */}
           <div className="modal-action flex">
