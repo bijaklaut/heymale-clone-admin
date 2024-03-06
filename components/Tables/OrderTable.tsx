@@ -65,48 +65,11 @@ const OrderTable = ({
     try {
       const result = await createShippingOrder({ invoice });
       toast.success(result.message, { containerId: "Main" });
+      return stateChanges();
     } catch (error: any) {
       toast.error(error.message, { containerId: "Main" });
     }
   }, []);
-
-  // const getPaidOrder = useCallback(() => {
-  //   let tempPending: OrderTypes[] = [];
-  //   let tempPaid: OrderTypes[] = [];
-  //   let tempOngoing: OrderTypes[] = [];
-  //   let tempFailed: OrderTypes[] = [];
-  //   let tempFinished: OrderTypes[] = [];
-
-  //   orders.forEach((order) => {
-  //     if (order.status == "pending") {
-  //       tempPending.push(order);
-  //     }
-  //     if (order.status == "settlement") {
-  //       tempPaid.push(order);
-  //     }
-  //     if (ongoingStatus.includes(order.status)) {
-  //       tempOngoing.push(order);
-  //     }
-  //     if (errorStatus.includes(order.status)) {
-  //       tempFailed.push(order);
-  //     }
-  //     if (order.status == "finished") {
-  //       tempFinished.push(order);
-  //     }
-  //   });
-
-  //   setPendingOrder(tempPending);
-  //   setPaidOrder(tempPaid);
-  //   setOngoingOrder(tempOngoing);
-  //   setFailedOrder(tempFailed);
-  //   setFinishedOrder(tempFinished);
-  // }, [orders]);
-
-  // useEffect(() => {
-  //   if (orders.length > 0) {
-  //     getPaidOrder();
-  //   }
-  // }, [orders]);
 
   return (
     <div className="min-h-screen max-w-[1920px]">
