@@ -380,8 +380,9 @@ export const getShipments = async () => {
 // End of Shipment
 
 // Transaction
-export const getTransactions = async () => {
-  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/transaction`;
+export const getTransactions = async (page?: number) => {
+  const pageQuery = page ? `?p=${page}` : "";
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/transaction${pageQuery}`;
 
   return callApi({
     url,

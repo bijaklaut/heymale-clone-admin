@@ -1,22 +1,12 @@
 "use client";
 import { Fragment, MouseEventHandler, useCallback } from "react";
-import {
-  OrderItemTypes,
-  OrderTypes,
-  PaginationTypes,
-  ShipmentTypes,
-  TransactionTypes,
-} from "../../services/types";
+import { PaginationTypes, TransactionTypes } from "../../services/types";
 import NoDisplay from "../Misc/NoDisplay";
 import Pagination from "../Misc/Pagination";
-import { InfoSvg, OptionDotSvg } from "../Misc/SvgGroup";
+import { OptionDotSvg } from "../Misc/SvgGroup";
 import NumFormatWrapper from "../Wrapper/NumFormatWrapper";
 import cx from "classnames";
-import {
-  capitalize,
-  transformDate,
-  underscoreTransform,
-} from "../../services/helper";
+import { transformDate, underscoreTransform } from "../../services/helper";
 
 interface TransactionPagination extends PaginationTypes {
   docs: TransactionTypes[];
@@ -26,26 +16,20 @@ interface ThisProps {
   paginate: TransactionPagination;
   paginateAction: MouseEventHandler<HTMLButtonElement>;
   stateChanges(): void;
-  itemsDetailMisc(items: OrderItemTypes[]): void;
-  trxDetailMisc(transaction: Partial<TransactionTypes>): void;
-  shipmentDetailMisc(shipment: Partial<ShipmentTypes>): void;
 }
 
 const TransactionTable = ({
   paginate,
   paginateAction,
   stateChanges,
-  itemsDetailMisc,
-  trxDetailMisc,
-  shipmentDetailMisc,
 }: ThisProps) => {
   const { docs: transactions } = paginate;
   const statusClass = useCallback((status: string) => {
     return cx({
       "w-fit badge badge-outline font-semibold py-3": status,
-      "xl:text-primary": status == "delivered",
-      "xl:text-error": status == "courier_not_found",
-      "xl:text-success": status == "placed",
+      "text-primary": status == "settlement",
+      "text-accent": status == "pending",
+      "text-error": errorStatus.includes(status),
     });
   }, []);
 
@@ -87,18 +71,31 @@ const TransactionTable = ({
                         {underscoreTransform(trx.transaction_status)}
                       </div>
                     </div>
-                    <div className="flex flex-col">
-                      <span>{underscoreTransform(trx.payment_type)}</span>
-                      {trx.payment_type == "bank_transfer" &&
-                        trx.va_numbers!.map((va, index) => (
-                          <span key={index}>{`${va.bank.toUpperCase()} - ${
-                            va.va_number
-                          }`}</span>
-                        ))}
-                      {trx.payment_type == "echannel" && (
-                        <span>{`${trx.biller_code}-${trx.bill_key}`}</span>
+                    {/* Payment Method */}
+                    {/* Permata */}
+                    {trx.payment_type == "bank_transfer" &&
+                      trx.permata_va_number && (
+                        <div className="flex flex-col">
+                          <span>Permata Virtual Account</span>
+                          <span>{trx.permata_va_number}</span>
+                        </div>
                       )}
-                    </div>
+                    {/* BCA, BNI, BRI, CIMB */}
+                    {trx.payment_type == "bank_transfer" &&
+                      !trx.permata_va_number && (
+                        <div className="flex flex-col">
+                          <span>{`${trx.va_numbers[0].bank.toUpperCase()} Virtual Account`}</span>
+                          <span>{trx.va_numbers[0].va_number}</span>
+                        </div>
+                      )}
+                    {/* Mandiri E-Channel */}
+                    {trx.payment_type == "echannel" && (
+                      <div className="flex flex-col">
+                        <span>Mandiri Virtual Account</span>
+                        <span>{`${trx.biller_code}${trx.bill_key}`}</span>
+                      </div>
+                    )}
+
                     <div>
                       <NumFormatWrapper
                         value={trx.gross_amount}
@@ -125,12 +122,6 @@ const TransactionTable = ({
                           <li>
                             <span>More Actions</span>
                           </li>
-                          <li>
-                            <span>More Actions</span>
-                          </li>
-                          <li>
-                            <span>More Actions</span>
-                          </li>
                         </ul>
                       </div>
                     </div>
@@ -149,5 +140,17 @@ const TransactionTable = ({
     </div>
   );
 };
+
+const errorStatus = [
+  "deny",
+  "cancel",
+  "expire",
+  "failure",
+  "courier_not_found",
+  "cancelled",
+  "rejected",
+  "disposed",
+  "returned",
+];
 
 export default TransactionTable;
