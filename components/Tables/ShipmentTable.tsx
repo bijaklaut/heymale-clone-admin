@@ -2,17 +2,16 @@
 import { Fragment, MouseEventHandler, useCallback } from "react";
 import {
   OrderItemTypes,
-  OrderTypes,
   PaginationTypes,
   ShipmentTypes,
   TransactionTypes,
 } from "../../services/types";
 import NoDisplay from "../Misc/NoDisplay";
 import Pagination from "../Misc/Pagination";
-import { InfoSvg, OptionDotSvg } from "../Misc/SvgGroup";
+import { OptionDotSvg } from "../Misc/SvgGroup";
 import NumFormatWrapper from "../Wrapper/NumFormatWrapper";
 import cx from "classnames";
-import { capitalize, underscoreTransform } from "../../services/helper";
+import { underscoreTransform } from "../../services/helper";
 
 interface OrderPagination extends PaginationTypes {
   docs: ShipmentTypes[];
@@ -22,35 +21,31 @@ interface ThisProps {
   paginate: OrderPagination;
   paginateAction: MouseEventHandler<HTMLButtonElement>;
   stateChanges(): void;
-  itemsDetailMisc(items: OrderItemTypes[]): void;
-  trxDetailMisc(transaction: Partial<TransactionTypes>): void;
   shipmentDetailMisc(shipment: Partial<ShipmentTypes>): void;
 }
 
 const ShipmentTable = ({
   paginate,
   paginateAction,
-  stateChanges,
-  itemsDetailMisc,
-  trxDetailMisc,
   shipmentDetailMisc,
 }: ThisProps) => {
   const { docs: shipments } = paginate;
   const statusClass = useCallback((status: string) => {
     return cx({
-      "w-fit badge badge-outline font-semibold py-3": status,
-      "xl:text-primary": status == "delivered",
-      "xl:text-error": status == "courier_not_found",
-      "xl:text-success": status == "placed",
+      "w-fit badge badge-outline font-semibold py-3": true,
+      "text-primary": status == "delivered",
+      "text-error": errorStatus.includes(status),
+      "text-accent": ongoingStatus.includes(status),
+      "text-black/60": !status,
     });
   }, []);
 
   return (
-    <div className="min-h-screen max-w-[1920px]">
+    <div className="min-h-screen max-w-[1920px] overflow-x-auto overflow-y-hidden">
       {shipments.length ? (
         <Fragment>
-          <div className="rounded-md bg-transparent xl:bg-neutral-100 xl:px-3 xl:py-5">
-            <div className="mb-4 hidden grid-cols-[50px_minmax(200px,_1fr)_minmax(min-content,_1fr)_150px_200px_200px_150px_50px] items-center justify-items-center gap-x-2 font-semibold text-black/60 xl:grid">
+          <div className="w-fit rounded-md bg-neutral-100 xl:px-3 xl:py-5">
+            <div className="mb-4 grid grid-cols-[50px_minmax(200px,_1fr)_minmax(min-content,_1fr)_150px_200px_200px_150px_50px] items-center justify-items-center gap-x-2 font-semibold text-black/60">
               <div className="">#</div>
               <div className="flex flex-col items-center">
                 <span>Shipment Order ID</span>
@@ -84,43 +79,8 @@ const ShipmentTable = ({
                       <div className={statusClass(shipment.status)}>
                         {shipment.status
                           ? underscoreTransform(shipment.status)
-                          : "-"}
+                          : "Pending"}
                       </div>
-                      {/* {order.status != "pending" && (
-                        <div className="dropdown dropdown-end">
-                          <button
-                            tabIndex={0}
-                            className="btn-icon-primary translate-y-1"
-                          >
-                            <InfoSvg className="w-4 stroke-current" />
-                          </button>
-                          <div
-                            tabIndex={0}
-                            className="card dropdown-content z-[1] h-[150px] w-64 rounded-md border bg-white p-0 shadow-md"
-                          >
-                            <div tabIndex={0} className="card-body">
-                              <div className="grid grid-cols-1">
-                                <span className="text-sm text-black/60">
-                                  Payment Status
-                                </span>
-                                <span>{capitalize(order.status)}</span>
-                              </div>
-                              <div className="grid grid-cols-1">
-                                <span className="text-sm text-black/60">
-                                  Shipping Status
-                                </span>
-                                <span>
-                                  {order.shipping_detail.status
-                                    ? underscoreTransform(
-                                        order.shipping_detail.status,
-                                      )
-                                    : "-"}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )} */}
                     </div>
                     <div className="flex flex-col">
                       <span>{shipment.destination.contact_name}</span>
@@ -141,14 +101,6 @@ const ShipmentTable = ({
                         "-"
                       )}
                     </div>
-                    {/* <div>
-                      <button
-                        className="btn btn-outline btn-primary btn-sm"
-                        onClick={() => itemsDetailMisc(order.order_item)}
-                      >
-                        See Details
-                      </button>
-                    </div> */}
 
                     <div>
                       <div className="dropdown dropdown-end">
@@ -187,5 +139,25 @@ const ShipmentTable = ({
     </div>
   );
 };
+
+const errorStatus = [
+  "failure",
+  "courier_not_found",
+  "cancelled",
+  "rejected",
+  "disposed",
+  "returned",
+];
+
+const ongoingStatus = [
+  "placed",
+  "confirmed",
+  "allocated",
+  "picking_up",
+  "picked",
+  "dropping_off",
+  "return_in_transit",
+  "delivered",
+];
 
 export default ShipmentTable;

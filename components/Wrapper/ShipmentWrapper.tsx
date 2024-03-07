@@ -1,18 +1,10 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { getOrders, getShipments } from "../../services/admin";
-import SearchFilter from "../Misc/SearchFilter";
+import { getShipments } from "../../services/admin";
 import SimpleTableLoading from "../Loading/SimpleTableLoading";
 import { initPagination } from "../../services/helper";
-import OrderTable from "../Tables/OrderTable";
-import {
-  OrderItemTypes,
-  ShipmentTypes,
-  TransactionTypes,
-} from "../../services/types";
-import OrderItemModal from "../Modals/Order/OrderItem";
-import TransactionDetailModal from "../Modals/Order/TransactionDetail";
+import { ShipmentTypes } from "../../services/types";
 import ShipmentDetailModal from "../Modals/Order/ShipmentDetail";
 import ShipmentTable from "../Tables/ShipmentTable";
 
@@ -25,8 +17,6 @@ const ShipmentWrapper = () => {
 
   const [detailModal, setDetailModal] = useState("none");
 
-  const [itemsDetail, setItemsDetail] = useState<OrderItemTypes[]>();
-  const [trxDetail, setTrxDetail] = useState<Partial<TransactionTypes>>();
   const [shipmentDetail, setShipmentDetail] =
     useState<Partial<ShipmentTypes>>();
 
@@ -35,7 +25,7 @@ const ShipmentWrapper = () => {
   const getFilteredShipment = useCallback(
     async (page?: number, search?: string) => {
       setLoading(true);
-      const { payload } = await getShipments();
+      const { payload } = await getShipments(page);
 
       setPagination(initPagination(payload));
       return setTimeout(() => setLoading(false), 500);
@@ -50,19 +40,6 @@ const ShipmentWrapper = () => {
   //   getFilteredShipment(search, pageParams);
   // }, [search, changes]);
 
-  const itemsDetailMisc = useCallback((items: OrderItemTypes[]) => {
-    setDetailModal("items");
-    setItemsDetail(items);
-  }, []);
-
-  const trxDetailMisc = useCallback(
-    (transaction: Partial<TransactionTypes>) => {
-      setTrxDetail(transaction);
-      setDetailModal("transaction");
-    },
-    [],
-  );
-
   const shipmentDetailMisc = useCallback((shipment: Partial<ShipmentTypes>) => {
     setShipmentDetail(shipment);
     setDetailModal("shipment");
@@ -76,7 +53,7 @@ const ShipmentWrapper = () => {
   return (
     <Fragment>
       <h2 className="text-3xl font-semibold">Shipment Dashboard</h2>
-      <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
+      <div className="mt-7 flex w-full flex-col gap-3 py-3">
         <ShipmentDetailModal
           isShow={detailModal}
           shipment={shipmentDetail}
@@ -89,8 +66,6 @@ const ShipmentWrapper = () => {
             paginateAction={(e) =>
               pageHandler(Number(e.currentTarget.dataset.page))
             }
-            itemsDetailMisc={itemsDetailMisc}
-            trxDetailMisc={trxDetailMisc}
             shipmentDetailMisc={shipmentDetailMisc}
           />
         ) : (

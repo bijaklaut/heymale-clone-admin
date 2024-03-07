@@ -369,8 +369,9 @@ export const createShippingOrder = async (data: { invoice: string }) => {
 // End of Order
 
 // Shipment
-export const getShipments = async () => {
-  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/shipment`;
+export const getShipments = async (page?: number) => {
+  const pageQuery = page ? `?p=${page}` : "";
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/shipment${pageQuery}`;
 
   return callApi({
     url,

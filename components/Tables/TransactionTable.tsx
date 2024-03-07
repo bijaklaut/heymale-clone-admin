@@ -34,11 +34,11 @@ const TransactionTable = ({
   }, []);
 
   return (
-    <div className="min-h-screen max-w-[1920px]">
+    <div className="min-h-screen max-w-[1920px] overflow-x-auto overflow-y-hidden">
       {transactions.length ? (
         <Fragment>
-          <div className="rounded-md bg-transparent xl:bg-neutral-100 xl:px-3 xl:py-5">
-            <div className="mb-4 hidden grid-cols-[50px_minmax(250px,_1fr)_150px_125px_minmax(200px,_1fr)_150px_200px_minmax(0px,_1fr)] items-center justify-items-center gap-x-2 font-semibold text-black/60 xl:grid">
+          <div className="w-fit rounded-md bg-neutral-100 px-3 py-5">
+            <div className="mb-4 grid grid-cols-[50px_minmax(250px,_1fr)_150px_125px_minmax(200px,_1fr)_150px_200px_minmax(50px,100px)] items-center justify-items-center gap-x-2 font-semibold text-black/60">
               <div className="">#</div>
               <div className="flex flex-col items-center">
                 <span>Invoice</span>
@@ -56,7 +56,7 @@ const TransactionTable = ({
                 return (
                   <div
                     key={index}
-                    className="grid grid-cols-[50px_minmax(250px,_1fr)_150px_125px_minmax(200px,_1fr)_150px_200px_minmax(0px,_1fr)] items-center gap-2 rounded-md bg-white py-3 text-center text-neutral shadow-md"
+                    className="grid grid-cols-[50px_minmax(250px,_1fr)_150px_125px_minmax(200px,_1fr)_150px_200px_minmax(50px,100px)] items-center gap-2 rounded-md bg-white py-3 text-center text-neutral shadow-md"
                   >
                     <div>{paginate.pagingCounter + index}</div>
                     <div className="flex flex-col">
