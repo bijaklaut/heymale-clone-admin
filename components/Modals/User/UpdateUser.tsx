@@ -37,7 +37,7 @@ const UpdateUserModal = (props: thisProps) => {
   const [data, setData] = useState<PostUserTypes>(initialData(user));
   const btnCheckProps = {
     data,
-    requiredField: ["name", "email", "phoneNumber", "confirm"],
+    requiredField: ["name", "email", "phoneNumber"],
     setDisable,
   };
 
@@ -64,8 +64,9 @@ const UpdateUserModal = (props: thisProps) => {
     }
 
     try {
-      const token = Cookies.get("token");
-      const result = await updateUser(form, id, token!);
+      const result = await updateUser(form, id, true);
+
+      if (result.status >= 300) throw result;
 
       setTimeout(() => {
         setLoading(false);
@@ -116,6 +117,7 @@ const UpdateUserModal = (props: thisProps) => {
             <TextInput
               dataState={{ data, setData }}
               label={["Email", "email", "Enter email"]}
+              type="email"
               validations={validation}
             />
           </div>

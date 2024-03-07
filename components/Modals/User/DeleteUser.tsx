@@ -24,8 +24,9 @@ const DeleteUserModal = (props: thisProps) => {
     setLoading(true);
 
     try {
-      const token = Cookies.get("token");
-      const result = await deleteUser(id, token!);
+      const result = await deleteUser(id, true);
+
+      if (result.status >= 300) throw result;
 
       setTimeout(() => {
         setLoading(false);

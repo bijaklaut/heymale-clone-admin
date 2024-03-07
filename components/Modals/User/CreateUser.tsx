@@ -62,8 +62,9 @@ const CreateUserModal = ({ stateChanges }: ThisProps) => {
     }
 
     try {
-      const token = Cookies.get("token");
-      const result = await createUser(form, token!);
+      const result = await createUser(form, true);
+
+      if (result.status >= 300) throw result;
 
       setTimeout(() => {
         setLoading(false);
@@ -113,6 +114,7 @@ const CreateUserModal = ({ stateChanges }: ThisProps) => {
             <TextInput
               dataState={{ data, setData }}
               label={["Email", "email", "Enter email"]}
+              type="email"
               validations={validation}
             />
           </div>
