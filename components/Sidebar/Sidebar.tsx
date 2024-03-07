@@ -27,12 +27,17 @@ import cx from "classnames";
 import { TopNavbar } from "./TopNavbar";
 import { getUserId } from "../../services/actions";
 
+interface User {
+  name: string;
+  avatar: string;
+}
+
 export const Sidebar = () => {
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<User>({
     name: "",
     avatar: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [checked, setChecked] = useState(false);
   const sidebarClass = cx({
     "fixed left-0 top-0 right-0 z-20 flex w-full h-screen origin-top flex-col justify-between px-2 sm:pt-4 shadow-lg sm:origin-left sm:right-auto lg:pt-7 lg:sticky":
@@ -54,26 +59,32 @@ export const Sidebar = () => {
   }, []);
 
   const getUserAPI = useCallback(async () => {
-    if (!user.name) {
+    const local_user: User = JSON.parse(localStorage.getItem("user")!);
+
+    if (local_user) {
+      setUser(local_user);
+    } else {
       let id = await getUserId();
 
-      if (id) {
-        const { payload } = await getUserById(id);
+      const { payload } = await getUserById(id);
 
-        setIsLoading(true);
-        setUser({
-          avatar: payload.avatar,
-          name: payload.name,
-        });
-      }
+      setUser({
+        avatar: payload.avatar,
+        name: payload.name,
+      });
 
-      setIsLoading(false);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ name: payload.name, avatar: payload.avatar }),
+      );
     }
-  }, [user]);
+
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     getUserAPI();
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     if (checked && window.innerWidth < 640) {
@@ -88,7 +99,7 @@ export const Sidebar = () => {
       <aside data-theme={"nord"} className={sidebarClass}>
         {checked ? (
           <>
-            <div>
+            <div className="overflow-x-auto">
               {/* Mobile Title */}
               <div className="title hidden h-[50px] w-full items-center justify-center sm:flex">
                 <Link href={"/"}>
@@ -184,9 +195,12 @@ export const Sidebar = () => {
         ) : (
           <>
             <div>
-              <div className="title flex h-[50px] w-full items-center justify-center text-3xl font-bold">
+              <Link
+                href={"/"}
+                className="title flex h-[50px] w-full items-center justify-center text-3xl font-bold"
+              >
                 H
-              </div>
+              </Link>
               <div className="divider mb-4 mt-2"></div>
               <div className="w-full">
                 <div className="menu-list flex flex-col items-center gap-y-[5px]">

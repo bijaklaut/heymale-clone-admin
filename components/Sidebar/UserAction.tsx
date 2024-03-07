@@ -55,7 +55,7 @@ const UserAction = (props: ThisProps) => {
               />
               {user.avatar ? (
                 <div className="avatar label-text ">
-                  <div className="w-[50px] rounded-full">
+                  <div className="w-[50px] rounded-full bg-white">
                     <Image
                       src={`${IMG}/${user.avatar}`}
                       width={50}
@@ -66,7 +66,7 @@ const UserAction = (props: ThisProps) => {
                 </div>
               ) : (
                 <div className="avatar placeholder label-text">
-                  <div className="w-[50px] rounded-full bg-primary text-white">
+                  <div className="w-[50px] rounded-full bg-white text-neutral">
                     <span>{user.name[0]}</span>
                   </div>
                 </div>
@@ -93,18 +93,18 @@ const UserAction = (props: ThisProps) => {
         <div className="relative flex items-center justify-between gap-x-3 py-5 sm:py-2">
           {user.avatar ? (
             <div className="avatar">
-              <div className="w-[50px] rounded-full">
+              <div className="w-[50px] rounded-full bg-white">
                 <Image
                   src={`${IMG}/${user.avatar}`}
                   width={50}
                   height={50}
-                  alt={`${user.name}-avatar`}
+                  alt={user.name[0]}
                 />
               </div>
             </div>
           ) : (
             <div className="avatar placeholder">
-              <div className="w-[50px] rounded-full bg-primary text-white">
+              <div className="w-[50px] rounded-full bg-white text-neutral">
                 <span>{user.name[0]}</span>
               </div>
             </div>
@@ -122,7 +122,7 @@ const UserAction = (props: ThisProps) => {
                   setChecked((prev) => !prev);
                 }}
               />
-              <ArrowDownSvg className="label-text stroke-current transition-all peer-checked:rotate-180 sm:hidden" />
+              <ArrowDownSvg className="label-text fill-current stroke-current transition-all peer-checked:rotate-180 sm:hidden" />
               <div className="label-text w-fit rounded-md px-2 py-1 transition-all hover:bg-gray-400/50">
                 <ArrowRightSvg className="hidden w-4 fill-current transition-all sm:block" />
               </div>
