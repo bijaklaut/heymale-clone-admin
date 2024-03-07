@@ -1,7 +1,6 @@
-import { ChangeEvent, ChangeEventHandler, InputHTMLAttributes } from "react";
+import { ChangeEventHandler, InputHTMLAttributes } from "react";
 import { ProductTypes } from "../../../services/types";
 import Image from "next/image";
-import { productImageUrl } from "../../../services/helper";
 import { CircleCheckSvg } from "../../Misc/SvgGroup";
 
 interface ThisProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -21,7 +20,7 @@ const ProductOption = ({ product, selectHandler }: ThisProps) => {
         />
         <div className="flex w-full items-center gap-x-3">
           <Image
-            src={productImageUrl(product.thumbnail)}
+            src={product.thumbnail}
             height={500}
             width={500}
             alt="image"

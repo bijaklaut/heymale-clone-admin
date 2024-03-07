@@ -1,84 +1,65 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { CategoryTypes, VoucherTypes } from "../../services/types";
-import { getProducts, getVouchers } from "../../services/admin";
-import ProductTable from "../Tables/ProductTable";
-import CreateProductModal from "../Modals/Product/CreateProduct";
-import SearchFilter from "../Misc/SearchFilter";
+import { ProductTypes, VoucherTypes } from "../../services/types";
+import { getVouchers } from "../../services/admin";
 import ComplexTableLoading from "../Loading/ComplexTableLoading";
-import {
-  initCriteria,
-  initPagination,
-  queryGenerator,
-} from "../../services/helper";
+import { initPagination } from "../../services/helper";
 import VoucherTable from "../Tables/VoucherTable";
 import PostVoucherModal from "../Modals/Voucher/PostVoucher";
 import DeleteVoucherModal from "../Modals/Voucher/DeleteVoucher";
 import VoucherConditionModal from "../Modals/Voucher/VoucherCondition";
 
-interface ThisProps {
-  // categories: CategoryTypes[];
-}
-
-const VoucherWrapper = (props: ThisProps) => {
-  // const { categories } = props;
-  // // const [filters, setFilters] = useState(
-  // //   initCriteria(categories || [], "name"),
-  // // );
-  // const [search, setSearch] = useState("");
+const VoucherWrapper = () => {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(initPagination());
   const [changes, setChanges] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [isUpdate, setIsUpdate] = useState(false);
-  const [updateVoucher, setUpdateVoucher] = useState<VoucherTypes>();
+  const [products, setProducts] = useState<Partial<ProductTypes[]>>();
   const [isDelete, setIsDelete] = useState(false);
   const [condShow, setCondShow] = useState(false);
-  const [deleteVoucher, setDeleteVoucher] = useState<VoucherTypes>();
+  const [detail, setDetail] = useState<VoucherTypes>();
 
-  const getFilteredVoucher = useCallback(async () => {
+  const getFilteredVoucher = useCallback(async (page: number) => {
     setLoading(true);
-    const { payload } = await getVouchers();
+    const { payload } = await getVouchers(page);
 
     return setTimeout(() => {
       setLoading(false);
-      setPagination(initPagination(payload));
+      setPagination(initPagination(payload.vouchers));
+      setProducts(payload.products);
     }, 500);
   }, []);
 
   const updateMisc = useCallback((voucher: VoucherTypes) => {
-    setUpdateVoucher(voucher);
     setIsUpdate(true);
+    setDetail(voucher);
   }, []);
 
   const deleteMisc = useCallback((voucher: VoucherTypes) => {
     setIsDelete(true);
-    setDeleteVoucher(voucher);
+    setDetail(voucher);
   }, []);
 
   const conditionsMisc = useCallback((voucher: VoucherTypes) => {
     setCondShow(true);
-    setDeleteVoucher(voucher);
+    setDetail(voucher);
   }, []);
 
   // Search filter then reset pagination
   useEffect(() => {
-    // const pageParams = 1;
+    const pageParams = 1;
     // const query = queryGenerator(filters);
 
-    getFilteredVoucher();
+    getFilteredVoucher(pageParams);
   }, [changes]);
 
   // Pagination
   useEffect(() => {
-    // const query = queryGenerator(filters);
-
-    getFilteredVoucher();
-  }, []);
-
-  const resetDelete = useCallback(() => setIsDelete(false), []);
+    getFilteredVoucher(page);
+  }, [page]);
 
   return (
     <>
@@ -86,19 +67,20 @@ const VoucherWrapper = (props: ThisProps) => {
       <div className="mt-7 flex w-full flex-col gap-3 overflow-hidden py-3">
         <PostVoucherModal
           stateChanges={() => setChanges((prev) => !prev)}
-          voucher={updateVoucher}
+          voucher={detail}
           isUpdate={isUpdate}
           reset={() => setIsUpdate(false)}
         />
         <DeleteVoucherModal
           stateChanges={() => setChanges((prev) => !prev)}
           isDelete={isDelete}
-          deleteItem={deleteVoucher}
+          deleteItem={detail}
           reset={() => setIsDelete(false)}
         />
         <VoucherConditionModal
-          condItem={deleteVoucher}
+          condItem={detail}
           isShow={condShow}
+          products={products ? products : []}
           reset={() => setCondShow(false)}
         />
         {!loading ? (

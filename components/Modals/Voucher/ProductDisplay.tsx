@@ -13,7 +13,7 @@ const ProductDisplay = ({ product, deselect }: ThisProps) => {
   return (
     <div className="relative flex items-center gap-x-3 rounded-md bg-white px-3 py-2 shadow-lg">
       <Image
-        src={productImageUrl(product.thumbnail)}
+        src={product.thumbnail}
         height={500}
         width={500}
         alt="image"

@@ -269,8 +269,9 @@ export const getAddressByUser = async (user: string, token: boolean) => {
 // End of Address
 
 // Voucher
-export const getVouchers = async () => {
-  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/voucher/`;
+export const getVouchers = async (page?: number) => {
+  const pageQuery = page ? `?p=${page}` : "";
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/voucher${pageQuery}`;
 
   return callApi({
     url,

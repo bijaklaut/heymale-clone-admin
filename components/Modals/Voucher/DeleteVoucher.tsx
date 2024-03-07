@@ -40,8 +40,9 @@ const DeleteVoucherModal = (props: thisProps) => {
     if (voucher) {
       try {
         setLoading(true);
-        const token = Cookies.get("token");
-        const result = await deleteVoucher(voucher.id, token!);
+        const result = await deleteVoucher(voucher.id, true);
+
+        if (result.status >= 300) throw result;
 
         setTimeout(() => {
           setLoading(false);

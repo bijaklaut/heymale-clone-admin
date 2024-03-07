@@ -9,6 +9,7 @@ interface ThisProps {
   condItem?: VoucherTypes;
   isShow: boolean;
   reset(): void;
+  products: Partial<ProductTypes[]>;
 }
 const initData = (voucher?: VoucherTypes) => {
   if (voucher) {
@@ -41,7 +42,12 @@ const initData = (voucher?: VoucherTypes) => {
   };
 };
 
-const VoucherConditionModal = ({ condItem, isShow, reset }: ThisProps) => {
+const VoucherConditionModal = ({
+  condItem,
+  isShow,
+  reset,
+  products,
+}: ThisProps) => {
   const [voucher, setVoucher] = useState(initData());
 
   const thumbnailClass = useCallback((thumbnail: string) => {
@@ -51,6 +57,19 @@ const VoucherConditionModal = ({ condItem, isShow, reset }: ThisProps) => {
         !thumbnail,
     });
   }, []);
+
+  const getThumbnailURL = useCallback(
+    (product_id: string) => {
+      if (products) {
+        const product = products.find((item) => item?._id == product_id);
+
+        return product ? product.thumbnail : "";
+      }
+
+      return "";
+    },
+    [products],
+  );
 
   useEffect(() => {
     if (isShow) {
@@ -102,7 +121,7 @@ const VoucherConditionModal = ({ condItem, isShow, reset }: ThisProps) => {
                         className="flex items-center gap-x-3 rounded-md bg-white p-2 shadow-lg"
                       >
                         <Image
-                          src={productImageUrl(product.thumbnail)}
+                          src={getThumbnailURL(product._id)}
                           alt={`thumbnail-${product.name}`}
                           width={500}
                           height={500}

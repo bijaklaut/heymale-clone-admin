@@ -312,6 +312,8 @@ const PostVoucherModal = (props: ThisProps) => {
       if (!updateState) {
         const result = await createVoucher(form, true);
 
+        if (result.status >= 300) throw result;
+
         setTimeout(() => {
           setLoading(false);
           toast.success(result.message, { containerId: "Main" });
@@ -322,6 +324,9 @@ const PostVoucherModal = (props: ThisProps) => {
         }, 700);
       } else {
         const result = await updateVoucher(form, true);
+
+        if (result.status >= 300) throw result;
+
         setTimeout(() => {
           setLoading(false);
           toast.success(result.message, { containerId: "Main" });
