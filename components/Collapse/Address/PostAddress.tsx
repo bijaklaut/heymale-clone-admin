@@ -158,6 +158,8 @@ const PostAddressCollapse = (props: thisProps) => {
       if (!isUpdate) {
         const result = await createAddress(form, true);
 
+        if (result.status >= 300) throw result;
+
         setTimeout(() => {
           setLoading(false);
           toast.success(result.message, { containerId: "Main" });
@@ -167,6 +169,8 @@ const PostAddressCollapse = (props: thisProps) => {
         }, 700);
       } else {
         const result = await updateAddress(form, address._id, true);
+
+        if (result.status >= 300) throw result;
 
         setTimeout(() => {
           setLoading(false);

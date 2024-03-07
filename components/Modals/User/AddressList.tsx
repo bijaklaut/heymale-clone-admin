@@ -46,8 +46,9 @@ const AddressListModal = (props: thisProps) => {
   const deleteHandler = async (id: string) => {
     const loading = toast.loading("Processing", { containerId: "AddressList" });
     try {
-      const token = Cookies.get("token");
-      const result = await deleteAddress(id, token!);
+      const result = await deleteAddress(id, true);
+
+      if (result.status >= 300) throw result;
 
       toast.dismiss(loading);
       toast.success(result.message, {
