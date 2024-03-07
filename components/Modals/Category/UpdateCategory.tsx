@@ -48,8 +48,7 @@ const UpdateCategoryModal = (props: thisProps) => {
     setValidation([]);
 
     try {
-      const token = Cookies.get("token");
-      const result = await updateCategory(data, id, token!);
+      const result = await updateCategory(data, id, true);
 
       setTimeout(() => {
         setLoading(false);

@@ -23,8 +23,7 @@ const DeleteCategoryModal = (props: thisProps) => {
   const submitHandler = async (id: string, index: number) => {
     setLoading(true);
     try {
-      const token = Cookies.get("token");
-      const result = await deleteCategory(id, token!);
+      const result = await deleteCategory(id, true);
 
       setTimeout(() => {
         toast.success(result.message, { containerId: "Main" });

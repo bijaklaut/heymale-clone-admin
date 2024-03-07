@@ -37,8 +37,7 @@ const CreateCategoryModal = ({ stateChanges }: { stateChanges(): void }) => {
     setValidation([]);
 
     try {
-      const token = Cookies.get("token");
-      const result = await createCategory(data, token!);
+      const result = await createCategory(data, true);
 
       setTimeout(() => {
         setLoading(false);
