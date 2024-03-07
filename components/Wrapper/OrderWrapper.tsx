@@ -8,6 +8,7 @@ import { initPagination } from "../../services/helper";
 import OrderTable from "../Tables/OrderTable";
 import {
   OrderItemTypes,
+  ProductTypes,
   ShipmentTypes,
   TransactionTypes,
 } from "../../services/types";
@@ -28,6 +29,7 @@ const OrderWrapper = () => {
   const [filter, setFilter] = useState("all");
 
   const [itemsDetail, setItemsDetail] = useState<OrderItemTypes[]>();
+  const [products, setProducts] = useState<Partial<ProductTypes[]>>();
   const [trxDetail, setTrxDetail] = useState<Partial<TransactionTypes>>();
   const [shipmentDetail, setShipmentDetail] =
     useState<Partial<ShipmentTypes>>();
@@ -50,7 +52,8 @@ const OrderWrapper = () => {
         setLoading(true);
         const { payload } = await getOrders(page, data);
 
-        setPagination(initPagination(payload));
+        setPagination(initPagination(payload.orders));
+        setProducts(payload.products);
       } catch (error) {
         setPagination(initPagination());
       } finally {
@@ -103,6 +106,7 @@ const OrderWrapper = () => {
           isShow={detailModal}
           orderItems={itemsDetail}
           reset={() => setDetailModal("none")}
+          products={products!}
         />
         <TransactionDetailModal
           isShow={detailModal}

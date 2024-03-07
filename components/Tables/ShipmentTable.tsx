@@ -44,7 +44,7 @@ const ShipmentTable = ({
     <div className="min-h-screen max-w-[1920px] overflow-x-auto overflow-y-hidden">
       {shipments.length ? (
         <Fragment>
-          <div className="w-fit rounded-md bg-neutral-100 xl:px-3 xl:py-5">
+          <div className="w-fit rounded-md bg-neutral-100 px-3 py-5">
             <div className="mb-4 grid grid-cols-[50px_minmax(200px,_1fr)_minmax(min-content,_1fr)_150px_200px_200px_150px_50px] items-center justify-items-center gap-x-2 font-semibold text-black/60">
               <div className="">#</div>
               <div className="flex flex-col items-center">

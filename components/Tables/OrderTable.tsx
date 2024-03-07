@@ -55,7 +55,7 @@ const OrderTable = ({
       "w-fit py-3 badge badge-outline font-semibold": true,
       "text-neutral/50": status == "pending",
       "text-primary": status == "delivered",
-      "text-success border-2": status == "settlement",
+      "text-success": status == "settlement",
       "text-error": errorStatus.includes(status),
       "text-accent": ongoingStatus.includes(status),
     });
@@ -72,11 +72,11 @@ const OrderTable = ({
   }, []);
 
   return (
-    <div className="min-h-screen max-w-[1920px]">
+    <div className="min-h-screen max-w-[1920px] overflow-x-auto overflow-y-hidden">
       {orders.length ? (
         <Fragment>
           <div className="rounded-md bg-neutral-100 px-3 py-5">
-            <div className="mb-4 grid grid-cols-[50px_1fr_1fr_200px_200px_150px_50px] justify-items-center gap-x-2 font-semibold text-black/60">
+            <div className="mb-4 grid grid-cols-[50px_minmax(min-content,_1fr)_minmax(min-content,_1fr)_200px_200px_150px_50px] justify-items-center gap-x-2 font-semibold text-black/60">
               <div className="">#</div>
               <div className="">Invoice</div>
               <div className="">User</div>
@@ -90,7 +90,7 @@ const OrderTable = ({
                 return (
                   <div
                     key={index}
-                    className="grid grid-cols-[50px_1fr_1fr_200px_200px_150px_50px] items-center gap-2 rounded-md bg-white py-3 text-center text-neutral shadow-md"
+                    className="grid grid-cols-[50px_minmax(min-content,_1fr)_minmax(min-content,_1fr)_200px_200px_150px_50px] items-center gap-2 rounded-md bg-white py-3 text-center text-neutral shadow-md"
                   >
                     <div>{paginate.pagingCounter + index}</div>
                     <div>{order.invoice}</div>

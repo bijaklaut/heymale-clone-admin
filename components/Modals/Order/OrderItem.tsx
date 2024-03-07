@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { productImageUrl, simpleModalHandler } from "../../../services/helper";
-import { OrderItemTypes } from "../../../services/types";
+import { OrderItemTypes, ProductTypes } from "../../../services/types";
 import Image from "next/image";
 import cx from "classnames";
 import NumFormatWrapper from "../../Wrapper/NumFormatWrapper";
@@ -9,9 +9,10 @@ interface ThisProps {
   orderItems?: OrderItemTypes[];
   isShow: string;
   reset(): void;
+  products: Partial<ProductTypes[]>;
 }
 
-const OrderItemModal = ({ orderItems, isShow, reset }: ThisProps) => {
+const OrderItemModal = ({ orderItems, isShow, reset, products }: ThisProps) => {
   const [items, setItems] = useState<OrderItemTypes[]>();
 
   const thumbnailClass = useCallback((thumbnail: string) => {
@@ -21,6 +22,19 @@ const OrderItemModal = ({ orderItems, isShow, reset }: ThisProps) => {
         !thumbnail,
     });
   }, []);
+
+  const getThumbnailURL = useCallback(
+    (product_id: string) => {
+      if (products) {
+        const product = products.find((item) => item?._id == product_id);
+
+        return product ? product.thumbnail : "";
+      }
+
+      return "";
+    },
+    [products],
+  );
 
   useEffect(() => {
     if (isShow == "items") {
@@ -45,7 +59,7 @@ const OrderItemModal = ({ orderItems, isShow, reset }: ThisProps) => {
                 className="flex items-center gap-x-3 rounded-md bg-white p-2 shadow-lg"
               >
                 <Image
-                  src={productImageUrl(item.thumbnail)}
+                  src={getThumbnailURL(item._id)}
                   alt={`thumbnail-${item.item_name}`}
                   width={500}
                   height={500}

@@ -224,9 +224,7 @@ const CheckoutWrapper = () => {
         const result = await getCourierRates(postData);
         setRates(result.pricing);
       }
-    } catch (error: any) {
-      toast.error(error.message, { containerId: "Main" });
-    }
+    } catch (error: any) {}
   }, [data, deliveryItems]);
 
   const paymentSelect = useCallback((value: string) => {
