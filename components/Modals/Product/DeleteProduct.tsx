@@ -23,8 +23,9 @@ const DeleteProductModal = (props: thisProps) => {
   const submitHandler = async (id: string, index: number) => {
     setLoading(true);
     try {
-      const token = Cookies.get("token");
-      const result = await deleteProduct(id, token!);
+      const result = await deleteProduct(id, true);
+
+      if (result.status >= 300) throw result;
 
       setTimeout(() => {
         setLoading(false);

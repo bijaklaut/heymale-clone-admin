@@ -58,8 +58,11 @@ export const ImageLightbox = ({
 
   return (
     <Fragment>
-      <div className="group relative w-fit overflow-hidden">
-        <div className="absolute top-1/2 z-20 -translate-y-[50%]">
+      <div className="relative w-fit overflow-hidden">
+        <div
+          className="group absolute top-1/2 z-20 -translate-y-[50%] cursor-pointer"
+          onClick={() => overlayHandler(true)}
+        >
           <Image
             src={thumbnail}
             width={width}
@@ -68,10 +71,7 @@ export const ImageLightbox = ({
             className={thumbnailClass()}
             placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQIW2P4DwQACfsD/Z8fLAAAAAAASUVORK5CYII="
           />
-          <div
-            className="absolute top-0 flex h-full w-full scale-0 cursor-pointer flex-col items-center justify-center rounded-md bg-black/40 text-center text-white transition-all duration-300 group-hover:scale-100"
-            onClick={() => overlayHandler(true)}
-          >
+          <div className="absolute top-0 flex h-full w-full scale-0 flex-col items-center justify-center rounded-md bg-black/40 text-center text-white transition-all duration-300 group-hover:scale-100">
             <span>Click to enlarge</span>
           </div>
         </div>

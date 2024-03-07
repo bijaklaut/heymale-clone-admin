@@ -86,6 +86,7 @@ export interface PostProductTypes {
   description: string;
   thumbnail?: Blob | string;
   status: string;
+  weight: number;
 }
 
 export interface ProductTypes

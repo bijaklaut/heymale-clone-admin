@@ -24,8 +24,8 @@ const callApi = async ({ url, method, data, token = false }: CallAPIProps) => {
 
     return response.data;
   } catch (error: any) {
-    if (error.response) throw error.response.data;
-    throw error;
+    if (error.response) return error.response.data;
+    return error;
   }
 };
 

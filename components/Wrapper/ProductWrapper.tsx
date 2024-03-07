@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { CategoryTypes } from "../../services/types";
-import { getProducts } from "../../services/admin";
+import { getCategories, getProducts } from "../../services/admin";
 import ProductTable from "../Tables/ProductTable";
 import CreateProductModal from "../Modals/Product/CreateProduct";
 import SearchFilter from "../Misc/SearchFilter";
@@ -19,9 +19,7 @@ interface ThisProps {
 
 const ProductWrapper = (props: ThisProps) => {
   const { categories } = props;
-  const [filters, setFilters] = useState(
-    initCriteria(categories || [], "name"),
-  );
+  const [filters, setFilters] = useState(initCriteria(categories, "name"));
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(initPagination());
@@ -60,31 +58,33 @@ const ProductWrapper = (props: ThisProps) => {
   return (
     <>
       <h2 className="text-3xl font-semibold">Product Dashboard</h2>
-      <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
-        <CreateProductModal
-          categories={categories}
-          stateChanges={stateChanges}
-        />
-        <SearchFilter
-          search={search}
-          filterData={{ filters, setFilters }}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search product by name"
-        />
-        {!loading ? (
-          <ProductTable
+      {categories && (
+        <div className="mt-7 flex w-full flex-col gap-3 overflow-x-auto overflow-y-hidden py-3">
+          <CreateProductModal
             categories={categories}
-            filters={filters}
             stateChanges={stateChanges}
-            paginate={pagination}
-            paginateAction={(e) =>
-              setPage(Number(e.currentTarget.dataset.page))
-            }
           />
-        ) : (
-          <ComplexTableLoading />
-        )}
-      </div>
+          <SearchFilter
+            search={search}
+            filterData={{ filters, setFilters }}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search product by name"
+          />
+          {!loading ? (
+            <ProductTable
+              categories={categories}
+              filters={filters}
+              stateChanges={stateChanges}
+              paginate={pagination}
+              paginateAction={(e) =>
+                setPage(Number(e.currentTarget.dataset.page))
+              }
+            />
+          ) : (
+            <ComplexTableLoading />
+          )}
+        </div>
+      )}
     </>
   );
 };

@@ -39,6 +39,7 @@ const initialState = () => {
     description: "",
     thumbnail: "",
     status: "Active",
+    weight: 0,
   };
 };
 
@@ -53,7 +54,7 @@ const CreateProductModal = (props: CreateProductProps) => {
   const [validation, setValidation] = useState<ValidationTypes[]>([]);
   const btnCheckProps = {
     data,
-    requiredField: ["name", "category", "price", "description"],
+    requiredField: ["name", "category", "price", "description", "weight"],
     setDisable,
   };
 
@@ -93,8 +94,9 @@ const CreateProductModal = (props: CreateProductProps) => {
     }
 
     try {
-      const token = Cookies.get("token");
-      const result = await createProduct(form, token!);
+      const result = await createProduct(form, true);
+
+      if (result.status >= 300) throw result;
 
       setTimeout(() => {
         setLoading(false);
@@ -180,11 +182,16 @@ const CreateProductModal = (props: CreateProductProps) => {
             validations={validation}
           />
           {/* Price, Thumbnail, Status */}
-          <div className="grid grid-cols-1 place-content-between content-between justify-between sm:grid-cols-2">
+          <div className="grid grid-cols-1 place-content-between content-between items-center justify-between sm:grid-cols-2">
             <div className="flex flex-col">
               <NumericInput
                 isCurrency
                 label={["Price", "price", "Enter product price"]}
+                validations={validation}
+                dataState={{ data, setData }}
+              />
+              <NumericInput
+                label={["Weight (gram)", "weight", "Enter product weight"]}
                 validations={validation}
                 dataState={{ data, setData }}
               />
@@ -196,7 +203,7 @@ const CreateProductModal = (props: CreateProductProps) => {
                 validations={validation}
               />
             </div>
-            <div className="flex h-[300px] w-[300px] items-center justify-center place-self-center self-center rounded-md bg-neutral sm:h-[250px] sm:w-[250px] sm:place-self-end md:h-[300px] md:w-[300px]">
+            <div className="flex h-[300px] w-[300px] items-center justify-center place-self-center self-center rounded-md bg-neutral sm:h-[250px] sm:w-[250px] md:h-[300px] md:w-[300px]">
               <Image
                 src={preview || "icon/image.svg"}
                 width={!preview ? 60 : 150}

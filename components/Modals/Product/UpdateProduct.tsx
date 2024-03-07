@@ -43,12 +43,12 @@ const initialData = (product: ProductTypes) => {
     description: product.description,
     thumbnail: product.thumbnail,
     status: product.status,
+    weight: product.weight,
   };
 };
 
 const UpdateProductModal = (props: ThisProps) => {
   const { product, index, categories, stateChanges } = props;
-  const IMG_API = process.env.NEXT_PUBLIC_IMG;
   const router = useRouter();
   const [preview, setPreview] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
@@ -58,7 +58,7 @@ const UpdateProductModal = (props: ThisProps) => {
   const [data, setData] = useState<PostProductTypes>(initialData(product));
   const btnCheckProps = {
     data,
-    requiredField: ["name", "category", "price", "description"],
+    requiredField: ["name", "category", "price", "description", "weight"],
     setDisable,
   };
 
@@ -99,6 +99,8 @@ const UpdateProductModal = (props: ThisProps) => {
 
     try {
       const result = await updateProduct(form, id, true);
+
+      if (result.status >= 300) throw result;
 
       setTimeout(() => {
         setLoading(false);
@@ -192,6 +194,11 @@ const UpdateProductModal = (props: ThisProps) => {
                 validations={validation}
                 dataState={{ data, setData }}
               />
+              <NumericInput
+                label={["Weight (gram)", "weight", "Enter product weight"]}
+                validations={validation}
+                dataState={{ data, setData }}
+              />
               <StatusInput dataState={{ data, setData }} label="status" />
               <FileInput
                 fileSetState={{ setData, setPreview }}
@@ -200,7 +207,7 @@ const UpdateProductModal = (props: ThisProps) => {
                 validations={validation}
               />
             </div>
-            <div className="flex h-[300px] w-[300px] items-center justify-center place-self-center self-center rounded-md bg-neutral sm:h-[250px] sm:w-[250px] sm:place-self-end md:h-[300px] md:w-[300px]">
+            <div className="flex h-[300px] w-[300px] items-center justify-center place-self-center self-center rounded-md bg-neutral sm:h-[250px] sm:w-[250px] md:h-[300px] md:w-[300px]">
               {preview ? (
                 <Image
                   src={preview}
@@ -215,7 +222,7 @@ const UpdateProductModal = (props: ThisProps) => {
                   width={150}
                   height={150}
                   alt="preview"
-                  className={"h-full w-auto object-cover"}
+                  className={"h-full w-auto bg-white object-cover"}
                 />
               ) : (
                 <ImageSvg className="h-auto w-[100px] fill-white" />
