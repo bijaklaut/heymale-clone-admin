@@ -55,8 +55,9 @@ const CreatePaymentModal = (props: ThisProps) => {
     setValidation([]);
 
     try {
-      const token = Cookies.get("token");
-      const result = await createPayment(data, token!);
+      const result = await createPayment(data, true);
+
+      if (result.status >= 300) throw result;
 
       setTimeout(() => {
         setLoading(false);

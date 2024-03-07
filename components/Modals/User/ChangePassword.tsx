@@ -70,8 +70,9 @@ const ChangePasswordModal = (props: thisProps) => {
     form.append("newPassword", data.newPassword);
 
     try {
-      const token = Cookies.get("token");
-      const result = await changePassword(form, id, token!);
+      const result = await changePassword(form, id, true);
+
+      if (result.status >= 300) throw result;
 
       setTimeout(() => {
         setLoading(false);

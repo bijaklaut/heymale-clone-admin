@@ -22,8 +22,8 @@ export const SelectCity = ({
       <select
         className="select select-bordered rounded-md"
         onChange={onChange}
-        disabled={!data.province.id}
-        value={data.city.id || ""}
+        disabled={!data.addressArea.province}
+        value={data.addressArea.city || ""}
       >
         <option disabled value={""}>
           Select City

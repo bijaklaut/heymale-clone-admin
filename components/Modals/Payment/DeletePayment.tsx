@@ -24,8 +24,9 @@ const DeletePaymentModal = (props: thisProps) => {
     setLoading(true);
 
     try {
-      const token = Cookies.get("token");
-      const result = await deletePayment(id, token!);
+      const result = await deletePayment(id, true);
+
+      if (result.status >= 300) throw result;
 
       setTimeout(() => {
         setLoading(false);

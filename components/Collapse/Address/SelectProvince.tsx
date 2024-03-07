@@ -22,7 +22,7 @@ export const SelectProvince = ({
       <select
         className="select select-bordered rounded-md"
         onChange={onChange}
-        value={data.province.id || ""}
+        value={data.addressArea.province || ""}
       >
         <option disabled value={""}>
           Select Province

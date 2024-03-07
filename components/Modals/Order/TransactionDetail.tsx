@@ -90,7 +90,7 @@ const TransactionDetailModal = ({ transaction, isShow, reset }: ThisProps) => {
               )}
               {data?.payment_type == "bank_transfer" &&
                 data.va_numbers!.map((va, index) => (
-                  <div className="grid grid-cols-2">
+                  <div key={index} className="grid grid-cols-2">
                     <div className="font-semibold">Virtual Account</div>
                     <div>{`${va.bank.toUpperCase()} - ${va.va_number}`}</div>
                   </div>

@@ -62,8 +62,9 @@ const UpdatePaymentModal = (props: thisProps) => {
     setValidation([]);
 
     try {
-      const token = Cookies.get("token");
-      const result = await updatePayment(data, id, token!);
+      const result = await updatePayment(data, id, true);
+
+      if (result.status >= 300) throw result;
 
       setTimeout(() => {
         setLoading(false);
