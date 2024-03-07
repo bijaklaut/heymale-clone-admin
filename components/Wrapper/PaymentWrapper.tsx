@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState, Fragment, useCallback } from "react";
+import { useEffect, useState, Fragment, useCallback } from "react";
 import { getPayments } from "../../services/admin";
 import SearchFilter from "../Misc/SearchFilter";
 import SimpleTableLoading from "../Loading/SimpleTableLoading";
