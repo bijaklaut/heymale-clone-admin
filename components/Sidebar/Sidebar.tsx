@@ -97,7 +97,7 @@ export const Sidebar = () => {
         {checked ? (
           <>
             <div className="overflow-y-auto">
-              {/* Mobile Title */}
+              {/* Tablet, Laptop, Desktop Title*/}
               <div className="title hidden h-[50px] w-full items-center justify-center sm:flex">
                 <Link href={"/"}>
                   <Image
@@ -108,8 +108,8 @@ export const Sidebar = () => {
                   />
                 </Link>
               </div>
-              {/* Tablet, Laptop, Desktop Title*/}
-              <div className="title left-0 right-0 top-0 flex h-[50px] w-full items-center justify-between py-8 ps-3 sm:hidden ">
+              {/* Mobile Title */}
+              <div className="title sticky top-0 flex h-[50px] w-full items-center justify-between py-8 ps-3 sm:hidden ">
                 <Link href={"/"}>
                   <Image
                     src={heymaleLogo}
@@ -136,7 +136,7 @@ export const Sidebar = () => {
                   </label>
                 </div>
               </div>
-              <div className="divider mb-4 mt-2"></div>
+              <div className="divider mb-2 mt-0"></div>
               <div className="w-full">
                 <div className="menu-list flex flex-col gap-y-[5px]">
                   <div className="menu text-lg font-semibold text-gray-400 sm:text-sm sm:font-bold">

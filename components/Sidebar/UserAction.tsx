@@ -90,7 +90,7 @@ const UserAction = (props: ThisProps) => {
           </div>
         </div>
       ) : (
-        <div className="relative flex items-center justify-between gap-x-3 py-5 sm:py-2">
+        <div className="relative flex w-full items-center justify-between gap-x-3 bg-base-100 py-2 max-sm:sticky max-sm:bottom-0">
           {user.avatar ? (
             <div className="avatar">
               <div className="w-[50px] rounded-full bg-white">
