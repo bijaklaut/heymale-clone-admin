@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -37,7 +38,7 @@ const Signin = () => {
         method: "POST",
       });
 
-      if (result.status != 200) throw result;
+      if (result.status >= 300) throw result;
 
       setTimeout(() => {
         setLoading(false);

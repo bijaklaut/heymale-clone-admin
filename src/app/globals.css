@@ -10,7 +10,7 @@
 
 /* Form */
 .mini-input {
-  @apply h-10 w-full rounded-md border-2 border-black bg-white px-2 text-black transition-colors placeholder:text-transparent autofill:bg-white focus:outline-none;
+  @apply h-10 w-full rounded-md border-2 border-black bg-white px-2 text-black transition-colors placeholder:text-transparent autofill:bg-white focus:border-primary focus:outline-none;
 }
 
 .is-valid {
