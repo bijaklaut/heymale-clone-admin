@@ -159,6 +159,15 @@ export const deleteProduct = async (id: string, token: boolean) => {
     token,
   });
 };
+
+export const getCatalogProducts = async () => {
+  const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/product/catalog`;
+
+  return callApi({
+    url,
+    method: "GET",
+  });
+};
 // End of Product Dashboard
 
 // User Dashboard

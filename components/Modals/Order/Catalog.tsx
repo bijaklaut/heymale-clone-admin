@@ -1,9 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { getProducts, getUserCart, updateCart } from "../../../services/admin";
+import {
+  getCatalogProducts,
+  getUserCart,
+  updateCart,
+} from "../../../services/admin";
 import { ToastContainer, toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import {
   CartItemTypes,
   CartTypes,
@@ -16,6 +19,7 @@ import cx from "classnames";
 import Image from "next/image";
 import { getUserId } from "../../../services/actions";
 import Link from "next/link";
+import { appendImageURL } from "../../../services/helper";
 
 interface ThisProps {
   stateChanges(): void;
@@ -26,9 +30,6 @@ interface ThisProps {
 
 const CatalogProductModal = (props: ThisProps) => {
   const { stateChanges, order, isUpdate, reset } = props;
-  const router = useRouter();
-  const [disable, setDisable] = useState(true);
-  const [loading, setLoading] = useState(false);
 
   const [products, setProducts] = useState<ProductTypes[]>([]);
   const [cart, setCart] = useState<CartTypes>();
@@ -58,7 +59,6 @@ const CatalogProductModal = (props: ThisProps) => {
   const modalHandler = useCallback(
     (id: string, show: boolean) => {
       const modal = document.getElementById(id) as HTMLDialogElement;
-      setDisable(true);
 
       if (show) {
         return modal.showModal();
@@ -70,66 +70,63 @@ const CatalogProductModal = (props: ThisProps) => {
   );
 
   const getProductsAPI = useCallback(async () => {
-    const { payload } = await getProducts();
+    const { payload } = await getCatalogProducts();
+
     setProducts(payload.docs);
   }, [products]);
 
-  const variantSelect = useCallback(
-    (element: HTMLInputElement, product: ProductTypes, k: string) => {
-      const parentDiv = document.querySelector(`div[id='${product._id}']`);
-      const children = parentDiv?.querySelectorAll("div.form-control");
-
-      children?.forEach((child) => {
-        const label = child.children[0];
-        if (child.id == `${product._id}-${k}`) {
-          label.classList.add("bg-black/10");
-        } else {
-          label.classList.remove("bg-black/10");
-        }
-      });
-
-      setSelected({
-        _id: product._id,
-        item_name: product.name,
-        thumbnail: product.thumbnail,
-        price: product.price,
-        weight: 200,
-        variants: {
-          [k]: 1,
-        },
-      });
-    },
-    [],
-  );
+  const variantSelect = useCallback((product: ProductTypes, k: string) => {
+    setSelected({
+      _id: product._id,
+      item_name: product.name,
+      thumbnail: product.thumbnail,
+      price: product.price,
+      weight: product.weight,
+      variants: {
+        [k]: 1,
+      },
+    });
+  }, []);
 
   const populateCart = useCallback(() => {
     if (!selected) {
       return null;
     }
 
+    // Copy cart or make new cart
     const copyItems = cart
       ? (JSON.parse(JSON.stringify(cart?.items)) as CartItemTypes[])
       : [];
 
+    // Find if selected product is exist in cart
     const existProduct = copyItems.findIndex(
       (item: CartItemTypes) => item._id == selected?._id,
     );
+
+    // Get which variant and value is selected
     const [label, value] = Object.entries(selected.variants).filter(
       ([k]) => (selected.variants as any)[k] != 0,
     )[0];
 
+    // Existed product conditional
     if (existProduct != -1) {
+      // If existed product have selected variant then accumulate it with new value
+      // If it doesnt have that variant then just add the new value
       const updateValue = (copyItems[existProduct].variants as any)[label]
         ? (copyItems[existProduct].variants as any)[label] + value
         : value;
 
+      // Insert the updated value to specific variant
       copyItems[existProduct].variants = {
         ...copyItems[existProduct].variants,
         [label]: updateValue,
       };
 
+      // Insert the copyItems to cart
       setCart((prev) => ({ ...prev!, items: copyItems }));
     } else {
+      // Just push the selected item to the copyItems
+      // and then insert it to the cart
       copyItems.push(selected);
       setCart((prev) => ({ ...prev!, items: copyItems }));
     }
@@ -142,6 +139,7 @@ const CatalogProductModal = (props: ThisProps) => {
       const newCart = populateCart();
       const user = await getUserId();
       const { payload, message } = await updateCart({ user, items: newCart! });
+
       setCart((prev) => ({
         ...prev!,
         items: payload.items,
@@ -233,6 +231,15 @@ const CatalogProductModal = (props: ThisProps) => {
     }
   }, []);
 
+  const generateTemporaryImage = useCallback(
+    (item_id: string) => {
+      const match = products.find((product) => product._id == item_id);
+
+      return match?.display;
+    },
+    [products],
+  );
+
   useEffect(() => {
     getProductsAPI();
     getCart();
@@ -248,11 +255,11 @@ const CatalogProductModal = (props: ThisProps) => {
     <>
       <button
         className="btn btn-primary btn-sm w-fit"
-        onClick={() => modalHandler("create_order", true)}
+        onClick={() => modalHandler("catalog", true)}
       >
         Catalog
       </button>
-      <dialog data-theme={"skies"} id="create_order" className="modal">
+      <dialog data-theme={"skies"} id="catalog" className="modal">
         <ToastContainer
           enableMultiContainer
           containerId={"catalog"}
@@ -278,7 +285,7 @@ const CatalogProductModal = (props: ThisProps) => {
                   >
                     <div className="mb-5 flex w-full justify-center">
                       <Image
-                        src={product.thumbnail}
+                        src={appendImageURL(product.display!)}
                         width={500}
                         height={500}
                         alt={`thm-${product.name}`}
@@ -302,19 +309,15 @@ const CatalogProductModal = (props: ThisProps) => {
                           key={i}
                           className="form-control"
                         >
-                          <label className="label h-8 w-8 cursor-pointer rounded-md border-2 border-neutral transition-colors hover:bg-black/10 focus:bg-black/10">
+                          <label className="has-[input:checked]:bg-black/10 label h-8 w-8 cursor-pointer rounded-md border-2 border-neutral transition-colors hover:bg-black/10 focus:bg-black/10">
                             <span className="label-text w-full text-center text-neutral">
                               {k.toUpperCase()}
                             </span>
                             <input
                               type="radio"
-                              checked={
-                                (selected?.variants as any)[k] ? true : false
-                              }
+                              name="variants"
                               className="hidden"
-                              onChange={(e) =>
-                                variantSelect(e.target, product, k)
-                              }
+                              onChange={() => variantSelect(product, k)}
                             />
                           </label>
                         </div>
@@ -356,7 +359,7 @@ const CatalogProductModal = (props: ThisProps) => {
                       >
                         <div>
                           <Image
-                            src={item.thumbnail}
+                            src={appendImageURL(item.thumbnail)}
                             width={500}
                             height={500}
                             alt={`thm-${item.item_name}`}
@@ -412,13 +415,16 @@ const CatalogProductModal = (props: ThisProps) => {
 
           {/* Submit */}
           <div className="modal-action flex">
-            <Link className="btn btn-primary btn-sm" href={"/checkout"}>
-              Checkout
-            </Link>
+            <button
+              disabled={cart?.items.length == 0}
+              className="btn btn-primary btn-sm"
+            >
+              <Link href={"/checkout"}>Checkout</Link>
+            </button>
             <form method="dialog">
               <button
                 className="btn btn-outline btn-sm"
-                onClick={() => modalHandler("create_order", false)}
+                onClick={() => modalHandler("catalog", false)}
               >
                 Close
               </button>

@@ -94,6 +94,7 @@ export interface ProductTypes
   _id: string;
   category: CategoryTypes;
   thumbnail: string;
+  display?: string;
 }
 
 export interface PostAddressTypes {

@@ -309,3 +309,7 @@ export const underscoreTransform = (words: string) => {
     .map((word) => word[0].toUpperCase() + word.slice(1))
     .join(" ");
 };
+
+export const appendImageURL = (imageStr: string) => {
+  return `data:image/jpeg;base64,${imageStr}`;
+};

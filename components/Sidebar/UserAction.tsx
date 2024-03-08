@@ -42,7 +42,7 @@ const UserAction = (props: ThisProps) => {
         <div className="flex items-center justify-center gap-x-3 py-5 sm:py-2">
           <div
             data-tip={!checked ? user.name : null}
-            className="form-control tooltip tooltip-right"
+            className="form-control sm:tooltip sm:tooltip-right"
           >
             <label className="label cursor-pointer">
               <input

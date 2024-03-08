@@ -17,6 +17,8 @@ export async function POST(req: NextRequest) {
 
     cookies().delete("accessToken");
     cookies().delete("refreshToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("cart");
 
     return NextResponse.json({ message: "Signed out", status: 200 });
   } catch (error) {
