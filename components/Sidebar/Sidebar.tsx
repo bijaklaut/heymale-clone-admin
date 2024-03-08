@@ -4,10 +4,7 @@ import Image from "next/image";
 import { MenuItem } from "./MenuItem";
 import UserAction from "./UserAction";
 import { useCallback, useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import { getUserById } from "../../services/admin";
-import { jwtDecode } from "jwt-decode";
-import { UserToken } from "../../services/types";
 import SidebarLoading from "../Loading/SidebarLoading";
 import Link from "next/link";
 import heymaleLogo from "../../public/images/logo/heymale-logo.png";
@@ -99,7 +96,7 @@ export const Sidebar = () => {
       <aside data-theme={"nord"} className={sidebarClass}>
         {checked ? (
           <>
-            <div className="overflow-x-auto">
+            <div className="overflow-y-auto">
               {/* Mobile Title */}
               <div className="title hidden h-[50px] w-full items-center justify-center sm:flex">
                 <Link href={"/"}>
