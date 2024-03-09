@@ -1,7 +1,7 @@
 import { PUBLIC_API_BASEURL, PUBLIC_API_VER } from "../constants";
 import callApi from "./callApi";
 import {
-  CartItemTypes,
+  PostCartItemTypes,
   PostOrderTypes,
   PostPaymentTypes,
   SignInTypes,
@@ -404,10 +404,10 @@ export const getTransactions = async (page?: number) => {
 // Cart
 export const updateCart = async (data: {
   user: string;
-  items: CartItemTypes[];
+  items: PostCartItemTypes[];
 }) => {
   const url = `${PUBLIC_API_BASEURL}/${PUBLIC_API_VER}/cart/updatecart`;
-
+  console.log("DATA: ", data);
   return callApi({
     url,
     data,

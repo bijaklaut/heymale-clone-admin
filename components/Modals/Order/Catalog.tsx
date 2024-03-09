@@ -11,6 +11,7 @@ import {
   CartItemTypes,
   CartTypes,
   OrderTypes,
+  PostCartItemTypes,
   ProductTypes,
 } from "../../../services/types";
 import { TrashSvg } from "../../Misc/SvgGroup";
@@ -33,10 +34,12 @@ const CatalogProductModal = (props: ThisProps) => {
 
   const [products, setProducts] = useState<ProductTypes[]>([]);
   const [cart, setCart] = useState<CartTypes>();
+  // const [localCart, setLocalCart] = useState<LocalCartTypes>();
   const [selected, setSelected] = useState<CartItemTypes>({
     _id: "",
     item_name: "",
     thumbnail: "",
+    thumbnail_file: "",
     price: 0,
     weight: 0,
     variants: {
@@ -80,6 +83,7 @@ const CatalogProductModal = (props: ThisProps) => {
       _id: product._id,
       item_name: product.name,
       thumbnail: product.thumbnail,
+      thumbnail_file: product.display!,
       price: product.price,
       weight: product.weight,
       variants: {
@@ -94,13 +98,21 @@ const CatalogProductModal = (props: ThisProps) => {
     }
 
     // Copy cart or make new cart
-    const copyItems = cart
-      ? (JSON.parse(JSON.stringify(cart?.items)) as CartItemTypes[])
-      : [];
+    let postItems: PostCartItemTypes[] = [];
+    let copyItems: CartItemTypes[] = [];
+
+    if (cart) {
+      cart?.items.forEach((item) => {
+        let { thumbnail_file, ...rest } = item;
+        postItems.push(rest);
+      });
+
+      copyItems = JSON.parse(JSON.stringify(cart?.items));
+    }
 
     // Find if selected product is exist in cart
-    const existProduct = copyItems.findIndex(
-      (item: CartItemTypes) => item._id == selected?._id,
+    const existProduct = postItems.findIndex(
+      (item) => item._id == selected?._id,
     );
 
     // Get which variant and value is selected
@@ -112,11 +124,16 @@ const CatalogProductModal = (props: ThisProps) => {
     if (existProduct != -1) {
       // If existed product have selected variant then accumulate it with new value
       // If it doesnt have that variant then just add the new value
-      const updateValue = (copyItems[existProduct].variants as any)[label]
-        ? (copyItems[existProduct].variants as any)[label] + value
+      const updateValue = (postItems[existProduct].variants as any)[label]
+        ? (postItems[existProduct].variants as any)[label] + value
         : value;
 
       // Insert the updated value to specific variant
+      postItems[existProduct].variants = {
+        ...postItems[existProduct].variants,
+        [label]: updateValue,
+      };
+
       copyItems[existProduct].variants = {
         ...copyItems[existProduct].variants,
         [label]: updateValue,
@@ -125,32 +142,39 @@ const CatalogProductModal = (props: ThisProps) => {
       // Insert the copyItems to cart
       setCart((prev) => ({ ...prev!, items: copyItems }));
     } else {
-      // Just push the selected item to the copyItems
+      const { thumbnail_file, ...postSelected } = selected;
+      // Just push the selected item to the postItems
       // and then insert it to the cart
+      postItems.push(postSelected);
       copyItems.push(selected);
+
       setCart((prev) => ({ ...prev!, items: copyItems }));
     }
 
-    return copyItems as CartItemTypes[];
+    // return postItems as new cart
+    return postItems as PostCartItemTypes[];
   }, [selected, cart]);
 
   const storeCart = useCallback(async () => {
     try {
       const newCart = populateCart();
       const user = await getUserId();
-      const { payload, message } = await updateCart({ user, items: newCart! });
+      const result = await updateCart({ user, items: newCart! });
 
-      setCart((prev) => ({
-        ...prev!,
-        items: payload.items,
-      }));
+      if (!result.payload) throw result;
 
-      if (message) {
-        toast.success(message, { containerId: "catalog" });
-      }
+      toast.success(result.message, {
+        containerId: "catalog",
+        toastId: "update_cart",
+        hideProgressBar: true,
+      });
     } catch (error: any) {
       await getCart();
-      toast.error("Failed to update cart", { containerId: "catalog" });
+      toast.error("Failed to update cart", {
+        containerId: "catalog",
+        toastId: "update_cart",
+        hideProgressBar: true,
+      });
     }
   }, [selected, cart]);
 
@@ -160,27 +184,53 @@ const CatalogProductModal = (props: ThisProps) => {
         const copyItems = JSON.parse(
           JSON.stringify(cart?.items),
         ) as CartItemTypes[];
-        const itemIndex = copyItems.findIndex((copy) => copy._id == item._id);
+
+        let postItems: PostCartItemTypes[] = [];
+
+        if (cart) {
+          cart?.items.forEach((item) => {
+            let { thumbnail_file, ...rest } = item;
+            postItems.push(rest);
+          });
+        }
+
+        const itemIndex = postItems.findIndex((post) => post._id == item._id);
+
         const updateValue =
-          (copyItems[itemIndex].variants as any)[label] + value;
+          (postItems[itemIndex].variants as any)[label] + value;
+
+        postItems[itemIndex].variants = {
+          ...postItems[itemIndex].variants,
+          [label]: updateValue,
+        };
+
         copyItems[itemIndex].variants = {
           ...copyItems[itemIndex].variants,
           [label]: updateValue,
         };
+
         setCart((prev) => ({ ...prev!, items: copyItems }));
 
         const user = await getUserId();
         const result = await updateCart({
           user,
-          items: copyItems,
+          items: postItems,
         });
 
-        if (result) {
-          toast.success(result.message, { containerId: "catalog" });
-        }
+        if (!result.payload) throw result;
+
+        toast.success(result.message, {
+          containerId: "catalog",
+          toastId: "update_cart",
+          hideProgressBar: true,
+        });
       } catch (error: any) {
         await getCart();
-        toast.error("Failed to update cart", { containerId: "catalog" });
+        toast.error("Failed to update cart", {
+          containerId: "catalog",
+          toastId: "update_cart",
+          hideProgressBar: true,
+        });
       }
     },
     [cart],
@@ -192,27 +242,46 @@ const CatalogProductModal = (props: ThisProps) => {
         const copyItems = JSON.parse(
           JSON.stringify(cart?.items),
         ) as CartItemTypes[];
+        let postItems: PostCartItemTypes[] = [];
+
+        if (cart) {
+          cart?.items.forEach((item) => {
+            let { thumbnail_file, ...rest } = item;
+            postItems.push(rest);
+          });
+        }
+
         const itemIndex = copyItems.findIndex((copy) => copy._id == item._id);
 
         delete (copyItems[itemIndex].variants as any)[label];
+        delete (postItems[itemIndex].variants as any)[label];
 
         if (Object.entries(copyItems[itemIndex].variants).length == 0) {
           copyItems.splice(itemIndex, 1);
+          postItems.splice(itemIndex, 1);
         }
 
         setCart((prev) => ({ ...prev!, items: copyItems }));
         const user = await getUserId();
-        const { message } = await updateCart({
+        const result = await updateCart({
           user,
-          items: copyItems,
+          items: postItems,
         });
 
-        if (message) {
-          toast.success(message, { containerId: "catalog" });
-        }
+        if (!result.payload) throw result;
+
+        toast.success(result.message, {
+          containerId: "catalog",
+          toastId: "update_cart",
+          hideProgressBar: true,
+        });
       } catch (error: any) {
         await getCart();
-        toast.error("Failed to update cart", { containerId: "catalog" });
+        toast.error("Failed to update cart", {
+          containerId: "catalog",
+          toastId: "update_cart",
+          hideProgressBar: true,
+        });
       }
     },
     [cart],
@@ -225,6 +294,7 @@ const CatalogProductModal = (props: ThisProps) => {
 
       if (payload) {
         setCart(payload);
+        // setLocalCart(payload);
       }
     } catch (error) {
       console.log("Cart not found");
@@ -275,7 +345,7 @@ const CatalogProductModal = (props: ThisProps) => {
             </div>
             <div
               id="card-container"
-              className="collapse-content grid grid-cols-2 gap-3"
+              className="collapse-content grid grid-cols-1 gap-3 sm:grid-cols-2"
             >
               {products.length > 0 &&
                 products.map((product, index) => (
@@ -309,7 +379,7 @@ const CatalogProductModal = (props: ThisProps) => {
                           key={i}
                           className="form-control"
                         >
-                          <label className="has-[input:checked]:bg-black/10 label h-8 w-8 cursor-pointer rounded-md border-2 border-neutral transition-colors hover:bg-black/10 focus:bg-black/10">
+                          <label className="label h-8 w-8 cursor-pointer rounded-md border-2 border-neutral transition-colors hover:bg-black/10 focus:bg-black/10 has-[input:checked]:bg-black/20">
                             <span className="label-text w-full text-center text-neutral">
                               {k.toUpperCase()}
                             </span>
@@ -346,7 +416,7 @@ const CatalogProductModal = (props: ThisProps) => {
             </div>
           </div>
 
-          {cart && (
+          {cart && cart.items.length > 0 && (
             <div className="mt-3 flex flex-col rounded-md bg-base-200 p-4">
               <h4 className="modal-title mx-auto mb-5">Cart</h4>
               <div className="grid grid-cols-1 gap-3">
@@ -359,7 +429,7 @@ const CatalogProductModal = (props: ThisProps) => {
                       >
                         <div>
                           <Image
-                            src={appendImageURL(item.thumbnail)}
+                            src={appendImageURL(item.thumbnail_file)}
                             width={500}
                             height={500}
                             alt={`thm-${item.item_name}`}

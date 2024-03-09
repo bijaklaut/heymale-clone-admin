@@ -439,7 +439,16 @@ export interface CartTypes {
   items: CartItemTypes[];
 }
 
-export interface CartItemTypes {
+export interface CartItemTypes extends PostCartItemTypes {
+  thumbnail_file: string;
+}
+
+export interface PostCartTypes {
+  user: string;
+  items: PostCartItemTypes[];
+}
+
+export interface PostCartItemTypes {
   _id: string;
   item_name: string;
   thumbnail: string;
