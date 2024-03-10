@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   AddressTypes,
+  CartItemTypes,
   CartTypes,
   GetCourierRatesTypes,
   OrderItemTypes,
@@ -93,7 +94,7 @@ const CheckoutWrapper = () => {
   }, [data]);
 
   const populateData = useCallback(() => {
-    let order_items: OrderItemTypes[] = [];
+    let order_items = cart ? excludeThumbnailFile(cart!) : [];
     let total_items = 0;
     let total_weight = 0;
     let total_amount = 0;
@@ -103,18 +104,8 @@ const CheckoutWrapper = () => {
       cart.items.map((item) => {
         let item_qty = 0;
         Object.entries(item.variants).map(([size, qty]) => {
-          let order_item = {
-            _id: item._id,
-            item_name: `${item.item_name} - ${size.toUpperCase()}`,
-            thumbnail: item.thumbnail,
-            quantity: qty,
-            price: item.price,
-            weight: item.weight,
-          };
           total_items += qty;
           item_qty += qty;
-
-          order_items.push(order_item);
         });
 
         let dataDlv = {
@@ -132,7 +123,7 @@ const CheckoutWrapper = () => {
     }
 
     const order_data: PostOrderTypes = {
-      orderItems: cart?.items ? cart.items : [],
+      orderItems: cart ? order_items! : [],
       voucher: {
         voucher_id: "",
         value: 0,
@@ -264,16 +255,16 @@ const CheckoutWrapper = () => {
   const confirmOrder = useCallback(async () => {
     try {
       if (data && cart?.items.length! > 0) {
-        const { status, payload, message } = await createOrder(data, true);
         setLoading(true);
+        const result = await createOrder(data, true);
 
-        if (status == 201) {
-          const { payload } = await emptyCart(cart!.user, true);
-          setCart((prev) => ({ ...prev!, items: payload }));
+        if (result.status == 201) {
+          const result2 = await emptyCart(cart!.user, true);
+          localStorage.removeItem("cart");
           setTimeout(() => {
             setLoading(false);
-            toast.success(message, { containerId: "Main" });
-            router.push(`/order/${payload}`);
+            toast.success(result.message, { containerId: "Main" });
+            router.push(`/order/${result.payload}`);
           }, 700);
         }
       }
@@ -289,6 +280,18 @@ const CheckoutWrapper = () => {
     (address: AddressTypes) => setSelectedAddress(address),
     [],
   );
+
+  const excludeThumbnailFile = useCallback((cart: CartTypes) => {
+    if (!cart) return null;
+    let copyItems = JSON.parse(JSON.stringify(cart.items)) as CartItemTypes[];
+
+    copyItems.forEach((item, index) => {
+      const { thumbnail_file, ...newItem } = item;
+      copyItems[index] = newItem;
+    });
+
+    return copyItems;
+  }, []);
 
   // Get cart items, addresses, vouchers exec
   useEffect(() => {
@@ -503,7 +506,7 @@ const CheckoutWrapper = () => {
                         >
                           <div>
                             <Image
-                              src={appendImageURL(item.thumbnail_file)}
+                              src={appendImageURL(item.thumbnail_file!)}
                               width={500}
                               height={500}
                               alt={`thm-${item.item_name}`}

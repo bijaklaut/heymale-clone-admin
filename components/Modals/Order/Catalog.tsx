@@ -429,7 +429,7 @@ const CatalogProductModal = (props: ThisProps) => {
                       >
                         <div>
                           <Image
-                            src={appendImageURL(item.thumbnail_file)}
+                            src={appendImageURL(item.thumbnail_file!)}
                             width={500}
                             height={500}
                             alt={`thm-${item.item_name}`}

@@ -440,7 +440,7 @@ export interface CartTypes {
 }
 
 export interface CartItemTypes extends PostCartItemTypes {
-  thumbnail_file: string;
+  thumbnail_file?: string;
 }
 
 export interface PostCartTypes {

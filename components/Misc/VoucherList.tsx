@@ -78,12 +78,6 @@ const VoucherListModal = ({
     [validityCheck],
   );
 
-  useEffect(() => {
-    if (order) {
-      console.log("ORDER: ", order);
-    }
-  }, [order]);
-
   return (
     <Fragment>
       <button
