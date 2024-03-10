@@ -418,7 +418,7 @@ const CheckoutWrapper = () => {
                         className="peer hidden"
                         onChange={() => paymentSelect(va.value)}
                       />
-                      <div className="flex w-full items-center gap-x-3">
+                      <div className="flex w-full items-center gap-x-3 sm:gap-x-6">
                         <Image
                           src={`/images/logo/${va.value}.png`}
                           width={100}
@@ -575,11 +575,11 @@ const CheckoutWrapper = () => {
                 </div>
               </div>
             </div>
-            <div className="mx-auto flex w-fit max-w-[400px] items-center justify-center gap-3">
+            <div className="mx-auto flex w-fit max-w-[350px] items-center justify-center gap-3">
               <InfoSvg className="h-8 w-8 stroke-info" />
               <span className="text-xs">
-                By purchasing, you agree with to our Terms & Conditions, Refund,
-                and Return Policies
+                By purchasing, you agree to our Purchase, Refund, and Return
+                Terms & Conditions
               </span>
             </div>
             {!loading ? (
