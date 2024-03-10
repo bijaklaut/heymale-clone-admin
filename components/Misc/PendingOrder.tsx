@@ -41,6 +41,8 @@ const PendingOrder = ({ order }: ThisProps) => {
   const transformDateTime = useCallback((time: string) => {
     if (time) {
       const theday = new Date(time);
+      theday.setHours(theday.getHours() - 7);
+
       const date =
         theday.getDate() < 10 ? `0${theday.getDate()}` : theday.getDate();
       const month = theday.toDateString().split(" ")[1];
@@ -61,51 +63,81 @@ const PendingOrder = ({ order }: ThisProps) => {
   }, []);
 
   const countdownGenerator = useCallback(() => {
-    const expiry_time =
-      Date.parse(order?.transaction.expiry_time!) - Date.now();
-    let dummyHours = Math.floor((expiry_time / (1000 * 60 * 60)) % 24);
-    let dummyMinutes = Math.floor((expiry_time / (1000 * 60)) % 60);
-    let dummySeconds = Math.floor((expiry_time / 1000) % 60);
+    const reset = new Date(order?.transaction.expiry_time!);
+    reset.setHours(reset.getHours() - 7);
 
-    let hours = dummyHours < 10 ? `0${dummyHours}` : dummyHours;
-    let minutes = dummyMinutes < 10 ? `0${dummyMinutes}` : dummyMinutes;
-    let seconds = dummySeconds < 10 ? `0${dummySeconds}` : dummySeconds;
+    const expiry_time = Date.parse(reset.toUTCString()) - Date.now();
 
-    const timeString = `${hours} : ${minutes} : ${seconds}`;
-    setCountdown(timeString);
+    if (expiry_time > 0) {
+      let dummyHours = Math.floor((expiry_time / (1000 * 60 * 60)) % 24);
+      let dummyMinutes = Math.floor((expiry_time / (1000 * 60)) % 60);
+      let dummySeconds = Math.floor((expiry_time / 1000) % 60);
+
+      let hours = dummyHours < 10 ? `0${dummyHours}` : dummyHours;
+      let minutes = dummyMinutes < 10 ? `0${dummyMinutes}` : dummyMinutes;
+      let seconds = dummySeconds < 10 ? `0${dummySeconds}` : dummySeconds;
+
+      const timeString = `${hours} : ${minutes} : ${seconds}`;
+      setCountdown(timeString);
+    } else {
+      setCountdown("EXPIRED");
+    }
   }, [order]);
+
+  const copyValue = useCallback(
+    (value: string | number, element: HTMLButtonElement) => {
+      const otherCopy = document.getElementsByClassName("copy");
+      for (let i = 0; i < otherCopy.length; i++) {
+        otherCopy[i].classList.add("opacity-0");
+      }
+
+      navigator.clipboard
+        .writeText(value.toString())
+        .then(() => {})
+        .catch(() => {
+          element.nextElementSibling!.innerHTML = "Not Supported";
+          element.nextElementSibling!.classList.replace(
+            "bg-primary/80",
+            "bg-neutral/40",
+          );
+        })
+        .finally(() => {
+          element.nextElementSibling?.classList.remove("opacity-0");
+          setTimeout(() => {
+            element.nextElementSibling?.classList.add("opacity-0");
+          }, 3500);
+        });
+    },
+    [],
+  );
 
   useEffect(() => {
-    const interval = setInterval(() => countdownGenerator(), 1000);
-    return () => clearInterval(interval);
-  }, [order]);
+    if (countdown != "EXPIRED") {
+      const interval = setInterval(() => countdownGenerator(), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [order, countdown]);
 
   return (
-    <div className="mx-auto flex w-[500px] flex-col items-center justify-center gap-5">
+    <div className="mx-auto flex w-full max-w-[500px] flex-col items-center justify-center gap-5">
       <h3 className="mb-5 text-xl font-semibold text-white">
         Waiting for Payment
       </h3>
-      <div
-        data-theme="nord"
-        className="relative grid w-full grid-cols-[minmax(0,_1fr)_max-content] items-center overflow-hidden rounded-md  p-5 text-neutral"
-      >
+      <div className="relative grid w-full grid-cols-[minmax(0,_1fr)_max-content] items-center overflow-hidden rounded-md bg-white  p-5 text-neutral">
         <div className="flex flex-col">
           <span className="text-sm">Payment Deadline:</span>
           <span>{transformDateTime(order.transaction.expiry_time!)}</span>
         </div>
         {countdown && (
-          <div className="flex items-center gap-2 rounded-lg bg-orange-500 px-2 py-1 text-sm text-base-100">
+          <div className="flex items-center gap-2 rounded-xl bg-error px-2 py-1 text-sm text-white">
             <ClockSvg className="h-5 w-5 stroke-current" />
             <span>{countdown}</span>
           </div>
         )}
 
-        <div className="absolute left-0 h-full w-2 bg-orange-500"></div>
+        <div className="absolute left-0 h-[105%] w-2 rounded-l-md bg-error"></div>
       </div>
-      <div
-        data-theme="nord"
-        className="grid w-full grid-cols-1 rounded-md p-5 text-neutral"
-      >
+      <div className="grid w-full grid-cols-1 rounded-md bg-white p-5 text-neutral">
         <div className="flex flex-col gap-1">
           <span className="text-sm">Invoice</span>
           <span>{order.invoice}</span>
@@ -121,38 +153,69 @@ const PendingOrder = ({ order }: ThisProps) => {
               thousandSeparator="."
               decimalSeparator=","
             />
-            <CopySvg className="btn-icon-accent h-5 w-5 fill-current" />
+            <button
+              className="btn-icon-accent"
+              onClick={(e) => copyValue(order.total_price, e.currentTarget)}
+            >
+              <CopySvg className="h-5 w-5 fill-current" />
+            </button>
+            <div
+              data-theme="skies"
+              className="copy rounded-lg bg-primary/80 px-2 py-1 text-sm text-white opacity-0 transition-opacity duration-200"
+            >
+              Copied
+            </div>
           </div>
         </div>
         <div className="divider"></div>
         <div className="flex flex-col gap-3">
           <span className="text-sm">Virtual Account</span>
           {/* Permata Bank */}
-          {order.transaction.permata_va_number != "" && (
-            <div className="grid w-full grid-cols-[75px_1fr_min-content] items-center gap-5">
-              <Image
-                src={`/images/logo/permata.png`}
-                width={200}
-                height={200}
-                alt={"permata"}
-              />
-              <div className="flex flex-col">
-                <span>Permata Virtual Account</span>
-                <div className="flex items-center gap-2">
-                  <span>{order.transaction.permata_va_number}</span>
-                  <CopySvg className="btn-icon-accent h-5 w-5 fill-current" />
+          {!order.transaction.va_numbers?.length &&
+            order.transaction.permata_va_number != "" && (
+              <div className="grid w-full grid-cols-[75px_1fr_min-content] items-center gap-5">
+                <Image
+                  src={`/images/logo/permata.png`}
+                  width={200}
+                  height={200}
+                  alt={"permata"}
+                />
+                <div className="flex flex-col">
+                  <span>Permata Virtual Account</span>
+                  <div className="flex items-center gap-2">
+                    <span>{order.transaction.permata_va_number}</span>
+                    <button
+                      className="btn-icon-accent"
+                      onClick={(e) =>
+                        copyValue(
+                          order.transaction.permata_va_number!,
+                          e.currentTarget,
+                        )
+                      }
+                    >
+                      <CopySvg className="h-5 w-5 fill-current" />
+                    </button>
+                    <div
+                      data-theme="skies"
+                      className="copy rounded-lg bg-primary/80 px-2 py-1 text-sm text-white opacity-0 transition-opacity duration-200"
+                    >
+                      Copied
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Bank Transfer & Except Permata */}
           {order.transaction.payment_type == "bank_transfer" &&
             !order.transaction.permata_va_number &&
-            virtual_accounts.map((va) => {
+            virtual_accounts.map((va, index) => {
               return (
                 va.value == order.transaction.va_numbers![0].bank && (
-                  <div className="grid w-full grid-cols-[75px_1fr_min-content] items-center gap-5">
+                  <div
+                    key={index}
+                    className="grid w-full grid-cols-[75px_1fr_min-content] items-center gap-5"
+                  >
                     <Image
                       src={`/images/logo/${va.value}.png`}
                       width={200}
@@ -165,7 +228,23 @@ const PendingOrder = ({ order }: ThisProps) => {
                         <span>
                           {order.transaction.va_numbers![0].va_number}
                         </span>
-                        <CopySvg className="btn-icon-accent h-5 w-5 fill-current" />
+                        <button
+                          className="btn-icon-accent"
+                          onClick={(e) =>
+                            copyValue(
+                              order.transaction.va_numbers![0].va_number,
+                              e.currentTarget,
+                            )
+                          }
+                        >
+                          <CopySvg className="h-5 w-5 fill-current" />
+                        </button>
+                        <div
+                          data-theme="skies"
+                          className="copy rounded-lg bg-primary/80 px-2 py-1 text-sm text-white opacity-0 transition-opacity duration-200"
+                        >
+                          Copied
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -186,7 +265,23 @@ const PendingOrder = ({ order }: ThisProps) => {
                 <span>Mandiri Virtual Account</span>
                 <div className="flex items-center gap-2">
                   <span>{`${order.transaction.biller_code}-${order.transaction.bill_key}`}</span>
-                  <CopySvg className="btn-icon-accent h-5 w-5 fill-current" />
+                  <button
+                    className="btn-icon-accent"
+                    onClick={(e) =>
+                      copyValue(
+                        `${order.transaction.biller_code}${order.transaction.bill_key}`,
+                        e.currentTarget,
+                      )
+                    }
+                  >
+                    <CopySvg className="h-5 w-5 fill-current" />
+                  </button>
+                  <div
+                    data-theme="skies"
+                    className="copy rounded-lg bg-primary/80 px-2 py-1 text-sm text-white opacity-0 transition-opacity duration-200"
+                  >
+                    Copied
+                  </div>
                 </div>
               </div>
             </div>
@@ -196,7 +291,7 @@ const PendingOrder = ({ order }: ThisProps) => {
         <div className="flex flex-col gap-3">
           <span className="text-sm">How to Pay</span>
           <div className="flex flex-col gap-2">
-            <div className="collapse collapse-arrow rounded-md border border-white/50 bg-white shadow-md">
+            <div className="collapse collapse-arrow rounded-md border border-white/50 bg-base-100 text-white shadow-md">
               <input type="checkbox" />
               <div className="collapse-title font-semibold">
                 Mobile Banking / m-BCA
@@ -205,7 +300,7 @@ const PendingOrder = ({ order }: ThisProps) => {
                 <p>Some instructions</p>
               </div>
             </div>
-            <div className="collapse collapse-arrow rounded-md border border-white/50 bg-white shadow-md">
+            <div className="collapse collapse-arrow rounded-md border border-white/50 bg-base-100 text-white shadow-md">
               <input type="checkbox" />
               <div className="collapse-title font-semibold">
                 Internet Banking / Klik-BCA
@@ -214,7 +309,7 @@ const PendingOrder = ({ order }: ThisProps) => {
                 <p>Some instructions</p>
               </div>
             </div>
-            <div className="collapse collapse-arrow rounded-md border border-white/50 bg-white shadow-md">
+            <div className="collapse collapse-arrow rounded-md border border-white/50 bg-base-100 text-white shadow-md">
               <input type="checkbox" />
               <div className="collapse-title font-semibold">ATM BCA</div>
               <div className="collapse-content">
