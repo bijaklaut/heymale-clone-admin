@@ -316,7 +316,7 @@ const CheckoutWrapper = () => {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [data, deliveryItems]);
+  }, [selectedAddress, deliveryItems]);
 
   // Order Data Null Check
   useEffect(() => {

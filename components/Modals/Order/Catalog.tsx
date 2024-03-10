@@ -52,7 +52,7 @@ const CatalogProductModal = (props: ThisProps) => {
 
   const imageClass = useCallback((thumbnail: boolean) => {
     return cx({
-      "w-auto h-[150px] rounded-md shadow-lg border-2 border-neutral/40":
+      "w-auto h-[100px] rounded-md shadow-lg border-2 border-neutral/40":
         thumbnail,
       "h-auto w-full max-w-[200px] rounded-md bg-neutral p-5 sm:p-8":
         !thumbnail,
@@ -335,7 +335,7 @@ const CatalogProductModal = (props: ThisProps) => {
           containerId={"catalog"}
           theme="dark"
         />
-        <div className="no-scrollbar modal-box absolute max-w-[700px] text-white">
+        <div className="no-scrollbar modal-box absolute max-w-[700px] text-white max-sm:px-3 max-sm:py-5">
           <div className="collapse collapse-arrow bg-base-200">
             <input type="checkbox" />
             <div className="collapse-title relative text-xl font-medium">
@@ -437,7 +437,7 @@ const CatalogProductModal = (props: ThisProps) => {
                           />
                         </div>
                         <div className="flex flex-col">
-                          <span className="font-semibold text-neutral">{`${
+                          <span className="font-semibold text-neutral max-sm:text-sm">{`${
                             item.item_name
                           } - ${k.toUpperCase()}`}</span>
                           <div className="text-sm text-neutral">
