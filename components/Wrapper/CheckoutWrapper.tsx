@@ -32,6 +32,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { appendImageURL } from "../../services/helper";
 import Link from "next/link";
+import ChangeAddressModal from "../Modals/Order/ChangeAddress";
 
 const CheckoutWrapper = () => {
   const router = useRouter();
@@ -42,8 +43,10 @@ const CheckoutWrapper = () => {
   const [vouchers, setVouchers] = useState<VoucherTypes[]>([]);
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [courierLoading, setCourierLoading] = useState(true);
 
   const [addresses, setAddresses] = useState<Partial<AddressTypes[]>>();
+  const [selectedAddress, setSelectedAddress] = useState<AddressTypes>();
 
   const imageClass = useCallback((thumbnail: boolean) => {
     return cx({
@@ -91,7 +94,6 @@ const CheckoutWrapper = () => {
 
   const populateData = useCallback(() => {
     let order_items: OrderItemTypes[] = [];
-    let address;
     let total_items = 0;
     let total_weight = 0;
     let total_amount = 0;
@@ -129,10 +131,6 @@ const CheckoutWrapper = () => {
       });
     }
 
-    if (addresses) {
-      address = addresses.find((item) => item?.asDefault);
-    }
-
     const order_data: PostOrderTypes = {
       orderItems: cart?.items ? cart.items : [],
       voucher: {
@@ -141,17 +139,29 @@ const CheckoutWrapper = () => {
       },
       shipping: {
         address: {
-          destination_contact_name: address ? address.recipientName : "",
-          destination_contact_phone: address ? address.phone : "",
-          destination_address: address ? address.address : "",
-          destination_province: address ? address.addressArea.province : "",
-          destination_city: address ? address.addressArea.city : "",
-          destination_district: address ? address.addressArea.district : "",
-          destination_postal_code: address
-            ? address.addressArea.postalCode
+          destination_contact_name: selectedAddress
+            ? selectedAddress.recipientName
             : "",
-          destination_area_id: address ? address.addressArea.areaId : "",
-          destination_note: address ? address.addressNote : "",
+          destination_contact_phone: selectedAddress
+            ? selectedAddress.phone
+            : "",
+          destination_address: selectedAddress ? selectedAddress.address : "",
+          destination_province: selectedAddress
+            ? selectedAddress.addressArea.province
+            : "",
+          destination_city: selectedAddress
+            ? selectedAddress.addressArea.city
+            : "",
+          destination_district: selectedAddress
+            ? selectedAddress.addressArea.district
+            : "",
+          destination_postal_code: selectedAddress
+            ? selectedAddress.addressArea.postalCode
+            : "",
+          destination_area_id: selectedAddress
+            ? selectedAddress.addressArea.areaId
+            : "",
+          destination_note: selectedAddress ? selectedAddress.addressNote : "",
         },
         courier_company: "",
         courier_type: "",
@@ -168,7 +178,7 @@ const CheckoutWrapper = () => {
     };
     setDeliveryItems(dlvItems);
     setData(order_data);
-  }, [cart, addresses]);
+  }, [cart, selectedAddress]);
 
   const getVouchersAPI = useCallback(async () => {
     const { payload } = await getAvailableVouchers();
@@ -181,6 +191,9 @@ const CheckoutWrapper = () => {
 
     if (payload.length > 0) {
       setAddresses(payload);
+
+      let address = payload.find((item: AddressTypes) => item?.asDefault);
+      setSelectedAddress(address);
     }
   }, []);
 
@@ -200,8 +213,16 @@ const CheckoutWrapper = () => {
         };
         const result = await getCourierRates(postData);
         setRates(result.pricing);
+
+        setTimeout(() => {
+          setCourierLoading(false);
+        }, 1000);
       }
-    } catch (error: any) {}
+    } catch (error: any) {
+      setTimeout(() => {
+        setCourierLoading(false);
+      }, 1000);
+    }
   }, [data, deliveryItems]);
 
   const paymentSelect = useCallback((value: string) => {
@@ -264,6 +285,11 @@ const CheckoutWrapper = () => {
     }
   }, [data, cart]);
 
+  const changeAddress = useCallback(
+    (address: AddressTypes) => setSelectedAddress(address),
+    [],
+  );
+
   // Get cart items, addresses, vouchers exec
   useEffect(() => {
     getItems();
@@ -280,11 +306,12 @@ const CheckoutWrapper = () => {
   // Populate Data Exec
   useEffect(() => {
     populateData();
-  }, [addresses]);
+  }, [cart, selectedAddress]);
 
   // Get Courier Rates Exec
   useEffect(() => {
     let timer = setTimeout(() => {
+      setCourierLoading(true);
       getCourierRatesAPI();
     }, 1000);
 
@@ -336,64 +363,79 @@ const CheckoutWrapper = () => {
                 )}
               </div>
             </div>
-            <button className="absolute right-3 top-4 rounded-md p-2 transition-all duration-300 hover:bg-black/20 active:bg-black/20">
-              <EditSvg className="h-5 w-5 stroke-current" />
-            </button>
+            {addresses && selectedAddress && (
+              <ChangeAddressModal
+                addresses={addresses}
+                selectedAddress={selectedAddress}
+                changeAddress={changeAddress}
+              />
+            )}
           </div>
           {/* Courier */}
           <div className="rounded-md border p-5 md:p-7">
-            {rates.length > 0 ? (
+            <h3 className="mb-5 text-lg font-semibold">Courier Service</h3>
+            {!courierLoading ? (
               <>
-                <h3 className="mb-5 text-lg font-semibold">Courier Service</h3>
-                <div className="grid grid-cols-1 gap-3">
-                  {rates.map((rate, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-5 rounded-md bg-base-200 p-[10px] lg:p-5"
-                    >
-                      <label className="label w-full cursor-pointer rounded-md p-2 transition-all">
-                        <input
-                          type="radio"
-                          name="shipping"
-                          className="peer hidden"
-                          onChange={() => {
-                            setData((prev) => ({
-                              ...prev!,
-                              shipping: {
-                                ...prev!.shipping,
-                                price: rate.price,
-                                courier_company: rate.courier_code,
-                                courier_type: rate.courier_service_code,
-                              },
-                              total:
-                                prev!.subtotal +
-                                prev!.voucher.value +
-                                rate.price,
-                            }));
-                          }}
-                        />
-                        <div className="flex w-full flex-col gap-1">
-                          <p>{`${rate.courier_name} - ${rate.courier_service_name} (${rate.duration})`}</p>
-                          <div className="text-sm">
-                            <NumFormatWrapper
-                              value={rate.price}
-                              displayType="text"
-                              prefix="Rp. "
-                              thousandSeparator="."
-                              decimalSeparator=","
-                            />
+                {rates.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-3">
+                    {rates.map((rate, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-5 rounded-md bg-base-200 p-[10px] lg:p-5"
+                      >
+                        <label className="label w-full cursor-pointer rounded-md p-2 transition-all">
+                          <input
+                            type="radio"
+                            name="shipping"
+                            className="peer hidden"
+                            onChange={() => {
+                              setData((prev) => ({
+                                ...prev!,
+                                shipping: {
+                                  ...prev!.shipping,
+                                  price: rate.price,
+                                  courier_company: rate.courier_code,
+                                  courier_type: rate.courier_service_code,
+                                },
+                                total:
+                                  prev!.subtotal +
+                                  prev!.voucher.value +
+                                  rate.price,
+                              }));
+                            }}
+                          />
+                          <div className="flex w-full flex-col gap-1">
+                            <p>{`${rate.courier_name} - ${rate.courier_service_name} (${rate.duration})`}</p>
+                            <div className="text-sm">
+                              <NumFormatWrapper
+                                value={rate.price}
+                                displayType="text"
+                                prefix="Rp. "
+                                thousandSeparator="."
+                                decimalSeparator=","
+                              />
+                            </div>
                           </div>
-                        </div>
-                        <div className="relative flex h-5 w-5 items-center justify-center rounded-full border peer-checked:[&>*]:scale-100">
-                          <CircleCheckSvg className="absolute w-6 scale-0 fill-current transition-all" />
-                        </div>
-                      </label>
-                    </div>
-                  ))}
-                </div>
+                          <div className="relative flex h-5 w-5 items-center justify-center rounded-full border peer-checked:[&>*]:scale-100">
+                            <CircleCheckSvg className="absolute w-6 scale-0 fill-current transition-all" />
+                          </div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-5 rounded-md bg-base-200 p-4">
+                    <InfoSvg className="h-14 w-14 stroke-accent" />
+                    <span className="text-sm">
+                      Sorry, there is no courier service available. Please
+                      change your address or you can contact us if you still
+                      having this problem.
+                    </span>
+                  </div>
+                )}
               </>
             ) : (
-              <div className="flex items-center justify-center">
+              <div className="mb-5 flex items-center justify-center">
                 <span className="loading loading-spinner"></span>
               </div>
             )}
