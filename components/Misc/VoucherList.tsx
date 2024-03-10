@@ -1,25 +1,11 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
-import {
-  capitalize,
-  simpleModalHandler,
-  transformDate,
-  transformPaymentType,
-} from "../../services/helper";
-import {
-  CartTypes,
-  PostOrderTypes,
-  TransactionTypes,
-  VoucherTypes,
-} from "../../services/types";
+import { Fragment, useCallback, useEffect } from "react";
+import { simpleModalHandler } from "../../services/helper";
+import { CartTypes, PostOrderTypes, VoucherTypes } from "../../services/types";
 import cx from "classnames";
 import NumFormatWrapper from "../Wrapper/NumFormatWrapper";
-import { getAvailableVouchers } from "../../services/admin";
 import { ClockSvg } from "./SvgGroup";
 
 interface ThisProps {
-  // transaction?: Partial<TransactionTypes>;
-  // isShow: string;
-  // reset(): void;
   vouchers: VoucherTypes[];
   order: PostOrderTypes;
   cart: CartTypes;
@@ -61,6 +47,9 @@ const VoucherListModal = ({
           ).length > 0;
       }
 
+      // Disabled because we don't have category on order item yet
+      // Or we can get another product data then match them
+
       // if (item.conditions == "Particular Category") {
       //   let validCategories: string[] = [];
       //   item.validCategories.map((category) =>
@@ -89,22 +78,17 @@ const VoucherListModal = ({
     [validityCheck],
   );
 
-  // useEffect(() => {
-  //   if (isShow == "transaction") {
-  //     setData(transaction);
-
-  //     setTimeout(() => {
-  //       simpleModalHandler("voucher_list", true);
-  //       reset();
-  //     }, 100);
-  //   }
-  // }, [isShow]);
+  useEffect(() => {
+    if (order) {
+      console.log("ORDER: ", order);
+    }
+  }, [order]);
 
   return (
     <Fragment>
       <button
         data-theme="skies"
-        className="btn btn-outline btn-sm text-neutral"
+        className="btn btn-sm border-emerald-500 bg-emerald-500 text-white hover:border-emerald-600 hover:bg-emerald-600"
         onClick={() => simpleModalHandler("voucher_list", true)}
       >
         Vouchers

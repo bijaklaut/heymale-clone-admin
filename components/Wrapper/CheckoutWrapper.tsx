@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   AddressTypes,
   CartTypes,
@@ -13,7 +13,12 @@ import {
 } from "../../services/types";
 import Image from "next/image";
 import cx from "classnames";
-import { CircleCheckSvg } from "../Misc/SvgGroup";
+import {
+  CircleCheckSvg,
+  EditSvg,
+  InfoSvg,
+  LongArrowLeft,
+} from "../Misc/SvgGroup";
 import NumFormatWrapper from "./NumFormatWrapper";
 import { getCourierRates, getUserId } from "../../services/actions";
 import {
@@ -21,40 +26,12 @@ import {
   emptyCart,
   getAddressByUser,
   getAvailableVouchers,
-  getUserCart,
 } from "../../services/admin";
-import Cookies from "js-cookie";
 import VoucherListModal from "../Misc/VoucherList";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { PUBLIC_API_IMG } from "../../constants";
-
-const virtual_accounts = [
-  {
-    value: "bca",
-    text: "BCA Virtual Account",
-  },
-  {
-    value: "bni",
-    text: "BNI Virtual Account",
-  },
-  {
-    value: "bri",
-    text: "BRI Virtual Account",
-  },
-  {
-    value: "mandiri",
-    text: "Mandiri Virtual Account",
-  },
-  {
-    value: "cimb",
-    text: "CIMB Virtual Account",
-  },
-  {
-    value: "permata",
-    text: "Permata Virtual Account",
-  },
-];
+import { appendImageURL } from "../../services/helper";
+import Link from "next/link";
 
 const CheckoutWrapper = () => {
   const router = useRouter();
@@ -320,14 +297,23 @@ const CheckoutWrapper = () => {
   }, [data]);
 
   return (
-    <Fragment>
-      <h2 className="mb-7 text-center text-2xl font-semibold text-white">{`Checkout Page - Simulation`}</h2>
-      <div className="grid w-full grid-cols-[minmax(min-content,_0.6fr)_minmax(min-content,_0.4fr)] p-10">
+    <div className="mx-auto w-full max-w-[600px] p-2 md:px-10 md:pb-10 lg:max-w-full 2xl:max-w-[1300px]">
+      <div className="mb-10 flex items-center gap-3">
+        <button className="rounded-md p-2 transition-all duration-300 hover:bg-black/20 active:bg-black/20">
+          <Link href={"/order"}>
+            <LongArrowLeft className="h-6 w-6 stroke-white md:h-8 md:w-8" />
+          </Link>
+        </button>
+        <h2 className="text-xl font-semibold text-white md:text-2xl">{`Checkout Page - Simulation`}</h2>
+      </div>
+      <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-[minmax(min-content,_0.55fr)_minmax(min-content,_0.45fr)] xl:grid-cols-[minmax(min-content,_0.6fr)_minmax(min-content,_0.4fr)] xl:gap-x-6">
         {/* Left */}
-        <div className="grid w-[700px] grid-cols-1 gap-4">
+        <div className="grid w-full grid-cols-1 gap-4">
           {/* Shipping Information */}
-          <div className="relative rounded-md border p-7">
-            <h3 className="mb-3 text-lg font-semibold">Shipping Information</h3>
+          <div className="relative rounded-md border p-5 md:p-7">
+            <div className="mb-3 flex items-center justify-between gap-1 text-lg font-semibold">
+              <span>Shipping Information</span>
+            </div>
             <div className="w-fit">
               <h4 className="mb-1 font-semibold">Recipient</h4>
               <div className="">
@@ -350,11 +336,12 @@ const CheckoutWrapper = () => {
                 )}
               </div>
             </div>
-            <button className="absolute right-3 top-2 font-semibold underline hover:text-white active:text-white">
-              Change
+            <button className="absolute right-3 top-4 rounded-md p-2 transition-all duration-300 hover:bg-black/20 active:bg-black/20">
+              <EditSvg className="h-5 w-5 stroke-current" />
             </button>
           </div>
-          <div className="rounded-md border p-7">
+          {/* Courier */}
+          <div className="rounded-md border p-5 md:p-7">
             {rates.length > 0 ? (
               <>
                 <h3 className="mb-5 text-lg font-semibold">Courier Service</h3>
@@ -362,7 +349,7 @@ const CheckoutWrapper = () => {
                   {rates.map((rate, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-5 rounded-md bg-base-200 p-5"
+                      className="flex items-center gap-5 rounded-md bg-base-200 p-[10px] lg:p-5"
                     >
                       <label className="label w-full cursor-pointer rounded-md p-2 transition-all">
                         <input
@@ -385,15 +372,17 @@ const CheckoutWrapper = () => {
                             }));
                           }}
                         />
-                        <div className="flex w-full flex-col gap-x-3">
+                        <div className="flex w-full flex-col gap-1">
                           <p>{`${rate.courier_name} - ${rate.courier_service_name} (${rate.duration})`}</p>
-                          <NumFormatWrapper
-                            value={rate.price}
-                            displayType="text"
-                            prefix="Rp. "
-                            thousandSeparator="."
-                            decimalSeparator=","
-                          />
+                          <div className="text-sm">
+                            <NumFormatWrapper
+                              value={rate.price}
+                              displayType="text"
+                              prefix="Rp. "
+                              thousandSeparator="."
+                              decimalSeparator=","
+                            />
+                          </div>
                         </div>
                         <div className="relative flex h-5 w-5 items-center justify-center rounded-full border peer-checked:[&>*]:scale-100">
                           <CircleCheckSvg className="absolute w-6 scale-0 fill-current transition-all" />
@@ -409,9 +398,8 @@ const CheckoutWrapper = () => {
               </div>
             )}
           </div>
-
           {/* Payment Method */}
-          <div className="rounded-md border p-7">
+          <div className="rounded-md border p-5 md:p-7">
             <h3 className="mb-10 text-center text-lg font-semibold">
               Payment Method
             </h3>
@@ -421,7 +409,7 @@ const CheckoutWrapper = () => {
                 {virtual_accounts.map((va, index) => (
                   <div
                     key={index}
-                    className="flex max-h-[80px] items-center gap-5 rounded-md bg-white p-5 text-neutral"
+                    className="flex h-[70px] items-center gap-5 rounded-md bg-white p-[10px] text-neutral lg:p-5"
                   >
                     <label className="label w-full cursor-pointer rounded-md p-2 transition-all">
                       <input
@@ -436,8 +424,9 @@ const CheckoutWrapper = () => {
                           width={100}
                           height={100}
                           alt={va.value}
+                          className="h-auto w-[75px] 2xl:w-[100px]"
                         />
-                        <span>{va.text}</span>
+                        <span className="text-sm">{va.text}</span>
                       </div>
                       <div className="relative flex h-5 w-5 items-center justify-center rounded-full border border-neutral/30 peer-checked:[&>*]:scale-100">
                         <CircleCheckSvg className="absolute w-6 scale-0 fill-current transition-all" />
@@ -452,13 +441,16 @@ const CheckoutWrapper = () => {
 
         {/* Right */}
         <div className="relative w-full">
-          <div className="sticky top-6 flex flex-col gap-4">
+          <div className="top-6 flex flex-col gap-4 lg:sticky">
             {/* Items */}
-            <div data-theme="nord" className="flex flex-col rounded-md p-5">
-              <h4 className="mb-7 text-center text-lg font-semibold">
-                Shopping Cart
+            <div
+              data-theme="nord"
+              className="flex flex-col rounded-md px-[10px] py-5 lg:p-5"
+            >
+              <h4 className="mb-7 text-center font-semibold lg:text-lg">
+                Checkout Items
               </h4>
-              <div className="flex flex-col gap-2">
+              <div className="flex max-h-[450px] flex-col gap-2 overflow-y-auto">
                 {cart?.items.map((item) => {
                   return Object.entries(item.variants).map(([k, v], index) => {
                     if (v > 0)
@@ -469,7 +461,7 @@ const CheckoutWrapper = () => {
                         >
                           <div>
                             <Image
-                              src={item.thumbnail}
+                              src={appendImageURL(item.thumbnail_file)}
                               width={500}
                               height={500}
                               alt={`thm-${item.item_name}`}
@@ -496,31 +488,34 @@ const CheckoutWrapper = () => {
                 })}
               </div>
             </div>
+
             {/* Transaction Detail-Action*/}
             <div
               data-theme="nord"
               className="grid grid-cols-1 gap-2 rounded-md px-7 py-5"
             >
-              <div className="mb-2 flex gap-1">
+              <div className="mb-2 grid grid-cols-2 items-center gap-2 max-[500px]:grid-cols-1">
                 <input
                   id="voucher_input"
                   type="text"
-                  placeholder="Input voucher code here"
-                  className="input input-bordered input-sm w-full max-w-xs"
+                  placeholder="Input voucher code"
+                  className="input input-bordered input-sm w-full"
                 />
-                <button
-                  disabled
-                  data-theme="skies"
-                  className="btn btn-sm text-white disabled:text-black/60"
-                >
-                  Apply
-                </button>
-                <VoucherListModal
-                  order={data!}
-                  applyVoucher={applyVoucher}
-                  vouchers={vouchers}
-                  cart={cart!}
-                />
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    disabled
+                    data-theme="skies"
+                    className="btn btn-sm text-white disabled:text-black/60"
+                  >
+                    Apply
+                  </button>
+                  <VoucherListModal
+                    order={data!}
+                    applyVoucher={applyVoucher}
+                    vouchers={vouchers}
+                    cart={cart!}
+                  />
+                </div>
               </div>
               <div className="grid grid-cols-2">
                 <span>{`Subtotal (${data?.total_items || "0"})`}</span>
@@ -580,9 +575,16 @@ const CheckoutWrapper = () => {
                 </div>
               </div>
             </div>
+            <div className="mx-auto flex w-fit max-w-[400px] items-center justify-center gap-3">
+              <InfoSvg className="h-8 w-8 stroke-info" />
+              <span className="text-xs">
+                By purchasing, you agree with to our Terms & Conditions, Refund,
+                and Return Policies
+              </span>
+            </div>
             {!loading ? (
               <button
-                className="btn btn-accent text-white"
+                className="btn btn-accent mx-auto w-[300px] text-white"
                 disabled={disable}
                 onClick={confirmOrder}
               >
@@ -597,8 +599,35 @@ const CheckoutWrapper = () => {
           </div>
         </div>
       </div>
-    </Fragment>
+    </div>
   );
 };
+
+const virtual_accounts = [
+  {
+    value: "bca",
+    text: "BCA Virtual Account",
+  },
+  {
+    value: "bni",
+    text: "BNI Virtual Account",
+  },
+  {
+    value: "bri",
+    text: "BRI Virtual Account",
+  },
+  {
+    value: "mandiri",
+    text: "Mandiri Virtual Account",
+  },
+  {
+    value: "cimb",
+    text: "CIMB Virtual Account",
+  },
+  {
+    value: "permata",
+    text: "Permata Virtual Account",
+  },
+];
 
 export default CheckoutWrapper;
