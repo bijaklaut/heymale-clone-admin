@@ -37,98 +37,120 @@ const TransactionTable = ({
     <div className="min-h-screen max-w-[1920px] overflow-x-auto overflow-y-hidden">
       {transactions.length ? (
         <Fragment>
-          <div className="w-fit rounded-md bg-neutral-100 px-3 py-5">
-            <div className="mb-4 grid grid-cols-[50px_minmax(250px,_1fr)_150px_125px_minmax(200px,_1fr)_150px_200px_minmax(50px,100px)] items-center justify-items-center gap-x-2 font-semibold text-black/60">
-              <div className="">#</div>
-              <div className="flex flex-col items-center">
-                <span>Invoice</span>
-                <span className="text-sm font-normal">Transaction ID</span>
-              </div>
-              <div>Merchant ID</div>
-              <div>Status</div>
-              <div>Payment Method</div>
-              <div>Payment Amount</div>
-              <div>Transaction Time</div>
-              <div></div>
-            </div>
-            <div className="grid grid-cols-1 gap-2">
-              {transactions.map((trx, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="grid grid-cols-[50px_minmax(250px,_1fr)_150px_125px_minmax(200px,_1fr)_150px_200px_minmax(50px,100px)] items-center gap-2 rounded-md bg-white py-3 text-center text-neutral shadow-md"
-                  >
-                    <div>{paginate.pagingCounter + index}</div>
-                    <div className="flex flex-col">
-                      <span>{trx.order_id || "-"}</span>
-                      <span className="text-sm">
-                        {trx.transaction_id || "-"}
+          <div data-theme="nord" className="overflow-auto rounded-md">
+            <table className="table border-separate border-spacing-y-2 p-2">
+              {/* head */}
+              <thead>
+                <tr className="text-base [&>th]:text-center [&>th]:font-semibold">
+                  <th className="min-w-[50px]">#</th>
+                  <th className="min-w-[200px]">
+                    <div className="flex flex-col items-center">
+                      <span>Invoice</span>
+                      <span className="text-sm font-normal">
+                        Transaction ID
                       </span>
                     </div>
-                    <div>{trx.merchant_id || "-"}</div>
-                    <div className="flex items-center justify-center">
-                      <div className={statusClass(trx.transaction_status)}>
-                        {underscoreTransform(trx.transaction_status)}
-                      </div>
-                    </div>
-                    {/* Payment Method */}
-                    {/* Permata */}
-                    {trx.payment_type == "bank_transfer" &&
-                      trx.permata_va_number && (
+                  </th>
+                  <th className="min-w-[100px]">Merchant ID</th>
+                  <th className="min-w-[180px]">Status</th>
+                  <th className="min-w-[200px]">Payment Method</th>
+                  <th className="min-w-[150px]">Payment Amount</th>
+                  <th className="min-w-[150px]">Transaction Time</th>
+                  <th className="min-w-[50px]"></th>
+                </tr>
+              </thead>
+              <tbody className="[&>tr:first-child>td:last-child>div]:dropdown-bottom [&>tr:last-child>td:last-child>div]:dropdown-top [&>tr]:rounded-md">
+                {transactions.map((trx, index) => {
+                  return (
+                    <tr
+                      key={index}
+                      className="bg-white shadow-sm [&>td]:text-center "
+                    >
+                      <td className="min-w-[50px]">
+                        {paginate.pagingCounter + index}
+                      </td>
+                      <td className="min-w-[200px]">
                         <div className="flex flex-col">
-                          <span>Permata Virtual Account</span>
-                          <span>{trx.permata_va_number}</span>
+                          <span>{trx.order_id || "-"}</span>
+                          <span className="text-xs">
+                            {trx.transaction_id || "-"}
+                          </span>
                         </div>
-                      )}
-                    {/* BCA, BNI, BRI, CIMB */}
-                    {trx.payment_type == "bank_transfer" &&
-                      !trx.permata_va_number && (
-                        <div className="flex flex-col">
-                          <span>{`${trx.va_numbers[0].bank.toUpperCase()} Virtual Account`}</span>
-                          <span>{trx.va_numbers[0].va_number}</span>
-                        </div>
-                      )}
-                    {/* Mandiri E-Channel */}
-                    {trx.payment_type == "echannel" && (
-                      <div className="flex flex-col">
-                        <span>Mandiri Virtual Account</span>
-                        <span>{`${trx.biller_code}${trx.bill_key}`}</span>
-                      </div>
-                    )}
-
-                    <div>
-                      <NumFormatWrapper
-                        value={trx.gross_amount}
-                        displayType="text"
-                        prefix="Rp. "
-                        thousandSeparator="."
-                        decimalSeparator=","
-                      />
-                    </div>
-                    <div>{transformDate(trx.transaction_time)}</div>
-                    <div>
-                      <div className="dropdown dropdown-end">
+                      </td>
+                      <td className="min-w-[100px]">
+                        {trx.merchant_id || "-"}
+                      </td>
+                      <td className="min-w-[180px]">
                         <div
-                          tabIndex={0}
-                          role="button"
-                          className="rounded-md transition-all hover:bg-black/20 active:bg-black/20"
+                          data-theme="skies"
+                          className={statusClass(trx.transaction_status)}
                         >
-                          <OptionDotSvg className="w-4 fill-neutral" />
+                          {underscoreTransform(trx.transaction_status)}
                         </div>
-                        <ul
-                          tabIndex={0}
-                          className="no-scrollbar dropdown-content z-[1] flex w-[200px] flex-col gap-y-2 rounded-box bg-base-100 p-2 text-sm text-white shadow [&>li:hover]:bg-white/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
-                        >
-                          <li>
-                            <span>More Actions</span>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                      </td>
+                      <td className="min-w-[200px]">
+                        <div className="flex flex-col">
+                          {/* Permata */}
+                          {trx.payment_type == "bank_transfer" &&
+                            trx.permata_va_number && (
+                              <>
+                                <span>Permata Virtual Account</span>
+                                <span>{trx.permata_va_number}</span>
+                              </>
+                            )}
+                          {/* BCA, BNI, BRI, CIMB */}
+                          {trx.payment_type == "bank_transfer" &&
+                            !trx.permata_va_number && (
+                              <>
+                                <span>{`${trx.va_numbers[0].bank.toUpperCase()} Virtual Account`}</span>
+                                <span>{trx.va_numbers[0].va_number}</span>
+                              </>
+                            )}
+                          {/* Mandiri E-Channel */}
+                          {trx.payment_type == "echannel" && (
+                            <>
+                              <span>Mandiri Virtual Account</span>
+                              <span>{`${trx.biller_code}${trx.bill_key}`}</span>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                      <td className="min-w-[150px]">
+                        <NumFormatWrapper
+                          value={trx.gross_amount}
+                          displayType="text"
+                          prefix="Rp. "
+                          thousandSeparator="."
+                          decimalSeparator=","
+                        />
+                      </td>
+                      <td className="min-w-150px">
+                        {transformDate(trx.transaction_time)}
+                      </td>
+                      <td className="min-w-[50px]">
+                        <div className="dropdown dropdown-end">
+                          <div
+                            tabIndex={0}
+                            role="button"
+                            className="rounded-md transition-all hover:bg-black/20 active:bg-black/20"
+                          >
+                            <OptionDotSvg className="w-4 fill-neutral" />
+                          </div>
+                          <ul
+                            tabIndex={0}
+                            className="no-scrollbar dropdown-content absolute -top-10 z-[1] flex w-[200px] flex-col gap-y-2 rounded-box bg-base-100 p-2 text-sm shadow [&>li:hover]:bg-neutral/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
+                          >
+                            <li>
+                              <span>More Actions</span>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
           <Pagination paginate={paginate} onClick={paginateAction} />
         </Fragment>

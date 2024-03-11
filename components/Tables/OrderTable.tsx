@@ -72,98 +72,112 @@ const OrderTable = ({
   }, []);
 
   return (
-    <div className="min-h-screen max-w-[1920px] overflow-x-auto overflow-y-hidden">
+    <div className="max-w-[1920px]">
       {orders.length ? (
         <Fragment>
-          <div className="rounded-md bg-neutral-100 px-3 py-5">
-            <div className="mb-4 grid grid-cols-[50px_minmax(min-content,_1fr)_minmax(min-content,_1fr)_200px_200px_150px_50px] justify-items-center gap-x-2 font-semibold text-black/60">
-              <div className="">#</div>
-              <div className="">Invoice</div>
-              <div className="">User</div>
-              <div className="">Status</div>
-              <div>Order Item</div>
-              <div>Total Price</div>
-              <div></div>
-            </div>
-            <div className="grid grid-cols-1 gap-2">
-              {orders.map((order, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="grid grid-cols-[50px_minmax(min-content,_1fr)_minmax(min-content,_1fr)_200px_200px_150px_50px] items-center gap-2 rounded-md bg-white py-3 text-center text-neutral shadow-md"
-                  >
-                    <div>{paginate.pagingCounter + index}</div>
-                    <div>{order.invoice}</div>
-                    <div className="flex flex-col">
-                      <span>{order.user.name}</span>
-                      <span className="text-sm">
-                        Contact: {order.user.phoneNumber}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-center">
-                      <div className={statusClass(order.status)}>
-                        {underscoreTransform(order.status)}
-                      </div>
-                    </div>
-                    <div>
-                      <button
-                        className="btn btn-primary btn-xs text-sm"
-                        onClick={() => itemsDetailMisc(order.order_item)}
-                      >
-                        See Details
-                      </button>
-                    </div>
-                    <div>
-                      <NumFormatWrapper
-                        value={order.total_price}
-                        displayType="text"
-                        prefix="Rp. "
-                        thousandSeparator="."
-                        decimalSeparator=","
-                      />
-                    </div>
-                    <div>
-                      <div className="dropdown dropdown-end">
-                        <div
-                          tabIndex={0}
-                          role="button"
-                          className="rounded-md transition-all hover:bg-black/20 active:bg-black/20"
-                        >
-                          <OptionDotSvg className="w-4 fill-neutral" />
+          <div data-theme="nord" className="overflow-auto rounded-md">
+            <table className="table border-separate border-spacing-y-2 p-2">
+              {/* head */}
+              <thead>
+                <tr className="text-base [&>th]:text-center [&>th]:font-semibold">
+                  <th className="min-w-[50px]">#</th>
+                  <th className="min-w-[200px]">Invoice</th>
+                  <th className="min-w-[200px]">User</th>
+                  <th className="min-w-[180px]">Status</th>
+                  <th className="min-w-[150px]">Order Item</th>
+                  <th className="min-w-[150px]">Total Price</th>
+                  <th className="min-w-[50px]"></th>
+                </tr>
+              </thead>
+              <tbody className="[&>tr:first-child>td:last-child>div]:dropdown-bottom [&>tr:last-child>td:last-child>div]:dropdown-top [&>tr:nth-last-child(2)>td:last-child>div]:dropdown-top [&>tr]:rounded-md">
+                {orders.map((order, index) => {
+                  return (
+                    <tr
+                      key={index}
+                      className="bg-white shadow-sm [&>td]:text-center "
+                    >
+                      <td className="min-w-[50px]">
+                        {paginate.pagingCounter + index}
+                      </td>
+                      <td className="min-w-[200px]">{order.invoice || "-"}</td>
+                      <td className="min-w-[200px]">
+                        <div className="flex flex-col">
+                          <span>{order.user.name}</span>
+                          <span>Contact: {order.user.phoneNumber}</span>
                         </div>
-                        <ul
-                          tabIndex={0}
-                          className="no-scrollbar dropdown-content z-[1] flex max-h-[150px] w-[200px] flex-col gap-y-2 overflow-y-auto rounded-box bg-base-100 p-2 text-sm text-white shadow [&>li:hover]:bg-white/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
+                      </td>
+                      <td className="min-w-[180px]">
+                        <div
+                          data-theme="skies"
+                          className={statusClass(order.status)}
                         >
-                          {order.status == "settlement" && (
+                          {underscoreTransform(order.status)}
+                        </div>
+                      </td>
+                      <td className="min-w-[150px]">
+                        <button
+                          data-theme="skies"
+                          className="btn btn-primary btn-xs text-sm"
+                          onClick={() => itemsDetailMisc(order.order_item)}
+                        >
+                          See Details
+                        </button>
+                      </td>
+                      <td className="min-w-[150px]">
+                        <NumFormatWrapper
+                          value={order.total_price}
+                          displayType="text"
+                          prefix="Rp. "
+                          thousandSeparator="."
+                          decimalSeparator=","
+                        />
+                      </td>
+
+                      <td className="min-w-[50px]">
+                        <div className="dropdown dropdown-end">
+                          <div
+                            tabIndex={0}
+                            role="button"
+                            className="rounded-md transition-all hover:bg-black/20 active:bg-black/20"
+                          >
+                            <OptionDotSvg className="w-4 fill-neutral" />
+                          </div>
+                          <ul
+                            tabIndex={0}
+                            className="no-scrollbar dropdown-content z-[1] flex max-h-[150px] w-[200px] flex-col gap-y-2 overflow-y-auto rounded-box bg-base-100 p-2 text-sm shadow [&>li:hover]:bg-neutral/10 [&>li]:cursor-pointer [&>li]:rounded-md [&>li]:p-2 [&>li]:transition-all"
+                          >
+                            {order.status == "settlement" && (
+                              <li
+                                onClick={() =>
+                                  createShippingOrderAPI(order.invoice)
+                                }
+                              >
+                                <span>Create Shipping Order</span>
+                              </li>
+                            )}
+                            <li>
+                              <span>Edit Order</span>
+                            </li>
+                            <li
+                              onClick={() => trxDetailMisc(order.transaction)}
+                            >
+                              <span>Transaction Detail</span>
+                            </li>
                             <li
                               onClick={() =>
-                                createShippingOrderAPI(order.invoice)
+                                shipmentDetailMisc(order.shipping_detail)
                               }
                             >
-                              <span>Create Shipping Order</span>
+                              <span>Shipping Detail</span>
                             </li>
-                          )}
-                          {/* <li>
-                            <span>Edit Order</span>
-                          </li> */}
-                          <li onClick={() => trxDetailMisc(order.transaction)}>
-                            <span>Transaction Detail</span>
-                          </li>
-                          <li
-                            onClick={() =>
-                              shipmentDetailMisc(order.shipping_detail)
-                            }
-                          >
-                            <span>Shipping Detail</span>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
           <Pagination paginate={paginate} onClick={paginateAction} />
         </Fragment>
