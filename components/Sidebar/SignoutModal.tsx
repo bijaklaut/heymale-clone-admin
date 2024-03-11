@@ -17,11 +17,16 @@ export const SignoutModal = () => {
         url: "/api/signout",
         method: "POST",
       });
+      localStorage.removeItem("user");
+
+      if (localStorage.getItem("cart")) {
+        localStorage.removeItem("cart");
+      }
       setTimeout(() => {
         setLoading(false);
         simpleModalHandler("logout", false);
-        toast.success(data.message, { containerId: "Main" });
         router.push("/signin");
+        toast.success(data.message, { containerId: "Main" });
       }, 700);
     } catch (error: any) {
       setTimeout(() => {

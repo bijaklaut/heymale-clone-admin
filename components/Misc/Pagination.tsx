@@ -5,6 +5,31 @@ interface ThisProps extends InputHTMLAttributes<HTMLButtonElement> {
   paginate: PaginationTypes;
 }
 
+const Pagination = ({ paginate, onClick }: ThisProps) => {
+  return (
+    <Fragment>
+      {paginate.totalPages > 1 ? (
+        <div className="mt-3 flex w-full justify-center">
+          <div
+            data-theme={"skies"}
+            className="join items-center justify-center gap-x-2 bg-transparent first:rounded-l-lg last:rounded-r-lg"
+          >
+            {firstPage({ paginate, onClick })}
+            {prevPage({ paginate, onClick })}
+            <button className="btn btn-primary join-item btn-sm pointer-events-none text-white">
+              {paginate.page}
+            </button>
+            {nextPage({ paginate, onClick })}
+            {lastPage({ paginate, onClick })}
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+    </Fragment>
+  );
+};
+
 const firstPage = ({ paginate, onClick }: ThisProps) => {
   // 1 2(now) 3
   if (paginate.hasPrevPage && paginate.prevPage! - 1 == 1)
@@ -52,7 +77,6 @@ const firstPage = ({ paginate, onClick }: ThisProps) => {
       </>
     );
 };
-
 const lastPage = ({ paginate, onClick }: ThisProps) => {
   if (paginate.hasNextPage && paginate.nextPage! + 1 == paginate.totalPages)
     return (
@@ -124,31 +148,6 @@ const nextPage = ({ paginate, onClick }: ThisProps) => {
         {paginate.nextPage}
       </button>
     );
-};
-
-const Pagination = ({ paginate, onClick }: ThisProps) => {
-  return (
-    <Fragment>
-      {paginate.totalPages > 1 ? (
-        <div className="mt-3 flex w-full justify-center">
-          <div
-            data-theme={"nord"}
-            className="join items-center justify-center gap-x-2 bg-transparent first:rounded-l-lg last:rounded-r-lg"
-          >
-            {firstPage({ paginate, onClick })}
-            {prevPage({ paginate, onClick })}
-            <button className="btn btn-primary join-item btn-sm pointer-events-none text-white">
-              {paginate.page}
-            </button>
-            {nextPage({ paginate, onClick })}
-            {lastPage({ paginate, onClick })}
-          </div>
-        </div>
-      ) : (
-        ""
-      )}
-    </Fragment>
-  );
 };
 
 export default Pagination;
