@@ -323,7 +323,9 @@ const CatalogProductModal = (props: ThisProps) => {
       const variant = Object.entries(selected.variants).find(
         ([k, v]) => v != 0,
       );
-      const [key] = variant!;
+      let key = "";
+
+      if (variant) key = variant[0];
 
       // If product id not equal selected id, always disable button
       if (product_id != selected._id) return true;
@@ -339,6 +341,25 @@ const CatalogProductModal = (props: ThisProps) => {
       return false;
     },
     [cart, selected, products],
+  );
+
+  const directUpdateCheck = useCallback(
+    (item: CartItemTypes, variant: string) => {
+      // Returned value true means button is disabled, vice versa
+      const theProduct = products.find((product) => product._id == item._id);
+
+      // If existed item variant greater than equal available stock, disable
+      if (
+        (item.variants as any)[variant] >= (theProduct?.variant as any)[variant]
+      )
+        return true;
+      // If existed item variant greater than equal 5, disable
+      if ((item.variants as any)[variant] >= 5) return true;
+
+      // If passed all requirement, enable
+      return false;
+    },
+    [products],
   );
 
   useEffect(() => {
@@ -484,7 +505,7 @@ const CatalogProductModal = (props: ThisProps) => {
                           <div className="mt-2 grid w-fit grid-cols-3 items-center justify-between justify-items-center overflow-hidden rounded-lg border border-neutral text-center text-neutral">
                             {(item.variants as any)[k] > 1 ? (
                               <button
-                                className="w-full rounded-lg transition-all hover:bg-black/10 active:bg-black/10"
+                                className="w-full rounded-lg text-lg transition-all hover:bg-black/10 active:bg-black/10"
                                 onClick={() => directUpdate(item, k, -1)}
                               >
                                 -
@@ -498,10 +519,11 @@ const CatalogProductModal = (props: ThisProps) => {
                               </button>
                             )}
 
-                            <div className="w-[35px] bg-red-200">{v}</div>
+                            <div className="w-[35px]">{v}</div>
                             <button
-                              className="w-full rounded-lg transition-all hover:bg-black/10 active:bg-black/10"
+                              className="w-full rounded-lg text-lg transition-all hover:bg-black/10 active:bg-black/10 disabled:cursor-not-allowed"
                               onClick={() => directUpdate(item, k, 1)}
+                              disabled={directUpdateCheck(item, k)}
                             >
                               +
                             </button>
