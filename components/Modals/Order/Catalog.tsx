@@ -301,13 +301,44 @@ const CatalogProductModal = (props: ThisProps) => {
     }
   }, []);
 
-  const generateTemporaryImage = useCallback(
-    (item_id: string) => {
-      const match = products.find((product) => product._id == item_id);
-
-      return match?.display;
-    },
+  const variantSelectClass = useCallback(
+    (stock: number) =>
+      cx({
+        "label h-8 w-8 rounded-md border-2 transition-colors has-[input:checked]:bg-black/20":
+          true,
+        "border-neutral cursor-pointer text-black hover:bg-black/10 focus:bg-black/10":
+          stock > 0,
+        "border-black/40 text-black/40 cursor-not-allowed": !stock,
+      }),
     [products],
+  );
+
+  const cartCheck = useCallback(
+    (product_id: string) => {
+      // Returned value true means button is disabled, vice versa
+      const cartItem = cart?.items.find((item) => item._id == selected._id);
+      const theProduct = products.find(
+        (product) => product._id == selected._id,
+      );
+      const variant = Object.entries(selected.variants).find(
+        ([k, v]) => v != 0,
+      );
+      const [key] = variant!;
+
+      // If product id not equal selected id, always disable button
+      if (product_id != selected._id) return true;
+      // If cart item or variant item not exist, enable
+      if (!cartItem || !(cartItem?.variants as any)[key]) return false;
+      // If existed item variant greater than equal available stock, disable
+      if ((cartItem?.variants as any)[key] >= (theProduct?.variant as any)[key])
+        return true;
+      // If existed item variant greater than equal 5, disable
+      if ((cartItem?.variants as any)[key] >= 5) return true;
+
+      // If passed all requirement, enable
+      return false;
+    },
+    [cart, selected, products],
   );
 
   useEffect(() => {
@@ -373,14 +404,14 @@ const CatalogProductModal = (props: ThisProps) => {
                       />
                     </div>
                     <div id={product._id} className="mt-2 flex w-full gap-1">
-                      {Object.entries(product.variant).map(([k], i) => (
+                      {Object.entries(product.variant).map(([k, v], i) => (
                         <div
                           id={`${product._id}-${k}`}
                           key={i}
                           className="form-control"
                         >
-                          <label className="label h-8 w-8 cursor-pointer rounded-md border-2 border-neutral transition-colors hover:bg-black/10 focus:bg-black/10 has-[input:checked]:bg-black/20">
-                            <span className="label-text w-full text-center text-neutral">
+                          <label className={variantSelectClass(v)}>
+                            <span className="label-text w-full text-center text-inherit">
                               {k.toUpperCase()}
                             </span>
                             <input
@@ -388,6 +419,7 @@ const CatalogProductModal = (props: ThisProps) => {
                               name="variants"
                               className="hidden"
                               onChange={() => variantSelect(product, k)}
+                              disabled={v == 0}
                             />
                           </label>
                         </div>
@@ -405,7 +437,7 @@ const CatalogProductModal = (props: ThisProps) => {
                       })}
 
                     <button
-                      disabled={selected?._id != product._id}
+                      disabled={cartCheck(product._id)}
                       className="btn btn-sm mt-4 text-white disabled:text-black/50"
                       onClick={storeCart}
                     >
