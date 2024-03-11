@@ -251,6 +251,7 @@ export const Sidebar = () => {
             <UserAction user={user} compact />
           </>
         )}
+        {/* Arrow to expand */}
         <div
           data-theme={"skies"}
           className="form-control absolute -right-4 top-7 hidden h-8  w-8 items-center justify-center rounded-full bg-base-100 p-1 sm:flex"
