@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: "Heymale Clone | Sign-in",
-  description: "Heymale Clone Project by Bijaklaut",
+  description: "Heymale Clone Project by Hudaa Eka Saputra",
 };
 
 export default function RootLayout({

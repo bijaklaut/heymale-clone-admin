@@ -3,7 +3,7 @@ import ShipmentWrapper from "../../../../components/Wrapper/ShipmentWrapper";
 
 export const metadata: Metadata = {
   title: "Heymale | Shipment Dashboard",
-  description: "Heymale Clone Project by Bijaklaut",
+  description: "Heymale Clone Project by Hudaa Eka Saputra",
 };
 
 const ShipmentDashboard = () => {

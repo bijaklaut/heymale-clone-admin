@@ -4,7 +4,7 @@ import ProductWrapper from "../../../../components/Wrapper/ProductWrapper";
 
 export const metadata: Metadata = {
   title: "Heymale | Product Dashboard",
-  description: "Heymale Clone Project by Bijaklaut",
+  description: "Heymale Clone Project by Hudaa Eka Saputra",
 };
 
 const ProductDashboard = async () => {

@@ -3,7 +3,7 @@ import OrderDetailWrapper from "../../../../../components/Wrapper/OrderDetail";
 
 export const metadata: Metadata = {
   title: "Heymale | Order Detail",
-  description: "Heymale Clone Project by Bijaklaut",
+  description: "Heymale Clone Project by Hudaa Eka Saputra",
 };
 
 interface ThisProps {

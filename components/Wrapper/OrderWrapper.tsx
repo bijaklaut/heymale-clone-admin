@@ -118,7 +118,7 @@ const OrderWrapper = () => {
           shipment={shipmentDetail}
           reset={() => setDetailModal("none")}
         />
-        <div className="my-3 flex gap-2">
+        <div className="my-3 flex w-full gap-2 overflow-x-auto">
           <div
             className={activeTab(filter, "all")}
             onClick={() => tabHandler("all")}

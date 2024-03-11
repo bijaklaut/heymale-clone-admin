@@ -3,7 +3,7 @@ import UserWrapper from "../../../../components/Wrapper/UserWrapper";
 
 export const metadata: Metadata = {
   title: "Heymale | User Dashboard",
-  description: "Heymale Clone Project by Bijaklaut",
+  description: "Heymale Clone Project by Hudaa Eka Saputra",
 };
 
 const UserDashboard = async () => {

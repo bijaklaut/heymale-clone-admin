@@ -5,7 +5,7 @@ import { Sidebar } from "../../../components/Sidebar/Sidebar";
 
 export const metadata: Metadata = {
   title: "Heymale Clone",
-  description: "Heymale Clone Project by Bijaklaut",
+  description: "Heymale Clone Project by Hudaa Eka Saputra",
 };
 
 export default function AdminLayout({
@@ -19,7 +19,7 @@ export default function AdminLayout({
 
       <main
         data-theme={"skies"}
-        className="mt-[70px] min-h-screen w-full px-3 py-8 pb-5 sm:ms-[4.5rem] sm:mt-3 lg:ms-0 lg:px-10 lg:py-10 xl:px-20"
+        className="mt-[70px] min-h-screen w-full px-3 pb-5 pt-10 sm:ms-[4.5rem] sm:mt-0 lg:ms-0 lg:px-10 lg:py-10 xl:px-20"
       >
         {children}
       </main>

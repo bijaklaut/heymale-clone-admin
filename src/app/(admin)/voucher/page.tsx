@@ -3,7 +3,7 @@ import VoucherWrapper from "../../../../components/Wrapper/VoucherWrapper";
 
 export const metadata: Metadata = {
   title: "Heymale | Voucher Dashboard",
-  description: "Heymale Clone Project by Bijaklaut",
+  description: "Heymale Clone Project by Hudaa Eka Saputra",
 };
 
 const VoucherDashboard = async () => {
