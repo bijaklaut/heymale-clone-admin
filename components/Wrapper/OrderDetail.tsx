@@ -31,7 +31,7 @@ const OrderDetailWrapper = ({ invoice }: ThisProps) => {
         ) : (
           <div className="absolute left-1/2 top-1/2 flex h-fit w-fit -translate-x-[50%] -translate-y-[50%] flex-col items-center justify-center gap-2 rounded-md bg-base-300 p-10 text-lg font-semibold text-white">
             <InfoSvg className="h-8 w-8 stroke-current" />
-            <span>Page doesn't available for this order</span>
+            <span>{`Page doesn't available for this order`}</span>
           </div>
         )
       ) : (
