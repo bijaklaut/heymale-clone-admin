@@ -3,6 +3,7 @@ import { OrderTypes } from "../../services/types";
 import NumFormatWrapper from "../Wrapper/NumFormatWrapper";
 import { ClockSvg, CopySvg } from "./SvgGroup";
 import Image from "next/image";
+import { PaymentInstruction } from "./PaymentInstruction";
 
 interface ThisProps {
   order: OrderTypes;
@@ -37,6 +38,7 @@ const virtual_accounts = [
 
 const PendingOrder = ({ order }: ThisProps) => {
   const [countdown, setCountdown] = useState("");
+  const [bank, setBank] = useState("");
 
   const transformDateTime = useCallback((time: string) => {
     if (time) {
@@ -111,12 +113,35 @@ const PendingOrder = ({ order }: ThisProps) => {
     [],
   );
 
+  const getBank = useCallback(() => {
+    if (order.transaction.va_numbers!.length > 0) {
+      const getBank = virtual_accounts.find(
+        (item) => item.value == order.transaction.va_numbers![0].bank,
+      );
+      return getBank ? setBank(getBank.value) : setBank("");
+    }
+
+    if (order.transaction.bill_key) {
+      return setBank("mandiri");
+    }
+
+    if (order.transaction.permata_va_number) {
+      return setBank("permata");
+    }
+  }, [order]);
+
   useEffect(() => {
     if (countdown != "EXPIRED") {
       const interval = setInterval(() => countdownGenerator(), 1000);
       return () => clearInterval(interval);
     }
   }, [order, countdown]);
+
+  useEffect(() => {
+    if (order) {
+      getBank();
+    }
+  }, [order]);
 
   return (
     <div className="mx-auto flex w-full max-w-[500px] flex-col items-center justify-center gap-5">
@@ -142,7 +167,7 @@ const PendingOrder = ({ order }: ThisProps) => {
           <span className="text-sm">Invoice</span>
           <span>{order.invoice}</span>
         </div>
-        <div className="divider"></div>
+        <div className="divider divider-neutral my-5 opacity-10"></div>
         <div className="flex flex-col gap-1">
           <span className="text-sm">Total Payment</span>
           <div className="flex items-center gap-2">
@@ -167,51 +192,50 @@ const PendingOrder = ({ order }: ThisProps) => {
             </div>
           </div>
         </div>
-        <div className="divider"></div>
+        <div className="divider divider-neutral my-5 opacity-10"></div>
         <div className="flex flex-col gap-3">
           <span className="text-sm">Virtual Account</span>
           {/* Permata Bank */}
-          {!order.transaction.va_numbers?.length &&
-            order.transaction.permata_va_number != "" && (
-              <div className="grid w-full grid-cols-[75px_1fr_min-content] items-center gap-5">
-                <Image
-                  src={`/images/logo/permata.png`}
-                  width={200}
-                  height={200}
-                  alt={"permata"}
-                />
-                <div className="flex flex-col">
-                  <span>Permata Virtual Account</span>
-                  <div className="flex items-center gap-2">
-                    <span>{order.transaction.permata_va_number}</span>
-                    <button
-                      className="btn-icon-accent"
-                      onClick={(e) =>
-                        copyValue(
-                          order.transaction.permata_va_number!,
-                          e.currentTarget,
-                        )
-                      }
-                    >
-                      <CopySvg className="h-5 w-5 fill-current" />
-                    </button>
-                    <div
-                      data-theme="skies"
-                      className="copy rounded-lg bg-primary/80 px-2 py-1 text-sm text-white opacity-0 transition-opacity duration-200"
-                    >
-                      Copied
-                    </div>
+          {bank == "permata" && (
+            <div className="grid w-full grid-cols-[75px_1fr_min-content] items-center gap-5">
+              <Image
+                src={`/images/logo/permata.png`}
+                width={200}
+                height={200}
+                alt={"permata"}
+              />
+              <div className="flex flex-col">
+                <span>Permata Virtual Account</span>
+                <div className="flex items-center gap-2">
+                  <span>{order.transaction.permata_va_number}</span>
+                  <button
+                    className="btn-icon-accent"
+                    onClick={(e) =>
+                      copyValue(
+                        order.transaction.permata_va_number!,
+                        e.currentTarget,
+                      )
+                    }
+                  >
+                    <CopySvg className="h-5 w-5 fill-current" />
+                  </button>
+                  <div
+                    data-theme="skies"
+                    className="copy rounded-lg bg-primary/80 px-2 py-1 text-sm text-white opacity-0 transition-opacity duration-200"
+                  >
+                    Copied
                   </div>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
           {/* Bank Transfer & Except Permata */}
-          {order.transaction.payment_type == "bank_transfer" &&
-            !order.transaction.permata_va_number &&
+          {bank != "permata" &&
+            bank != "mandiri" &&
             virtual_accounts.map((va, index) => {
               return (
-                va.value == order.transaction.va_numbers![0].bank && (
+                va.value == bank && (
                   <div
                     key={index}
                     className="grid w-full grid-cols-[75px_1fr_min-content] items-center gap-5"
@@ -253,7 +277,7 @@ const PendingOrder = ({ order }: ThisProps) => {
             })}
 
           {/* Mandiri E-Channel */}
-          {order.transaction.payment_type == "echannel" && (
+          {bank == "mandiri" && (
             <div className="grid w-full grid-cols-[75px_1fr_min-content] items-center gap-5">
               <Image
                 src={`/images/logo/mandiri.png`}
@@ -288,36 +312,7 @@ const PendingOrder = ({ order }: ThisProps) => {
           )}
         </div>
         <div className="divider"></div>
-        <div className="flex flex-col gap-3">
-          <span className="text-sm">How to Pay</span>
-          <div className="flex flex-col gap-2">
-            <div className="collapse collapse-arrow rounded-md border border-white/50 bg-base-100 text-white shadow-md">
-              <input type="checkbox" />
-              <div className="collapse-title font-semibold">
-                Mobile Banking / m-BCA
-              </div>
-              <div className="collapse-content">
-                <p>Some instructions</p>
-              </div>
-            </div>
-            <div className="collapse collapse-arrow rounded-md border border-white/50 bg-base-100 text-white shadow-md">
-              <input type="checkbox" />
-              <div className="collapse-title font-semibold">
-                Internet Banking / Klik-BCA
-              </div>
-              <div className="collapse-content">
-                <p>Some instructions</p>
-              </div>
-            </div>
-            <div className="collapse collapse-arrow rounded-md border border-white/50 bg-base-100 text-white shadow-md">
-              <input type="checkbox" />
-              <div className="collapse-title font-semibold">ATM BCA</div>
-              <div className="collapse-content">
-                <p>Some instructions</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PaymentInstruction bank={bank} />
       </div>
     </div>
   );

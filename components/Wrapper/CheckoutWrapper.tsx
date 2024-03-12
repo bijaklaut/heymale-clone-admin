@@ -6,7 +6,6 @@ import {
   CartItemTypes,
   CartTypes,
   GetCourierRatesTypes,
-  OrderItemTypes,
   PostOrderTypes,
   PricingRatesTypes,
   ShipmentItemTypes,
@@ -14,12 +13,7 @@ import {
 } from "../../services/types";
 import Image from "next/image";
 import cx from "classnames";
-import {
-  CircleCheckSvg,
-  EditSvg,
-  InfoSvg,
-  LongArrowLeft,
-} from "../Misc/SvgGroup";
+import { CircleCheckSvg, InfoSvg, LongArrowLeft } from "../Misc/SvgGroup";
 import NumFormatWrapper from "./NumFormatWrapper";
 import { getCourierRates, getUserId } from "../../services/actions";
 import {
@@ -636,7 +630,10 @@ const CheckoutWrapper = () => {
                 Confirm Order
               </button>
             ) : (
-              <button className="btn btn-sm pointer-events-none">
+              <button
+                disabled
+                className="btn pointer-events-none mx-auto w-[300px]"
+              >
                 <span className="loading loading-spinner loading-sm"></span>
                 Confirming..
               </button>
