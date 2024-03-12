@@ -1,12 +1,8 @@
 "use client";
 
-import { ToastContainer, toast } from "react-toastify";
-import { AddressTypes, UserTypes } from "../../../services/types";
-import { useRef, useState } from "react";
-import { deleteAddress } from "../../../services/admin";
-import { useRouter } from "next/navigation";
-import PostAddressCollapse from "../../Collapse/Address/PostAddress";
-import { EditSvg, HomeSvg } from "../../Misc/SvgGroup";
+import { ToastContainer } from "react-toastify";
+import { AddressTypes } from "../../../services/types";
+import { EditSvg } from "../../Misc/SvgGroup";
 import { simpleModalHandler } from "../../../services/helper";
 
 interface thisProps {
@@ -23,7 +19,8 @@ const ChangeAddressModal = ({
   return (
     <>
       <button
-        className="absolute right-3 top-4 rounded-md p-2 transition-all duration-300 hover:bg-black/20 active:bg-black/20"
+        disabled={addresses.length <= 1}
+        className="absolute right-3 top-4 rounded-md p-2 transition-all duration-300 hover:bg-black/20 active:bg-black/20 disabled:cursor-not-allowed disabled:text-gray-100/50 disabled:hover:bg-transparent"
         onClick={() => simpleModalHandler("changeAddress", true)}
       >
         <EditSvg className="h-5 w-5 stroke-current" />
@@ -98,16 +95,6 @@ const ChangeAddressModal = ({
               </div>
             )}
           </div>
-          {/* <div className="modal-action">
-            <form method="dialog">
-              <button
-                className="btn btn-outline btn-sm"
-                onClick={() => simpleModalHandler(`changeAddress`, false)}
-              >
-                Close
-              </button>
-            </form>
-          </div> */}
         </div>
       </dialog>
     </>

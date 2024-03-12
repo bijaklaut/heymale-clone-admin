@@ -55,9 +55,7 @@ const config: Config = {
         },
       },
       "nord",
-      "dracula",
     ],
-    darkTheme: "skies",
   },
 };
 export default config;

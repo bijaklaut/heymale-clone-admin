@@ -39,8 +39,9 @@ const CheckoutWrapper = () => {
   const [disable, setDisable] = useState(true);
   const [loading, setLoading] = useState(false);
   const [courierLoading, setCourierLoading] = useState(true);
+  const [addressLoading, setAddressLoading] = useState(true);
 
-  const [addresses, setAddresses] = useState<Partial<AddressTypes[]>>();
+  const [addresses, setAddresses] = useState<AddressTypes[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<AddressTypes>();
 
   const imageClass = useCallback((thumbnail: boolean) => {
@@ -180,6 +181,8 @@ const CheckoutWrapper = () => {
       let address = payload.find((item: AddressTypes) => item?.asDefault);
       setSelectedAddress(address);
     }
+
+    setAddressLoading(false);
   }, []);
 
   const getItems = useCallback(() => {
@@ -338,34 +341,51 @@ const CheckoutWrapper = () => {
             <div className="mb-3 flex items-center justify-between gap-1 text-lg font-semibold">
               <span>Shipping Information</span>
             </div>
-            <div className="w-fit">
-              <h4 className="mb-1 font-semibold">Recipient</h4>
-              <div className="">
-                <span>{`${data?.shipping.address.destination_contact_name} - ${data?.shipping.address.destination_contact_phone}`}</span>
+            {!addressLoading ? (
+              addresses.length > 0 ? (
+                <>
+                  <div className="w-fit">
+                    <h4 className="mb-1 font-semibold">Recipient</h4>
+                    <div>
+                      <span>{`${data?.shipping.address.destination_contact_name} - ${data?.shipping.address.destination_contact_phone}`}</span>
+                    </div>
+                  </div>
+                  <div className="mt-3 w-fit">
+                    <h4 className="mb-1 font-semibold">Address</h4>
+                    <div className="flex flex-col">
+                      <p>{`${data?.shipping.address.destination_address}`}</p>
+                      <span>{data?.shipping.address.destination_district}</span>
+                      <span>{`${data?.shipping.address.destination_province} ${data?.shipping.address.destination_postal_code}`}</span>
+                      {data?.shipping.address.destination_note ? (
+                        <p className="mt-3">
+                          <span className="font-semibold">Delivery Note:</span>
+                          {` ${data?.shipping.address.destination_note}`}
+                        </p>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  </div>
+                  {addresses && selectedAddress && (
+                    <ChangeAddressModal
+                      addresses={addresses}
+                      selectedAddress={selectedAddress}
+                      changeAddress={changeAddress}
+                    />
+                  )}
+                </>
+              ) : (
+                <div className="flex items-center gap-5 rounded-md bg-base-200 p-4">
+                  <InfoSvg className="h-14 w-14 stroke-accent" />
+                  <span className="text-sm">
+                    {`There's no address found. Please add address first`}
+                  </span>
+                </div>
+              )
+            ) : (
+              <div className="mb-5 flex items-center justify-center">
+                <span className="loading loading-spinner"></span>
               </div>
-            </div>
-            <div className="mt-3 w-fit">
-              <h4 className="mb-1 font-semibold">Address</h4>
-              <div className="flex flex-col">
-                <p>{`${data?.shipping.address.destination_address}`}</p>
-                <span>{data?.shipping.address.destination_district}</span>
-                <span>{`${data?.shipping.address.destination_province} ${data?.shipping.address.destination_postal_code}`}</span>
-                {data?.shipping.address.destination_note ? (
-                  <p className="mt-3">
-                    <span className="font-semibold">Delivery Note:</span>
-                    {` ${data?.shipping.address.destination_note}`}
-                  </p>
-                ) : (
-                  ""
-                )}
-              </div>
-            </div>
-            {addresses && selectedAddress && (
-              <ChangeAddressModal
-                addresses={addresses}
-                selectedAddress={selectedAddress}
-                changeAddress={changeAddress}
-              />
             )}
           </div>
           {/* Courier */}
