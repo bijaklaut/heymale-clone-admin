@@ -52,7 +52,7 @@ const CatalogProductModal = (props: ThisProps) => {
 
   const imageClass = useCallback((thumbnail: boolean) => {
     return cx({
-      "w-auto h-[100px] rounded-md shadow-lg border-2 border-neutral/40":
+      "w-auto h-[150px] rounded-md shadow-lg border-2 border-neutral/40":
         thumbnail,
       "h-auto w-full max-w-[200px] rounded-md bg-neutral p-5 sm:p-8":
         !thumbnail,
@@ -315,7 +315,7 @@ const CatalogProductModal = (props: ThisProps) => {
 
   const cartCheck = useCallback(
     (product_id: string) => {
-      // Returned value true means button is disabled, vice versa
+      // Returned value true that means button is disabled, vice versa
       const cartItem = cart?.items.find((item) => item._id == selected._id);
       const theProduct = products.find(
         (product) => product._id == selected._id,
@@ -327,6 +327,8 @@ const CatalogProductModal = (props: ThisProps) => {
 
       if (variant) key = variant[0];
 
+      // If product variant below 1, disable button
+      if ((theProduct!.variant as any)[key] <= 0) return true;
       // If product id not equal selected id, always disable button
       if (product_id != selected._id) return true;
       // If cart item or variant item not exist, enable

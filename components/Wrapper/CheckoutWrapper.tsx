@@ -255,21 +255,29 @@ const CheckoutWrapper = () => {
         setLoading(true);
         const result = await createOrder(data, true);
 
-        if (result.status == 201) {
-          const result2 = await emptyCart(cart!.user, true);
-          localStorage.removeItem("cart");
-          setTimeout(() => {
-            setLoading(false);
-            toast.success(result.message, { containerId: "Main" });
-            router.push(`/order/${result.payload}`);
-          }, 700);
-        }
+        if (result.status >= 300) throw result;
+
+        await emptyCart(cart!.user, true);
+        localStorage.removeItem("cart");
+        setTimeout(() => {
+          setLoading(false);
+          toast.success(result.message, { containerId: "Main" });
+          router.push(`/order/${result.payload}`);
+        }, 700);
       }
     } catch (error: any) {
-      toast.error(
-        `Failed to process order. Please try again later (${error.status})`,
-        { containerId: "Main" },
-      );
+      setLoading(false);
+      if (error.message) {
+        toast.error(error.message, { containerId: "Main" });
+        error.message.includes("unavailable") && router.push("/order");
+      } else {
+        toast.error(
+          `Failed to process order. Please try again later (${
+            error.status || 400
+          })`,
+          { containerId: "Main" },
+        );
+      }
     }
   }, [data, cart]);
 
@@ -480,10 +488,11 @@ const CheckoutWrapper = () => {
                       <div className="flex w-full items-center gap-x-3 sm:gap-x-6">
                         <Image
                           src={`/images/logo/${va.value}.png`}
-                          width={100}
-                          height={100}
+                          width={150}
+                          height={150}
                           alt={va.value}
-                          className="h-auto w-[75px] 2xl:w-[100px]"
+                          className="h-auto w-20 2xl:w-24"
+                          style={{ height: "auto" }}
                         />
                         <span className="text-sm">{va.text}</span>
                       </div>

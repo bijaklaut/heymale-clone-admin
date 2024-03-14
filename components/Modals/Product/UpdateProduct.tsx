@@ -112,11 +112,10 @@ const UpdateProductModal = (props: ThisProps) => {
     } catch (error: any) {
       setTimeout(() => {
         setLoading(false);
+        toast.error(error.message, { containerId: "updateProduct" });
         if (error.message == "Validation Error" || error.code == 11000) {
           return populateValidation(error, setValidation);
         }
-
-        toast.error(error.message, { containerId: "CreateProduct" });
       }, 700);
     }
   };
