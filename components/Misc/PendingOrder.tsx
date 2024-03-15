@@ -43,7 +43,7 @@ const PendingOrder = ({ order }: ThisProps) => {
   const transformDateTime = useCallback((time: string) => {
     if (time) {
       const theday = new Date(time);
-      theday.setHours(theday.getHours() - 7);
+      theday.setHours(theday.getHours() + theday.getTimezoneOffset() / 60);
 
       const date =
         theday.getDate() < 10 ? `0${theday.getDate()}` : theday.getDate();
@@ -66,7 +66,7 @@ const PendingOrder = ({ order }: ThisProps) => {
 
   const countdownGenerator = useCallback(() => {
     const reset = new Date(order?.transaction.expiry_time!);
-    reset.setHours(reset.getHours() - 7);
+    reset.setHours(reset.getHours() + reset.getTimezoneOffset() / 60);
 
     const expiry_time = Date.parse(reset.toUTCString()) - Date.now();
 
