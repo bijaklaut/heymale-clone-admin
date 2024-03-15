@@ -328,7 +328,7 @@ const CatalogProductModal = (props: ThisProps) => {
       if (variant) key = variant[0];
 
       // If product variant below 1, disable button
-      if ((theProduct!.variant as any)[key] <= 0) return true;
+      if (theProduct && (theProduct.variant as any)[key] <= 0) return true;
       // If product id not equal selected id, always disable button
       if (product_id != selected._id) return true;
       // If cart item or variant item not exist, enable
@@ -545,7 +545,7 @@ const CatalogProductModal = (props: ThisProps) => {
               disabled={cart?.items.length == 0}
               className="btn btn-primary btn-sm"
             >
-              <Link href={"/checkout"}>Checkout</Link>
+              <Link href={"/checkout"}>Checkout Simulation</Link>
             </button>
             <form method="dialog">
               <button
