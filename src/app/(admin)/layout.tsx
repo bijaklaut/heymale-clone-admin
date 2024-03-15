@@ -14,12 +14,11 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-row">
+    <section className="flex">
       <Sidebar />
-
       <main
         data-theme={"skies"}
-        className="mt-[70px] min-h-screen w-full px-3 pb-5 pt-10 sm:ms-[4.5rem] sm:mt-0 lg:ms-0 lg:px-10 lg:py-10 xl:px-20"
+        className="mt-[70px] min-h-screen w-full overflow-y-auto overflow-x-hidden px-5 pb-5 pt-10 sm:ms-[4.25rem] sm:mt-0 lg:ms-0 lg:px-10 lg:py-10 xl:px-20"
       >
         {children}
       </main>

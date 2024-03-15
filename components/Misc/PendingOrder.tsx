@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { OrderTypes } from "../../services/types";
 import NumFormatWrapper from "../Wrapper/NumFormatWrapper";
-import { ClockSvg, CopySvg } from "./SvgGroup";
+import { ClockSvg, CopySvg, LongArrowLeft } from "./SvgGroup";
 import Image from "next/image";
 import { PaymentInstruction } from "./PaymentInstruction";
+import Link from "next/link";
 
 interface ThisProps {
   order: OrderTypes;
@@ -145,9 +146,16 @@ const PendingOrder = ({ order }: ThisProps) => {
 
   return (
     <div className="mx-auto flex w-full max-w-[500px] flex-col items-center justify-center gap-5">
-      <h3 className="mb-5 text-xl font-semibold text-white">
-        Waiting for Payment
-      </h3>
+      <div className="relative mb-5 flex w-full items-center justify-center">
+        <button className="absolute left-0 top-1/2 -translate-y-[50%] rounded-md p-2 transition-all duration-300 hover:bg-black/20 active:bg-black/20">
+          <Link href={"/order"}>
+            <LongArrowLeft className="h-6 w-6 stroke-white md:h-7 md:w-7" />
+          </Link>
+        </button>
+        <h3 className="text-xl font-semibold text-white">
+          Waiting for Payment
+        </h3>
+      </div>
       <div className="relative grid w-full grid-cols-[minmax(0,_1fr)_max-content] items-center overflow-hidden rounded-md bg-white  p-5 text-neutral">
         <div className="flex flex-col">
           <span className="text-sm">Payment Deadline:</span>

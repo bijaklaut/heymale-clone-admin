@@ -278,6 +278,7 @@ export const transformPaymentType = (payment: string) => {
 export const transformDate = (dateString: string) => {
   if (dateString) {
     const theday = new Date(dateString);
+    theday.setHours(theday.getHours() + theday.getTimezoneOffset() / 60);
     const date =
       theday.getDate() < 10 ? `0${theday.getDate()}` : theday.getDate();
     const month =

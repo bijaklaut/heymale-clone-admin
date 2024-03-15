@@ -92,7 +92,7 @@ export const Sidebar = () => {
   }, [checked]);
 
   return !isLoading ? (
-    <>
+    <div>
       <aside data-theme={"nord"} className={sidebarClass}>
         {checked ? (
           <>
@@ -277,7 +277,7 @@ export const Sidebar = () => {
         checked={checked}
         onChange={() => setChecked((prev) => !prev)}
       />
-    </>
+    </div>
   ) : (
     <SidebarLoading />
   );
