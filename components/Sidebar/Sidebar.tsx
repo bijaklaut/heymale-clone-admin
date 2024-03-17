@@ -104,12 +104,12 @@ export const Sidebar = () => {
                     src={heymaleLogo}
                     width={180}
                     alt="heymale-logo"
-                    className="h-auto w-[170px] sm:w-[180px]"
+                    className="h-auto w-[170px] sm:w-[180px] lg:w-[200px]"
                   />
                 </Link>
               </div>
               {/* Mobile Title */}
-              <div className="title sticky top-0 flex h-[50px] w-full items-center justify-between py-8 ps-3 sm:hidden ">
+              <div className="title flex h-[50px] w-full items-center justify-between py-8 ps-3 sm:hidden ">
                 <Link href={"/"}>
                   <Image
                     src={heymaleLogo}
@@ -136,7 +136,7 @@ export const Sidebar = () => {
                   </label>
                 </div>
               </div>
-              <div className="divider mb-2 mt-0"></div>
+              <div className="divider mb-4 mt-2"></div>
               <div className="w-full">
                 <div className="menu-list flex flex-col gap-y-[5px]">
                   <div className="menu text-lg font-semibold text-gray-400 sm:text-sm sm:font-bold">

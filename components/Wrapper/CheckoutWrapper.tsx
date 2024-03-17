@@ -331,6 +331,22 @@ const CheckoutWrapper = () => {
     orderDataCheck();
   }, [data]);
 
+  const imitateSticky = useCallback(() => {
+    window.addEventListener("scroll", () => {
+      const sticked = document.getElementById("stickyone");
+      if (!sticked) return null;
+      if (window.scrollY >= 135) {
+        sticked.classList.add("lg:fixed", `lg:max-w-[476.483px]`);
+      } else {
+        sticked.classList.remove("lg:fixed", `lg:max-w-[476.483px]`);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    imitateSticky();
+  }, []);
+
   return (
     <div className="mx-auto w-full max-w-[600px] p-2 md:px-10 md:pb-10 lg:max-w-full 2xl:max-w-[1300px]">
       <div className="mb-10 flex items-center gap-3">
@@ -508,8 +524,8 @@ const CheckoutWrapper = () => {
         </div>
 
         {/* Right */}
-        <div className="relative w-full">
-          <div className="top-6 flex flex-col gap-4 lg:sticky">
+        <div className="relative grid grid-cols-1">
+          <div id="stickyone" className="top-6 flex w-full flex-col gap-4">
             {/* Items */}
             <div
               data-theme="nord"
